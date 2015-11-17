@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Source
+﻿namespace BitsetNET
 {
+    /// <summary>
+    /// This is the common interface for all bitsets regardless of compression. It defines common operations. 
+    /// </summary>
     public interface IBitset 
     {
         IBitset And(IBitset x);
         IBitset Or(IBitset y);
-        IBitset Length();
-        
+        int Length();
+        void SetOne(int index);
+        void SetZero(int index);
+        bool IsOne(int index);
     }
 }
