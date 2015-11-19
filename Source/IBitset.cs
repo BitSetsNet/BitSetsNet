@@ -1,4 +1,6 @@
-﻿namespace BitsetNET
+﻿using System;
+
+namespace BitsetsNET
 {
     /// <summary>
     /// This is the common interface for all bitsets regardless of compression. It defines common operations. 
@@ -8,8 +10,15 @@
         IBitset And(IBitset x);
         IBitset Or(IBitset y);
         int Length();
-        void SetOne(int index);
-        void SetZero(int index);
-        bool IsOne(int index);
+        bool Get(int index);
+        void Set(int index, bool value);
+        void SetAll(bool value);
     }
+
+    public interface IBitSet<T> : IBitset 
+    {
+        T And(T x);
+        T Or(T x);       
+    }
+
 }
