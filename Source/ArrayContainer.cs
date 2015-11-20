@@ -11,8 +11,8 @@ namespace BitsetsNET
         private const int DEFAULT_INIT_SIZE = 4;
         private const int DEFAULT_MAX_SIZE = 4096;
 
-        protected int cardinality;
-        protected short[] content;
+        public int cardinality;
+        public short[] content;
 
         public ArrayContainer() : this(DEFAULT_INIT_SIZE) {}
         
