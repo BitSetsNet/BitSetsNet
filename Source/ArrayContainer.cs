@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace BitsetsNET
 {
-<<<<<<< HEAD
     class ArrayContainer : Container
     {
         private const int DEFAULT_INIT_SIZE = 4;
@@ -15,11 +14,7 @@ namespace BitsetsNET
         protected int cardinality;
         protected short[] content;
 
-        // TODO: FIX THIS
-        //public ArrayContainer()
-        //{
-        //    this(DEFAULT_INIT_SIZE); //I'm not sure what the C# equivalent of this is
-        //}
+        public ArrayContainer() : this(DEFAULT_INIT_SIZE) {}
         
         public ArrayContainer(int capacity)
         {
@@ -27,12 +22,9 @@ namespace BitsetsNET
             this.content = new short[capacity];
         }
 
-=======
-    class ArrayContainer  :Container
-    {
         public override Container add(short x)
         {
-            return new ArrayContainer();
+            return new ArrayContainer(DEFAULT_INIT_SIZE);
         }
 
         public override Container and(BitsetContainer x)
@@ -114,6 +106,6 @@ namespace BitsetsNET
         {
             throw new NotImplementedException();
         }
->>>>>>> origin/feature/Roaring
+
     }
 }

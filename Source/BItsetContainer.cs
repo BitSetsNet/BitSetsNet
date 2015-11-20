@@ -8,7 +8,6 @@ namespace BitsetsNET
 {
     class BitsetContainer : Container
     {
-<<<<<<< HEAD
         protected const int MAX_CAPACITY = 1 << 64;
 
         int cardinality;
@@ -18,7 +17,9 @@ namespace BitsetsNET
         {
             this.cardinality = 0;
             this.bitmap = new long[MAX_CAPACITY / 64];
-=======
+        }
+
+
         public override Container add(short x)
         {
             throw new NotImplementedException();
@@ -102,7 +103,6 @@ namespace BitsetsNET
         public override short select(int j)
         {
             throw new NotImplementedException();
->>>>>>> origin/feature/Roaring
         }
 
     }
