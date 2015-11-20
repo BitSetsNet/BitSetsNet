@@ -11,19 +11,10 @@ namespace BitsetsNET.Tests
     [TestClass()]
     public class UncompressedBitArrayTests : BaseBitSetTests
     {
-        [TestMethod]
-        public override void OrTest()
+
+        protected override IBitset CreateSetFromIndicies(int[] indices, int length)
         {
-            int[] first = { 1, 2 };
-            int[] second = { 2, 3 };
-            int[] result = { 1, 2, 3 };
-            TestSet = new UncompressedBitArray(first, 3);
-            TestSet2 = new UncompressedBitArray(second, 3);
-            OrResult = new UncompressedBitArray(result);
-
-            base.OrTest();
+            return new UncompressedBitArray(indices, length);
         }
-
-        
     }
 }

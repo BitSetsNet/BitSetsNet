@@ -8,9 +8,46 @@ namespace BitsetsNET
     {
         private BitArray _Array;
 
+        public override bool Equals(object obj)
+        {
+            //       
+            // See the full list of guidelines at
+            //   http://go.microsoft.com/fwlink/?LinkID=85237  
+            // and also the guidance for operator== at
+            //   http://go.microsoft.com/fwlink/?LinkId=85238
+            //
+
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+            else
+            {
+                UncompressedBitArray compare = (UncompressedBitArray)obj;
+                bool answer = (this.Length() == compare.Length());
+                if (answer) {
+                    for (int i = 0; i < Length(); i++)
+                    {
+                        if (this._Array.Get(i) != compare._Array.Get(i))
+                        {
+                            answer = false;
+                        }
+
+                    }
+                }
+                return answer;
+            }
+        }
+
+        // override object.GetHashCode
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public UncompressedBitArray()
         {
-
+            
         }
 
         public UncompressedBitArray(UncompressedBitArray copy)
@@ -35,17 +72,9 @@ namespace BitsetsNET
 
         public IBitset And(IBitset otherSet)
         {
-            if (otherSet.GetType().Equals(this))
-            {
-                //same type proceed 
-                IBitset result = this.Clone();
-                result.AndWith(otherSet);
-                return result;
-            }
-            else
-            {
-                throw new InvalidCastException(otherSet.GetType().Name);
-            }
+            IBitset result = this.Clone();
+            result.AndWith(otherSet);
+            return result;
         }
 
         public void AndWith(IBitset otherSet)
@@ -70,17 +99,9 @@ namespace BitsetsNET
 
         public IBitset Or(IBitset otherSet)
         {
-            if (otherSet.GetType().Equals(this))
-            {
-                //same type proceed 
-                IBitset result = this.Clone();
-                result.AndWith(otherSet);
-                return result;
-            }
-            else
-            {
-                throw new InvalidCastException(otherSet.GetType().Name);
-            }
+            IBitset result = this.Clone();
+            result.OrWith(otherSet);
+            return result;
         }
 
         public void OrWith(IBitset otherSet)
