@@ -7,7 +7,7 @@
     <ProjectGuid>{3EDD9484-BBBE-47E4-A783-0B99B51D253D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BitsetsNET</RootNamespace>
+    <RootNamespace>BitsetsNET.Roaring</RootNamespace>
     <AssemblyName>BitsetsNET</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
