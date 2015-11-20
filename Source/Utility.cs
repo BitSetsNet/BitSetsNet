@@ -18,5 +18,15 @@ namespace BitsetsNET
         {
             return (short)(x & 0xFFFF);
         }
+
+        public static int unsignedBinarySearch(short[] array, int begin, int end, short k) {
+       
+            //optimizes for the case where the value is inserted at the end
+            //if ((end > 0) && (toIntUnsigned(array[end - 1]) < ikey))
+            //{
+
+            //}
+            return 0;
+        }
     }
 }

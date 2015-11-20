@@ -26,9 +26,15 @@ namespace BitsetsNET
         public int getIndex(short x)
         {
             //TODO: optimize this
-            //Add binarySearch to Util
-            //if((Size = 0) || (Keys[Size - 1] == x))
-            return Array.IndexOf(keys, x);
+            //before the binary search we optimize for frequent cases
+            if ((size == 0) || (keys[size - 1] == x)) {
+                return size - 1;
+            }
+            return this.binarySearch(0, size, x); 
+        }
+
+        private int binarySearch(int begin, int end, short key) {
+            return Utility.unsignedBinarySearch(keys, begin, end, key);
         }
 
         public void setContainerAtIndex(int i, Container c)
