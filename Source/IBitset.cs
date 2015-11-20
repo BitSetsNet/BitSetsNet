@@ -7,18 +7,23 @@ namespace BitsetsNET
     /// </summary>
     public interface IBitset 
     {
-        IBitset And(IBitset x);
-        IBitset Or(IBitset y);
-        int Length();
+        IBitset And(IBitset otherSet);
+
+        void AndWith(IBitset otherSet);
+
+        IBitset Clone();
+
+        IBitset Or(IBitset otherSet);      
+
+        void OrWith(IBitset otherSet);
+
         bool Get(int index);
+
+        int Length();
+
         void Set(int index, bool value);
+
         void SetAll(bool value);
     }
-
-    public interface IBitSet<T> : IBitset 
-    {
-        T And(T x);
-        T Or(T x);       
-    }
-
+       
 }
