@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitsetsNET", "Source\BitsetsNET.csproj", "{3EDD9484-BBBE-47E4-A783-0B99B51D253D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitsetsNETTests", "Tests\BitsetsNETTests.csproj", "{6D4A018C-E525-44FB-BBBB-4CB7FE9D2C49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitsetsNET.Tests", "Tests\BitsetsNET.Tests.csproj", "{6D4A018C-E525-44FB-BBBB-4CB7FE9D2C49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
