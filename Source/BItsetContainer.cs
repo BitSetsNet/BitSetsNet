@@ -8,6 +8,18 @@ namespace BitsetsNET
 {
     class BitsetContainer : Container
     {
+        protected const int MAX_CAPACITY = 1 << 64;
+
+        int cardinality;
+        long[] bitmap; //Should we use a BitArray object?
+
+        public BitsetContainer()
+        {
+            this.cardinality = 0;
+            this.bitmap = new long[MAX_CAPACITY / 64];
+        }
+
+
         public override Container add(short x)
         {
             throw new NotImplementedException();

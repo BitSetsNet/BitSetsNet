@@ -6,11 +6,25 @@ using System.Threading.Tasks;
 
 namespace BitsetsNET
 {
-    class ArrayContainer  :Container
+    class ArrayContainer : Container
     {
+        private const int DEFAULT_INIT_SIZE = 4;
+        private const int DEFAULT_MAX_SIZE = 4096;
+
+        protected int cardinality;
+        protected short[] content;
+
+        public ArrayContainer() : this(DEFAULT_INIT_SIZE) {}
+        
+        public ArrayContainer(int capacity)
+        {
+            this.cardinality = 0;
+            this.content = new short[capacity];
+        }
+
         public override Container add(short x)
         {
-            return new ArrayContainer();
+            return new ArrayContainer(DEFAULT_INIT_SIZE);
         }
 
         public override Container and(BitsetContainer x)
