@@ -11,7 +11,7 @@ namespace BitsetsNET
         protected const int MAX_CAPACITY = 1 << 64;
 
         int cardinality;
-        long[] bitmap; //Should we use a BitArray object?
+        long[] bitmap;
 
         public BitsetContainer()
         {
@@ -22,7 +22,12 @@ namespace BitsetsNET
 
         public override Container add(short x)
         {
-            throw new NotImplementedException();
+            int y = Utility.toIntUnsigned(x);
+            long prevVal = bitmap[x / 64];
+            long newVal = prevVal | (1L << x);
+            bitmap[x / 64] = newVal;
+            if (prevVal != newVal) ++cardinality;
+            return this;
         }
 
         public override Container and(BitsetContainer x)
@@ -32,6 +37,7 @@ namespace BitsetsNET
 
         public override Container and(ArrayContainer x)
         {
+            
             throw new NotImplementedException();
         }
 
