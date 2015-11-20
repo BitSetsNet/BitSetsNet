@@ -37,8 +37,16 @@ namespace BitsetsNET
 
         public override Container and(ArrayContainer x)
         {
-            
             throw new NotImplementedException();
+            ArrayContainer answer = new ArrayContainer(x.content.Length);
+            int c = x.cardinality;
+            for (int i=0; i<c; i++)
+            {
+                short v = x.content[i];
+                if (this.contains(v))
+                    answer.content[answer.cardinality++] = v;
+            }
+            return answer;
         }
 
         public override Container clone()
@@ -48,7 +56,8 @@ namespace BitsetsNET
 
         public override bool contains(short x)
         {
-            throw new NotImplementedException();
+            int y = Utility.toIntUnsigned(x);
+            return (bitmap[x / 64] & (1L << x)) != 0;
         }
 
         public override void fillLeastSignificant16bits(int[] x, int i, int mask)
