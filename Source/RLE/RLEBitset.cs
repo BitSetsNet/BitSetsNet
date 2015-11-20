@@ -29,7 +29,8 @@ namespace BitsetsNET.RLE
 
         #region "Declaration"
 
-        private List<Run> _RLEArray = new List<Run>();
+        private List<Run> _RunArray = new List<Run>();
+        private int _Length;
 
         #endregion
 
@@ -38,6 +39,7 @@ namespace BitsetsNET.RLE
         public static IBitset CreateFrom(BitArray bits)
         {
             RLEBitset rtnVal = new RLEBitset();
+            rtnVal._Length = bits.Length;
             Run currRun = new Run();
             for (int i = 0; i < bits.Count; i++)
             {
@@ -49,7 +51,7 @@ namespace BitsetsNET.RLE
                         if (bits.Get(j) == false)
                         {
                             currRun.RunLength = j - i;
-                            rtnVal._RLEArray.Add(currRun);
+                            rtnVal._RunArray.Add(currRun);
                             i = j;
                             currRun = new Run();
                             break;
@@ -61,20 +63,29 @@ namespace BitsetsNET.RLE
             return rtnVal;
         }
 
-        public static IBitset CreateFrom(int[] indicies)
+        public static IBitset CreateFrom(int[] indices)
         {
+            int capacity = indices.Max();
+            return RLEBitset.CreateFrom(indices, capacity);
+        }
+
+        public static IBitset CreateFrom(int[] indices, int capacity)
+        {
+            //sort the input array first.
+            Array.Sort(indices);
             RLEBitset rtnVal = new RLEBitset();
+            rtnVal._Length = capacity;
             Run currRun = new Run();
-            for (int i = 0; i < indicies.Length; i++)
+            for (int i = 0; i < indices.Length; i++)
             {
-                if (indicies[i + 1] - indicies[i] == 1)
+                if (indices[i + 1] - indices[i] == 1)
                 {
                     currRun.StartIndex = i;
                     currRun.RunLength = currRun.RunLength + 1;
                 }
                 else
                 {
-                    rtnVal._RLEArray.Add(currRun);
+                    rtnVal._RunArray.Add(currRun);
                     currRun = new Run();
                 }
             }
