@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayContainer.cs" />
-    <Compile Include="BItsetContainer.cs" />
+    <Compile Include="BitsetContainer.cs" />
     <Compile Include="Container.cs" />
     <Compile Include="ContainerArray.cs" />
     <Compile Include="IBitset.cs" />
