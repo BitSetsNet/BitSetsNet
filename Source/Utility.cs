@@ -52,9 +52,5 @@ namespace BitsetsNET
             return 0;
         }
 
-        protected static int toIntUnsigned(short x) {
-            return x & 0xFFFF;
-        }
-
     }
 }
