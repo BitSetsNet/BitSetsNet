@@ -80,12 +80,18 @@ namespace BitsetsNET
 
         public override Container and(BitsetContainer x)
         {
-            throw new NotImplementedException();
+            return x.and(this);
         }
 
-        public override Container and(ArrayContainer x)
+        public override Container and(ArrayContainer value2)
         {
-            throw new NotImplementedException();
+            ArrayContainer value1 = this;
+            int desiredCapacity = Math.Min(value1.getCardinality(), value2.getCardinality());
+            ArrayContainer answer = new ArrayContainer(desiredCapacity);
+            answer.cardinality = Utility.unsignedIntersect2by2(value1.content,
+                    value1.getCardinality(), value2.content,
+                    value2.getCardinality(), answer.content);
+            return answer;
         }
 
         public override Container clone()
@@ -107,7 +113,7 @@ namespace BitsetsNET
 
         public override int getCardinality()
         {
-            throw new NotImplementedException();
+            return cardinality;
         }
 
         public override Container iand(BitsetContainer x)
