@@ -16,7 +16,7 @@ namespace BitsetsNET
         public Container[] values = null;
         public int size = 0;
 
-        protected RoaringArray() {
+        public RoaringArray() {
             keys = new ushort[INITIAL_CAPACITY];
             values = new Container[INITIAL_CAPACITY];
         }
