@@ -10,8 +10,8 @@ namespace BitsetsNET
     {
         protected static int MAX_CAPACITY = 1 << 16;
 
-        int cardinality;
-        long[] bitmap;
+        public int cardinality;
+        public long[] bitmap;
 
         public BitsetContainer()
         {
@@ -41,6 +41,38 @@ namespace BitsetsNET
             {
                 ushort x = arrayContainer.content[k];
                 bitmap[x / 64] |= (1L << x);
+            }
+        }
+
+         /**
+         * Copies the data to an array container
+         *
+         * @return the array container
+         */
+        public ArrayContainer toArrayContainer()
+        {
+            ArrayContainer ac = new ArrayContainer(cardinality);
+            ac.loadData(this);
+            return ac;
+        }
+
+        /**
+         * Fill the array with set bits
+         *
+         * @param array container (should be sufficiently large)
+         */
+        public void fillArray(ushort[] array)
+        {
+            int pos = 0;
+            for (int k = 0; k < bitmap.Length; ++k)
+            {
+                long bitset = bitmap[k];
+                while (bitset != 0)
+                {
+                    long t = bitset & -bitset;
+                    array[pos++] = (ushort)(k * 64 + Utility.longBitCount(t - 1));
+                    bitset ^= t;
+                }
             }
         }
 

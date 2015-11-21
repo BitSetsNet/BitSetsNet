@@ -100,6 +100,87 @@ namespace BitsetsNET
                 }
             }
         }
+        
+        
+        /**
+ * Unite two sorted lists and write the result to the provided
+ * output array
+ *
+ * @param set1    first array
+ * @param length1 length of first array
+ * @param set2    second array
+ * @param length2 length of second array
+ * @param buffer  output array
+ * @return cardinality of the union
+ */
+        public static int unsignedUnion2by2(ushort[] set1,
+                                            int length1, 
+                                            ushort[] set2,
+                                            int length2,
+                                            ushort[] buffer)
+        {
+            int pos = 0;
+            int k1 = 0, k2 = 0;
+            if (0 == length2)
+            {
+                Array.Copy(set1, 0, buffer, 0, length1);
+                return length1;
+            }
+            if (0 == length1)
+            {
+                Array.Copy(set2, 0, buffer, 0, length2);
+                return length2;
+            }
+            ushort s1 = set1[k1];
+            ushort s2 = set2[k2];
+            while (true)
+            {
+                int v1 = s1;
+                int v2 = s2;
+                if (v1 < v2)
+                {
+                    buffer[pos++] = s1;
+                    ++k1;
+                    if (k1 >= length1)
+                    {
+                        Array.Copy(set2, k2, buffer, pos, length2 - k2);
+                        return pos + length2 - k2;
+                    }
+                    s1 = set1[k1];
+                }
+                else if (v1 == v2)
+                {
+                    buffer[pos++] = s1;
+                    ++k1;
+                    ++k2;
+                    if (k1 >= length1)
+                    {
+                        Array.Copy(set2, k2, buffer, pos, length2 - k2);
+                        return pos + length2 - k2;
+                    }
+                    if (k2 >= length2)
+                    {
+                        Array.Copy(set1, k1, buffer, pos, length1 - k1);
+                        return pos + length1 - k1;
+                    }
+                    s1 = set1[k1];
+                    s2 = set2[k2];
+                }
+                else
+                {// if (set1[k1]>set2[k2])
+                    buffer[pos++] = s2;
+                    ++k2;
+                    if (k2 >= length2)
+                    {
+                        Array.Copy(set1, k1, buffer, pos, length1 - k1);
+                        return pos + length1 - k1;
+                    }
+                    s2 = set2[k2];
+                }
+            }
+            //return pos;
+        }
+
 
         /**
          * Intersect two sorted lists and write the result to the provided
