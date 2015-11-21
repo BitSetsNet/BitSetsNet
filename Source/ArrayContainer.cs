@@ -24,13 +24,13 @@ namespace BitsetsNET
 
         public override Container add(ushort x)
         {
+            // this is the location (one higher than the index) where you want to add the value
             int loc = Utility.unsignedBinarySearch(content, 0, cardinality, x);
-            if (loc < 0)
-            {
+
+            if (loc < 0) {
                 // Transform the ArrayContainer to a BitmapContainer
                 // when cardinality = DEFAULT_MAX_SIZE
-                if (cardinality >= DEFAULT_MAX_SIZE)
-                {
+                if (cardinality >= DEFAULT_MAX_SIZE) {
                     BitsetContainer a = this.toBitsetContainer();
                     a.add(x);
                     return a;

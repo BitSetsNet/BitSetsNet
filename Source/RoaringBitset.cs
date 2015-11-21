@@ -23,17 +23,23 @@ namespace BitsetsNET
         public void add(int x)
         {
             ushort highBits = Utility.GetHighBits(x);
-            int i = containers.getIndex(highBits);
+            int containerIndex = containers.getIndex(highBits);
 
-            if (i >= 0)
+            if (containerIndex >= 0)
+                // a container exists at this index already.
+                // find the right container, get the low order bits to add to the container and add them
             {
-                containers.setContainerAtIndex(i, containers.getContainerAtIndex(i).add(Utility.GetLowBits(x))
+                containers.setContainerAtIndex(containerIndex, containers.getContainerAtIndex(containerIndex).add(Utility.GetLowBits(x))
                 );
             }
             else
             {
+                // no container exists for this index
+                // create a new ArrayContainer, since it will only hold one integer to start
+                // get the low order bits and att to the newly created container
+                // add the newly created container to the array of containers
                 ArrayContainer newac = new ArrayContainer();
-                containers.insertNewKeyValueAt(-i - 1, highBits, newac.add(Utility.GetLowBits(x)));
+                containers.insertNewKeyValueAt(-containerIndex - 1, highBits, newac.add(Utility.GetLowBits(x)));
             }
 
         }
