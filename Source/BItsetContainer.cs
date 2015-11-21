@@ -22,12 +22,22 @@ namespace BitsetsNET
 
         public override Container add(short x)
         {
-            int y = Utility.toIntUnsigned(x);
+            uint y = Utility.toIntUnsigned(x);
             long prevVal = bitmap[x / 64];
             long newVal = prevVal | (1L << x);
             bitmap[x / 64] = newVal;
             if (prevVal != newVal) ++cardinality;
             return this;
+        }
+
+        public void loadData(ArrayContainer arrayContainer)
+        {
+            this.cardinality = arrayContainer.cardinality;
+            for (int k = 0; k < arrayContainer.cardinality; ++k)
+            {
+                short x = arrayContainer.content[k];
+                bitmap[Utility.toIntUnsigned(x) / 64] |= (1L << x);
+            }
         }
 
         public override Container and(BitsetContainer x)
@@ -56,7 +66,7 @@ namespace BitsetsNET
 
         public override bool contains(short x)
         {
-            int y = Utility.toIntUnsigned(x);
+            uint y = Utility.toIntUnsigned(x);
             return (bitmap[x / 64] & (1L << x)) != 0;
         }
 

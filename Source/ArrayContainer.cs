@@ -24,7 +24,43 @@ namespace BitsetsNET
 
         public override Container add(short x)
         {
-            return new ArrayContainer(DEFAULT_INIT_SIZE);
+            int loc = Utility.unsignedBinarySearch(content, 0, cardinality, x);
+            if (loc < 0)
+            {
+                // Transform the ArrayContainer to a BitmapContainer
+                // when cardinality = DEFAULT_MAX_SIZE
+                if (cardinality >= DEFAULT_MAX_SIZE)
+                {
+                    BitsetContainer a = this.toBitsetContainer();
+                    a.add(x);
+                    return a;
+                }
+                if (cardinality >= this.content.Length)
+                    increaseCapacity();
+
+                // insertion : shift the elements > x by one position to
+                // the right
+                // and put x in its appropriate place
+                Array.Copy(content, -loc - 1, content, -loc, cardinality + loc + 1);
+
+                ++cardinality;
+            }
+            return this;
+        }
+
+        //TODO: This needs to be optimized. It should increase capacity by more than just 1 each time
+        public void increaseCapacity()
+        {
+            int currCapacity = this.content.Length;
+            //TODO: Tori says this may be jank
+            Array.Resize(ref this.content, currCapacity + 1);
+        }
+
+        public BitsetContainer toBitsetContainer()
+        {
+            BitsetContainer bc = new BitsetContainer();
+            bc.loadData(this);
+            return bc;
         }
 
         public override Container and(BitsetContainer x)
