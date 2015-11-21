@@ -9,7 +9,7 @@ namespace BitsetsNET
     class ArrayContainer : Container
     {
         private const int DEFAULT_INIT_SIZE = 4;
-        private const int DEFAULT_MAX_SIZE = 4096;
+        public const int DEFAULT_MAX_SIZE = 4096;
 
         public int cardinality;
         public ushort[] content;
