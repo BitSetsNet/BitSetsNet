@@ -8,7 +8,7 @@ namespace BitsetsNET
 {
     class BitsetContainer : Container
     {
-        protected const int MAX_CAPACITY = 1 << 64;
+        protected const int MAX_CAPACITY = 1 << 16;
 
         int cardinality;
         long[] bitmap;
@@ -22,7 +22,6 @@ namespace BitsetsNET
 
         public override Container add(ushort x)
         {
-            uint y = Utility.toIntUnsigned(x);
             long prevVal = bitmap[x / 64];
             long newVal = prevVal | (1L << x);
             bitmap[x / 64] = newVal;
@@ -36,7 +35,7 @@ namespace BitsetsNET
             for (int k = 0; k < arrayContainer.cardinality; ++k)
             {
                 ushort x = arrayContainer.content[k];
-                bitmap[Utility.toIntUnsigned(x) / 64] |= (1L << x);
+                bitmap[x / 64] |= (1L << x);
             }
         }
 
