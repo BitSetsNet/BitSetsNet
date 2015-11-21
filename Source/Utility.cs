@@ -62,12 +62,12 @@ namespace BitsetsNET
         /// </returns>
         public static int longBitCount(long w)
         {
-            //TODO - Implement a faster counting method
             int rtnVal = 0;
+            ulong word = (ulong)w;
 
-            for (int i = 0; i < 64; i++)
+            for (; word > 0; rtnVal++)
             {
-                rtnVal += (int)((uint)(w >> i) & 1);
+                word &= word - 1;
             }
 
             return rtnVal;
