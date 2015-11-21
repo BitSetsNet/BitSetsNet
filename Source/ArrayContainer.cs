@@ -24,9 +24,13 @@ namespace BitsetsNET
 
         public override Container add(ushort x)
         {
-            // this is the location (one higher than the index) where you want to add the value
             int loc = Utility.unsignedBinarySearch(content, 0, cardinality, x);
 
+            // if the location is positive, it means the number being added already existed in the
+            // array, so no need to do anything.
+
+            // if the location is negative, we did not find the value in the array. The location represents
+            // the negative value of the position in the array (not the index) where we want to add the value
             if (loc < 0) {
                 // Transform the ArrayContainer to a BitmapContainer
                 // when cardinality = DEFAULT_MAX_SIZE
