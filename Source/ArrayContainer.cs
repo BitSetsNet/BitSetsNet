@@ -42,11 +42,10 @@ namespace BitsetsNET
                 if (cardinality >= this.content.Length)
                     increaseCapacity();
 
-                // insertion : shift the elements > x by one position to
-                // the right
+                // insertion : shift the elements > x by one position to the right
                 // and put x in its appropriate place
                 Array.Copy(content, -loc - 1, content, -loc, cardinality + loc + 1);
-
+                content[-loc - 1] = x;
                 ++cardinality;
             }
             return this;
