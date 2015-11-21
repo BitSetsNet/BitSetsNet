@@ -31,25 +31,24 @@ namespace BitsetsNET
             {
                 return -end - 1;
             }
+
             int low = begin;
             int high = end - 1;
             while (low <= high) {
 
-                //convert to uint to shift unsigned by one, then convert back
+                // divide by 2 to find the middle index
                 int middleIndex = (low + high) >> 1;
-                uint middleValue = toIntUnsigned(array[middleIndex]);
+                ushort middleValue = array[middleIndex];
 
-                if (middleIndex < key) {
+                if (middleValue < key) {
                     low = middleIndex + 1;
                 } else if (middleValue > key) {
                     high = middleIndex - 1;
                 } else {
                     return middleIndex;
                 }
-                return -(low + 1);
             }
-            return 0;
+            return -(low + 1);
         }
-
     }
 }
