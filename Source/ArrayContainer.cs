@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BitsetsNET
 {
-    class ArrayContainer : Container
+    public class ArrayContainer : Container
     {
         private const int DEFAULT_INIT_SIZE = 4;
         public const int DEFAULT_MAX_SIZE = 4096;
@@ -20,6 +20,18 @@ namespace BitsetsNET
         {
             this.cardinality = 0;
             this.content = new ushort[capacity];
+        }
+
+        private ArrayContainer(int cardinality, ushort[] inpContent)
+        {
+            this.cardinality = cardinality;
+            this.content = inpContent;
+        }
+
+        public ArrayContainer(ushort[] newContent)
+        {
+            this.cardinality = newContent.Length;
+            this.content = newContent;
         }
 
         public override Container add(ushort x)
@@ -78,7 +90,9 @@ namespace BitsetsNET
 
         public override Container clone()
         {
-            throw new NotImplementedException();
+            ushort[] newContent = new ushort[this.content.Length];
+            this.content.CopyTo(newContent, 0);
+            return new ArrayContainer(this.cardinality, newContent);
         }
 
         public override bool contains(ushort x)

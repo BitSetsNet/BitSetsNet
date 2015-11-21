@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BitsetsNET
 {
-    class BitsetContainer : Container
+    public class BitsetContainer : Container
     {
         protected static int MAX_CAPACITY = 1 << 16;
 

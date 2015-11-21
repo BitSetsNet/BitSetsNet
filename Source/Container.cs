@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BitsetsNET
 {
-    abstract class Container
+    public abstract class Container
     {
 
         /**
