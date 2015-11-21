@@ -43,5 +43,35 @@ namespace BitsetsNET
             }
 
         }
+
+        public static RoaringBitset and(RoaringBitset x1,
+                                        RoaringBitset x2) {
+            RoaringBitset answer = new RoaringBitset();
+            int length1 = x1.containers.size, length2 = x2.containers.size;
+            int pos1 = 0, pos2 = 0;
+
+            while (pos1 < length1 && pos2 < length2) {
+                ushort s1 = x1.containers.getKeyAtIndex(pos1);
+                ushort s2 = x2.containers.getKeyAtIndex(pos2);
+
+                if (s1 == s2) {
+                    Container c1 = x1.containers.getContainerAtIndex(pos1);
+                    Container c2 = x2.containers.getContainerAtIndex(pos2);
+                    Container c = c1.and(c2);
+
+                    if (c.getCardinality() > 0) {
+                        answer.containers.append(s1, c);
+                    }
+
+                    ++pos1;
+                    ++pos2;
+                } else if (s1 < s2 ) { // s1 < s2
+                    pos1 = x1.containers.advanceUntil(s2, pos1);
+                } else { // s1 > s2
+                    pos2 = x2.containers.advanceUntil(s1, pos2);
+                }
+            }
+            return answer;
+        }
     }
 }
