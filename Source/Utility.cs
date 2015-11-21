@@ -67,11 +67,38 @@ namespace BitsetsNET
 
             for (int i = 0; i < 64; i++)
             {
-                rtnVal += (int)((1L << i) | w);
+                rtnVal += (int)((uint)(w >> i) & 1);
             }
 
             return rtnVal;
         }
 
+        /// <summary>
+        /// compute the bitwise AND between two long arrays and write the set
+        /// bits in the container
+        /// </summary>
+        /// <param name="container">where we write</param>
+        /// <param name="bitmap1">first bitmap</param>
+        /// <param name="bitmap2">second bitmap</param>
+        public static void fillArrayAND(
+            ref ushort[] container, 
+            long[] bitmap1,
+            long[] bitmap2
+        ) {
+            int pos = 0;
+
+            if (bitmap1.Length != bitmap2.Length)
+                throw new ArgumentOutOfRangeException("not supported");
+
+            for (int k = 0; k < bitmap1.Length; ++k) {
+                long bitset = bitmap1[k] & bitmap2[k];
+
+                while (bitset != 0) {
+                    long t = bitset & -bitset;
+                    container[pos++] = (ushort) (k * 64 + longBitCount(t - 1));
+                    bitset ^= t;
+                }
+            }
+        }
     }
 }

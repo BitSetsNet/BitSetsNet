@@ -8,7 +8,7 @@ namespace BitsetsNET
 {
     class BitsetContainer : Container
     {
-        protected const int MAX_CAPACITY = 1 << 16;
+        protected static int MAX_CAPACITY = 1 << 16;
 
         int cardinality;
         long[] bitmap;
@@ -19,6 +19,11 @@ namespace BitsetsNET
             this.bitmap = new long[MAX_CAPACITY / 64];
         }
 
+        public BitsetContainer(int cardinality, long[] bitmap)
+        {
+            this.cardinality = cardinality;
+            this.bitmap = bitmap;
+        }
 
         public override Container add(ushort x)
         {
@@ -39,14 +44,31 @@ namespace BitsetsNET
             }
         }
 
-        public override Container and(BitsetContainer x)
+        public override Container and(BitsetContainer value2)
         {
-            throw new NotImplementedException();
+            int newCardinality = 0;
+            for (int k = 0; k < this.bitmap.Length; ++k) {
+                newCardinality += Utility.longBitCount(
+                    this.bitmap[k] & value2.bitmap[k]
+                );
+            }
+            if (newCardinality > ArrayContainer.DEFAULT_MAX_SIZE) {
+                BitsetContainer answer = new BitsetContainer();
+                for (int k = 0; k < answer.bitmap.Length; ++k) {
+                    answer.bitmap[k] = this.bitmap[k]
+                            & value2.bitmap[k];
+                }
+                answer.cardinality = newCardinality;
+                return answer;
+            }
+            ArrayContainer ac = new ArrayContainer(newCardinality);
+            Utility.fillArrayAND(ref ac.content, this.bitmap, value2.bitmap);
+            ac.cardinality = newCardinality;
+            return ac;
         }
 
         public override Container and(ArrayContainer x)
         {
-            throw new NotImplementedException();
             ArrayContainer answer = new ArrayContainer(x.content.Length);
             int c = x.cardinality;
             for (int i=0; i<c; i++)
@@ -60,7 +82,10 @@ namespace BitsetsNET
 
         public override Container clone()
         {
-            throw new NotImplementedException();
+            long[] newBitmap = new long[this.bitmap.Length];
+            this.bitmap.CopyTo(newBitmap, 0);
+
+            return new BitsetContainer(this.cardinality, newBitmap);
         }
 
         public override bool contains(ushort x)
@@ -127,6 +152,5 @@ namespace BitsetsNET
         {
             throw new NotImplementedException();
         }
-
     }
 }
