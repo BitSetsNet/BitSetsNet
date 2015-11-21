@@ -78,6 +78,12 @@ namespace BitsetsNET
             return bc;
         }
 
+        public void loadData(BitsetContainer bitsetContainer)
+        {
+            this.cardinality = bitsetContainer.cardinality;
+            bitsetContainer.fillArray(content);
+        }
+
         public override Container and(BitsetContainer x)
         {
             return x.and(this);
@@ -103,7 +109,7 @@ namespace BitsetsNET
 
         public override bool contains(ushort x)
         {
-            throw new NotImplementedException();
+            return Utility.unsignedBinarySearch(content, 0, cardinality, x) >= 0;
         }
 
         public override void fillLeastSignificant16bits(int[] x, int i, int mask)
@@ -151,9 +157,43 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
-        public override Container or(ArrayContainer x)
+        public override Container or(ArrayContainer value2)
         {
-            throw new NotImplementedException();
+            ArrayContainer value1 = this;
+            int totalCardinality = value1.getCardinality() + value2.getCardinality();
+            if (totalCardinality > DEFAULT_MAX_SIZE) {
+                // it could be a bitmap!
+                BitsetContainer bc = new BitsetContainer();
+                for (int k = 0; k < value2.cardinality; ++k)
+                {
+                    ushort v = value2.content[k];
+                    int i = v >> 6;
+                    bc.bitmap[i] |= (1L << v);
+                }
+                for (int k = 0; k < this.cardinality; ++k)
+                {
+                    ushort v = this.content[k];
+                    int i = v >> 6;
+                    bc.bitmap[i] |= (1L << v);
+                }
+                bc.cardinality = 0;
+                foreach (long k in bc.bitmap)
+                {
+                    bc.cardinality += Utility.longBitCount(k);
+                }
+                if (bc.cardinality <= DEFAULT_MAX_SIZE)
+                    return bc.toArrayContainer();
+                return bc;
+            } else {
+                // remains an array container
+                int desiredCapacity = totalCardinality; // Math.min(BitmapContainer.MAX_CAPACITY,
+                                                        // totalCardinality);
+                ArrayContainer answer = new ArrayContainer(desiredCapacity);
+                answer.cardinality = Utility.unsignedUnion2by2(value1.content,
+                        value1.getCardinality(), value2.content,
+                        value2.getCardinality(), answer.content);
+                return answer;
+            }
         }
 
         public override Container remove(ushort x)
