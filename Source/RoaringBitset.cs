@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace BitsetsNET
 {
-    class RoaringBitset
+    public class RoaringBitset
     {
 
-        RoaringArray containers = null;
+        RoaringArray containers = new RoaringArray();
 
         public static RoaringBitset Crte(int[] input)
         {
