@@ -20,7 +20,7 @@ namespace BitsetsNET
         }
 
 
-        public override Container add(short x)
+        public override Container add(ushort x)
         {
             uint y = Utility.toIntUnsigned(x);
             long prevVal = bitmap[x / 64];
@@ -35,7 +35,7 @@ namespace BitsetsNET
             this.cardinality = arrayContainer.cardinality;
             for (int k = 0; k < arrayContainer.cardinality; ++k)
             {
-                short x = arrayContainer.content[k];
+                ushort x = arrayContainer.content[k];
                 bitmap[Utility.toIntUnsigned(x) / 64] |= (1L << x);
             }
         }
@@ -52,7 +52,7 @@ namespace BitsetsNET
             int c = x.cardinality;
             for (int i=0; i<c; i++)
             {
-                short v = x.content[i];
+                ushort v = x.content[i];
                 if (this.contains(v))
                     answer.content[answer.cardinality++] = v;
             }
@@ -64,9 +64,8 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
-        public override bool contains(short x)
+        public override bool contains(ushort x)
         {
-            uint y = Utility.toIntUnsigned(x);
             return (bitmap[x / 64] & (1L << x)) != 0;
         }
 
@@ -120,7 +119,7 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
-        public override Container remove(short x)
+        public override Container remove(ushort x)
         {
             throw new NotImplementedException();
         }

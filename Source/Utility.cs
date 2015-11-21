@@ -8,27 +8,26 @@ namespace BitsetsNET
 {
     class Utility
     {
-        public static short GetHighBits(int x)
+        public static ushort GetHighBits(int x)
         {
             uint u = (uint)(x);
-            return (short) (u >> 16);
+            return (ushort) (u >> 16);
         }
 
-        public static short GetLowBits(int x)
+        public static ushort GetLowBits(int x)
         {
-            return (short)(x & 0xFFFF);
+            return (ushort)(x & 0xFFFF);
         }
 
-        public static uint toIntUnsigned(short x)
+        public static uint toIntUnsigned(ushort x)
         {
             return (uint) x;
         }
 
-        public static int unsignedBinarySearch(short[] array, int begin, int end, short k) {
+        public static int unsignedBinarySearch(ushort[] array, int begin, int end, ushort key) {
 
-            uint ikey = toIntUnsigned(k);
             //optimizes for the case where the value is inserted at the end
-            if ((end > 0) && (toIntUnsigned(array[end - 1]) < ikey))
+            if ((end > 0) && (array[end - 1] < key))
             {
                 return -end - 1;
             }
@@ -37,12 +36,12 @@ namespace BitsetsNET
             while (low <= high) {
 
                 //convert to uint to shift unsigned by one, then convert back
-                int middleIndex = (int)((uint)(low + high) >> 1);
+                int middleIndex = (low + high) >> 1;
                 uint middleValue = toIntUnsigned(array[middleIndex]);
 
-                if (middleIndex < ikey) {
+                if (middleIndex < key) {
                     low = middleIndex + 1;
-                } else if (middleValue > ikey) {
+                } else if (middleValue > key) {
                     high = middleIndex - 1;
                 } else {
                     return middleIndex;

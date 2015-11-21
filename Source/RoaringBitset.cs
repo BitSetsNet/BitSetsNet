@@ -9,7 +9,7 @@ namespace BitsetsNET
     class RoaringBitset
     {
 
-        ContainerArray containers = null;
+        RoaringArray containers = null;
 
         public static RoaringBitset Crte(int[] input)
         {
@@ -22,7 +22,7 @@ namespace BitsetsNET
 
         public void add(int x)
         {
-            short highBits = Utility.GetHighBits(x);
+            ushort highBits = Utility.GetHighBits(x);
             int i = containers.getIndex(highBits);
 
             if (i >= 0)
