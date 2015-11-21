@@ -75,7 +75,7 @@ namespace BitsetsNET
 
         public override int getCardinality()
         {
-            throw new NotImplementedException();
+            return cardinality;
         }
 
         public override Container iand(BitsetContainer x)
