@@ -12,17 +12,17 @@ namespace BitsetsNET
         private const int DEFAULT_MAX_SIZE = 4096;
 
         public int cardinality;
-        public short[] content;
+        public ushort[] content;
 
         public ArrayContainer() : this(DEFAULT_INIT_SIZE) {}
         
         public ArrayContainer(int capacity)
         {
             this.cardinality = 0;
-            this.content = new short[capacity];
+            this.content = new ushort[capacity];
         }
 
-        public override Container add(short x)
+        public override Container add(ushort x)
         {
             int loc = Utility.unsignedBinarySearch(content, 0, cardinality, x);
             if (loc < 0)
@@ -78,7 +78,7 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
-        public override bool contains(short x)
+        public override bool contains(ushort x)
         {
             throw new NotImplementedException();
         }
@@ -133,7 +133,7 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
-        public override Container remove(short x)
+        public override Container remove(ushort x)
         {
             throw new NotImplementedException();
         }

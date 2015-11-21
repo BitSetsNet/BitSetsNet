@@ -15,7 +15,7 @@ namespace BitsetsNET
          * @param x short to be added
          * @return the new container
          */
-        public abstract Container add(short x);
+        public abstract Container add(ushort x);
 
         /**
          * Computes the bitwise AND of this container with another
@@ -61,7 +61,7 @@ namespace BitsetsNET
          * @param x value to check
          * @return whether the value is in the container
          */
-        public abstract bool contains(short x);
+        public abstract bool contains(ushort x);
 
         /**
          * Fill the least significant 16 bits of the integer array, starting at
@@ -226,7 +226,7 @@ namespace BitsetsNET
          * @param x to be removed
          * @return New container
          */
-        public abstract Container remove(short x);
+        public abstract Container remove(ushort x);
 
         /**
          * Return the jth value 
