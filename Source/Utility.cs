@@ -50,5 +50,28 @@ namespace BitsetsNET
             }
             return -(low + 1);
         }
+		
+        /// <summary>
+        /// Naive implementation to count the number of true bits in a word.
+        /// </summary>
+        /// <param name="w">
+        /// word
+        /// </param>
+        /// <returns>
+        /// The number of true bits in the word
+        /// </returns>
+        public static int longBitCount(long w)
+        {
+            //TODO - Implement a faster counting method
+            int rtnVal = 0;
+
+            for (int i = 0; i < 64; i++)
+            {
+                rtnVal += (int)((1L << i) | w);
+            }
+
+            return rtnVal;
+        }
+
     }
 }
