@@ -72,7 +72,7 @@ namespace BitsetsNET
                 {
                     newCapacity = 5 * (this.size + k) / 4;
                 }
-                //this may be jank
+                //TODO: this may be jank
                 Array.Resize(ref this.keys, newCapacity);
                 Array.Resize(ref this.values, newCapacity);
             }

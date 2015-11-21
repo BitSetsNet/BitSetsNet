@@ -19,14 +19,14 @@ namespace BitsetsNET
             return (short)(x & 0xFFFF);
         }
 
-        public static int toIntUnsigned(short x)
+        public static uint toIntUnsigned(short x)
         {
-            return x & 0xFFFF;
+            return (uint) x;
         }
 
         public static int unsignedBinarySearch(short[] array, int begin, int end, short k) {
 
-            int ikey = toIntUnsigned(k);
+            uint ikey = toIntUnsigned(k);
             //optimizes for the case where the value is inserted at the end
             if ((end > 0) && (toIntUnsigned(array[end - 1]) < ikey))
             {
@@ -38,7 +38,7 @@ namespace BitsetsNET
 
                 //convert to uint to shift unsigned by one, then convert back
                 int middleIndex = (int)((uint)(low + high) >> 1);
-                int middleValue = toIntUnsigned(array[middleIndex]);
+                uint middleValue = toIntUnsigned(array[middleIndex]);
 
                 if (middleIndex < ikey) {
                     low = middleIndex + 1;
