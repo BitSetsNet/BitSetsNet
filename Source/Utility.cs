@@ -225,7 +225,7 @@ namespace BitsetsNET
                         ++k2;
                         if (k2 == length2)
                         {
-                            breakflag = false;
+                            breakflag = true;
                             break;
                         }
 
@@ -238,7 +238,7 @@ namespace BitsetsNET
                         ++k1;
                         if (k1 == length1)
                         {
-                            breakflag = false;
+                            breakflag = true;
                             break;
                         }
 
