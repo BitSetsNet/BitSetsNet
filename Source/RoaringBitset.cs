@@ -73,5 +73,13 @@ namespace BitsetsNET
             }
             return answer;
         }
+
+        public override bool Equals(Object o) {
+            if (o is RoaringBitset) {
+                RoaringBitset srb = (RoaringBitset) o;
+                return srb.containers.Equals(this.containers);
+            }
+            return false;
+        }
     }
 }
