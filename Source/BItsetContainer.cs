@@ -180,9 +180,19 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
-        public override short select(int j)
+        public override ushort select(int j)
         {
-            throw new NotImplementedException();
+            int leftover = j;
+            for (int k = 0; k < bitmap.Length; ++k)
+            {
+                int w = Utility.longBitCount(bitmap[k]);
+                if (w > leftover)
+                {
+                    return (ushort)(k * 64 + Utility.select(bitmap[k], leftover));
+                }
+                leftover -= w;
+            }
+            throw new ArgumentOutOfRangeException("Insufficient cardinality.");
         }
 
         public override bool Equals(Object o) {

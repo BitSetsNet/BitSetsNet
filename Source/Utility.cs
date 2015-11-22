@@ -371,5 +371,51 @@ namespace BitsetsNET
             return upper;
 
         }
+
+        public static int select(long w, int j) {
+            ulong word = (ulong) w;
+            int seen = 0;
+            // Divide 64bit
+            uint part = (uint) word & 0xFFFFFFFF;
+            int n = longBitCount(part);
+            if (n <= j) {
+                part = (uint) (word >> 32);
+                seen += 32;
+                j -= n;
+            }
+            uint ww = part;
+
+            // Divide 32bit
+            part = ww & 0xFFFF;
+
+            n = longBitCount(part);
+            if (n <= j) {
+
+                part = ww >> 16;
+                seen += 16;
+                j -= n;
+            }
+            ww = part;
+
+            // Divide 16bit
+            part = ww & 0xFF;
+            n = longBitCount(part);
+            if (n <= j) {
+                part = ww >> 8;
+                seen += 8;
+                j -= n;
+            }
+            ww = part;
+
+            // Lookup in final byte
+            int counter;
+            for (counter = 0; counter < 8; counter++) {
+                j -= (int)(ww >> counter) & 1;
+                if (j < 0) {
+                    break;
+                }
+            }
+            return seen + counter;
+        }
     }
 }

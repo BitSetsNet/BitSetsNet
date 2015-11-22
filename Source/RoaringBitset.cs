@@ -81,5 +81,33 @@ namespace BitsetsNET
             }
             return false;
         }
+
+        public int select(int j)
+        {
+            int leftover = j;
+            for (int i = 0; i < this.containers.size; i++)
+            {
+                Container c = this.containers.getContainerAtIndex(i);
+                int thiscard = c.getCardinality();
+                if (thiscard > leftover)
+                {
+                    uint keycontrib = (uint) this.containers.getKeyAtIndex(i) << 16;
+                    uint lowcontrib = (uint) c.select(leftover);
+                    return (int) (lowcontrib + keycontrib);
+                }
+                leftover -= thiscard;
+            }
+            throw new ArgumentOutOfRangeException("select " + j + " when the cardinality is " + this.getCardinality());
+        }
+
+        public int getCardinality()
+        {
+            int size = 0;
+            for (int i = 0; i < this.containers.size; i++)
+            {
+                size += this.containers.getContainerAtIndex(i).getCardinality();
+            }
+            return size;
+        }
     }
 }

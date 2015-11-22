@@ -201,9 +201,9 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
-        public override short select(int j)
+        public override ushort select(int j)
         {
-            throw new NotImplementedException();
+            return this.content[j];
         }
 
         public override bool Equals(Object o) {
