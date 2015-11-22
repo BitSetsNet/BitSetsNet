@@ -204,5 +204,6 @@ namespace BitsetsNET
             } 
             return false;
         }
+
     }
 }

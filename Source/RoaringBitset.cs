@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BitsetsNET
 {
-    public class RoaringBitset
+    public class RoaringBitset : IBitset
     {
 
         RoaringArray containers = new RoaringArray();
@@ -108,6 +108,69 @@ namespace BitsetsNET
                 size += this.containers.getContainerAtIndex(i).getCardinality();
             }
             return size;
+        }
+
+        public IBitset And(IBitset otherSet)
+        {
+            if (otherSet is RoaringBitset) {
+                return and(this, (RoaringBitset)otherSet);
+            }
+            throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitset");
+        }
+
+        public void AndWith(IBitset otherSet)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBitset Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBitset Or(IBitset otherSet)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OrWith(IBitset otherSet)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Get(int index)
+        {
+            ushort highBits = Utility.GetHighBits(index);
+            int containerIndex = containers.getIndex(highBits);
+
+            // a container exists at this index already.
+            // find the right container, get the low order bits to add to the 
+            // container and add them
+            if (containerIndex >= 0)
+            {
+                return containers.getContainerAtIndex(containerIndex).contains(
+                    Utility.GetLowBits(index));
+            }
+            else
+            {
+                // no container exists for this index
+                return false;
+            }
+        }
+
+        public int Length()
+        {
+            return getCardinality();
+        }
+
+        public void Set(int index, bool value)
+        {
+            add(index);
+        }
+
+        public void SetAll(bool value)
+        {
+            throw new NotImplementedException();
         }
     }
 }
