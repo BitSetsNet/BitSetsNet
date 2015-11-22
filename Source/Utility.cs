@@ -217,7 +217,8 @@ namespace BitsetsNET
             ushort s2 = set2[k2];
 
             bool breakflag = false;
-            while (true) {
+            while (!breakflag)
+            {
                 int v1 = s1;
                 int v2 = s2;
                 if (v2 < v1) {
@@ -232,9 +233,6 @@ namespace BitsetsNET
                         s2 = set2[k2];
                         v2 = s2;
                     } while (v2 < v1);
-
-                    if (breakflag)
-                        break;
                 } else if (v1 < v2) {
                     do {
                         ++k1;
@@ -247,10 +245,6 @@ namespace BitsetsNET
                         s1 = set1[k1];
                         v1 = s1;
                     } while (v1 < v2);
-
-                    if (breakflag)
-                        break;
-
                 } else {
                     // (set2[k2] == set1[k1])
                     buffer[pos++] = s1;
