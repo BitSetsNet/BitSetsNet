@@ -184,5 +184,15 @@ namespace BitsetsNET
         {
             throw new NotImplementedException();
         }
+
+        public override bool Equals(Object o) {
+            if (o is BitsetContainer) {
+                BitsetContainer srb = (BitsetContainer)o;
+                if (srb.cardinality != this.cardinality)
+                    return false;
+                return Array.Equals(this.bitmap, srb.bitmap);
+            } 
+            return false;
+        }
     }
 }

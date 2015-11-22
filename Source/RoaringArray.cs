@@ -135,5 +135,21 @@ namespace BitsetsNET
                 Array.Resize(ref this.values, newCapacity);
             }
         }
+
+        public override bool Equals(Object o) {
+            if (o is RoaringArray) {
+                RoaringArray srb = (RoaringArray) o;
+                if (srb.size != this.size) {
+                    return false;
+                }
+                for (int i = 0; i < srb.size; ++i) {
+                    if (this.keys[i] != srb.keys[i] || !this.values[i].Equals(srb.values[i])) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
     }
 }

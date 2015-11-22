@@ -206,5 +206,19 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
+        public override bool Equals(Object o) {
+            if (o is ArrayContainer) {
+                ArrayContainer srb = (ArrayContainer) o;
+                if (srb.cardinality != this.cardinality)
+                    return false;
+                for (int i = 0; i < this.cardinality; ++i) {
+                    if (this.content[i] != srb.content[i])
+                        return false;
+                }
+                return true;
+            } 
+            return false;
+        }
+
     }
 }
