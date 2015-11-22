@@ -235,7 +235,7 @@ namespace BitsetsNET
          *
          * @return the value
          */
-        public abstract short select(int j);
+        public abstract ushort select(int j);
 
 
 
