@@ -12,28 +12,64 @@ namespace BitsetsNET
     {
         protected static short INITIAL_CAPACITY = 5;
 
-        public short[] Keys = null;
-        public Container[] Values = null;
-        public int Size = 0;
+        public short[] keys = null;
+        public Container[] values = null;
+        public int size = 0;
 
         protected ContainerArray() {
 
 
-            this.Keys = new short[INITIAL_CAPACITY];
-            this.Values = new Container[INITIAL_CAPACITY];
+            keys = new short[INITIAL_CAPACITY];
+            values = new Container[INITIAL_CAPACITY];
         }
 
-        protected int getIndex(short x)
+        public int getIndex(short x)
         {
             //TODO: optimize this
             //Add binarySearch to Util
             //if((Size = 0) || (Keys[Size - 1] == x))
-            return Array.IndexOf(Keys, x);
+            return Array.IndexOf(keys, x);
         }
 
-        protected void setContainerAtIndex(int i, Container c)
+        public void setContainerAtIndex(int i, Container c)
         {
-            this.Values[i] = c;
+            values[i] = c;
+        }
+
+        public Container getContainerAtIndex(int i) {
+            return values[i];
+        }
+
+        // insert a new key, it is assumed that it does not exist
+        public void insertNewKeyValueAt(int i, short key, Container value)
+        {
+            extendArray(1);
+            Array.Copy(keys, i, keys, i + 1, size - i);
+            keys[i] = key;
+            Array.Copy(values, i, values, i + 1, size - i);
+            values[i] = value;
+            size++;
+        }
+
+        // make sure there is capacity for at least k more elements
+        public void extendArray(int k)
+        {
+            // size + 1 could overflow
+            if (this.size + k >= this.keys.Length)
+            {
+                int newCapacity;
+                if (this.keys.Length < 1024)
+                {
+                    newCapacity = 2 * (this.size + k);
+                }
+                else
+                {
+                    newCapacity = 5 * (this.size + k) / 4;
+                }
+                //this may be jank
+                Array.Resize(ref this.keys, newCapacity);
+                Array.Resize(ref this.values, newCapacity);
+            }
         }
     }
 }
