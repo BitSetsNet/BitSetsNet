@@ -6,7 +6,91 @@ using System.Threading.Tasks;
 
 namespace BitsetsNET
 {
-    class ArrayContainer
+    class ArrayContainer  :Container
     {
+        public override Container add(short x)
+        {
+            return new ArrayContainer();
+        }
+
+        public override Container and(BitsetContainer x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Container and(ArrayContainer x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Container clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool contains(short x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void fillLeastSignificant16bits(int[] x, int i, int mask)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int getCardinality()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Container iand(BitsetContainer x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Container iand(ArrayContainer x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool intersects(BitsetContainer x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool intersects(ArrayContainer x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Container ior(BitsetContainer x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Container ior(ArrayContainer x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Container or(BitsetContainer x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Container or(ArrayContainer x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Container remove(short x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override short select(int j)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
