@@ -8,5 +8,15 @@ namespace BitsetsNET
 {
     class Utility
     {
+        public static short GetHighBits(int x)
+        {
+            uint u = (uint)(x);
+            return (short) (u >> 16);
+        }
+
+        public static short GetLowBits(int x)
+        {
+            return (short)(x & 0xFFFF);
+        }
     }
 }
