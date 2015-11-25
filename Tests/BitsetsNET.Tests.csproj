@@ -54,10 +54,11 @@
   <ItemGroup>
     <Compile Include="BaseBitSetTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SetGenerator.cs" />
     <Compile Include="UncompressedBitArrayTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\Development\GitHub\BitSetsNet\Source\BitsetsNET.csproj">
+    <ProjectReference Include="..\Source\BitsetsNET.csproj">
       <Project>{3EDD9484-BBBE-47E4-A783-0B99B51D253D}</Project>
       <Name>BitsetsNET</Name>
     </ProjectReference>
