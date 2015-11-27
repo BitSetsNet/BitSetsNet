@@ -1,0 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BitsetsNET.Tests
+{
+    public class SetGenerator
+    {
+
+        private static Random numberGenerator = new Random();
+        private SetGenerator()
+        {
+            //can't instantiate this
+        }
+
+        public static int[] GetRandomArray(int length, int maxNumberOfOnes = 0)
+        {
+
+            if (maxNumberOfOnes == 0) { maxNumberOfOnes = length; }
+
+            var indexSet = new HashSet<int>();
+           
+            int numberOfOnes = numberGenerator.Next(maxNumberOfOnes);
+
+            for (int i = 0; i<numberOfOnes; i++)
+            {
+                indexSet.Add(numberGenerator.Next(length));
+            }
+
+            return indexSet.ToArray();
+        }
+    }
+}
