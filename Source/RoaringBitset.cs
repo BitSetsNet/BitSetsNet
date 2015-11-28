@@ -125,7 +125,9 @@ namespace BitsetsNET
 
         public IBitset Clone()
         {
-            throw new NotImplementedException();
+            RoaringBitset x = new RoaringBitset();
+            x.containers = containers.clone();
+            return x;
         }
 
         public IBitset Or(IBitset otherSet)
