@@ -154,7 +154,7 @@ namespace BitsetsNET
 
         public override Container or(BitsetContainer x)
         {
-            throw new NotImplementedException();
+            return x.or((ArrayContainer) this);
         }
 
         public override Container or(ArrayContainer value2)

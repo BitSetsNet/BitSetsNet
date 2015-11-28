@@ -165,14 +165,38 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
-        public override Container or(BitsetContainer x)
+        public override Container or(BitsetContainer value2)
         {
-            throw new NotImplementedException();
+            BitsetContainer answer = new BitsetContainer();
+            answer.cardinality = 0;
+            for (int k = 0; k < answer.bitmap.Length; ++k) {
+                long w = this.bitmap[k] | value2.bitmap[k];
+                answer.bitmap[k] = w;
+                answer.cardinality += Utility.longBitCount(w);
+            }
+            return answer;
         }
 
-        public override Container or(ArrayContainer x)
+        public override Container or(ArrayContainer value2)
         {
-            throw new NotImplementedException();
+            BitsetContainer answer = (BitsetContainer) clone();
+
+            int c = value2.cardinality;
+            for (int k = 0; k < c ; ++k) {
+                ushort v = value2.content[k];
+                int i = v >> 6;
+                long w = answer.bitmap[i];
+                long aft = w | (1L << v);
+
+                answer.bitmap[i] = aft;
+                //if (USE_BRANCHLESS) {
+                answer.cardinality += (int)((w - aft) >> 63);
+                //} else {
+                //    if (w != aft)
+                //        answer.cardinality++;
+                //}
+            }
+            return answer;
         }
 
         public override Container remove(ushort x)
