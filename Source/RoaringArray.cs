@@ -29,6 +29,22 @@ namespace BitsetsNET
             this.size++;
         }
 
+        public RoaringArray clone() {
+            RoaringArray sa = new RoaringArray();
+
+            sa.keys = new ushort[this.keys.Length];
+            this.keys.CopyTo(sa.keys, 0);
+
+            sa.values = new Container[this.values.Length];
+            this.values.CopyTo(sa.values, 0);
+
+            for (int k = 0; k < this.size; ++k)
+                sa.values[k] = sa.values[k].clone();
+
+            sa.size = this.size;
+            
+            return sa;
+        }
         /// <summary>
         /// Append copy of the one value from another array
         /// </summary>
