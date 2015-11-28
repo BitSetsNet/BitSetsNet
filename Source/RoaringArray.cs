@@ -29,6 +29,46 @@ namespace BitsetsNET
             this.size++;
         }
 
+        /// <summary>
+        /// Append copy of the one value from another array
+        /// </summary>
+        /// <param name="sa">
+        /// other array
+        /// </param>
+        /// <param name="index">
+        /// index in the other array
+        /// </param>
+        public void appendCopy(RoaringArray sa, int index)
+        {
+            extendArray(1);
+            this.keys[this.size] = sa.keys[index];
+            this.values[this.size] = sa.values[index].clone();
+            this.size++;
+        }
+
+        /// <summary>
+        /// Append copies of the values from another array
+        /// </summary>
+        /// <param name="sa">
+        /// other array
+        /// </param>
+        /// <param name="startingIndex">
+        /// starting index in the other array
+        /// </param>
+        /// <param name="end">
+        /// (exclusive) in the other array
+        /// </param>
+        public void appendCopy(RoaringArray sa, int startingIndex, int end)
+        {
+            extendArray(end - startingIndex);
+            for (int i = startingIndex; i < end; ++i)
+            {
+                this.keys[this.size] = sa.keys[i];
+                this.values[this.size] = sa.values[i].clone();
+                this.size++;
+            }
+        }
+
         public int advanceUntil(ushort x, int pos)
         {
             int lower = pos + 1;
