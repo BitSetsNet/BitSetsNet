@@ -218,7 +218,8 @@ namespace BitsetsNET
 
         public void Set(int index, bool value)
         {
-            add(index);
+            throw new NotImplementedException();
+            //add(index); //This only sets something to true.
         }
 
         public void SetAll(bool value)
