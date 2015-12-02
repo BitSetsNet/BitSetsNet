@@ -338,28 +338,33 @@ namespace BitsetsNET.RLE
         /// </summary>
         /// <param name="otherSet">the other IBitset</param>
         /// <returns>a boolean</returns>
-        public bool Equals(IBitset otherSet)
+        public override bool Equals(object otherSet)
         {
-            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
-
             bool rtnVal = false;
-            if (this._Length == otherRLESet._Length && 
-                this._RunArray.Count == otherRLESet._RunArray.Count)
+            if ((otherSet is RLEBitset))
             {
-                for (int i = 0; i < this._RunArray.Count; i++)
+                RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
+
+                if (this._Length == otherRLESet._Length &&
+                this._RunArray.Count == otherRLESet._RunArray.Count)
                 {
-                    if (this._RunArray[i].StartIndex == otherRLESet._RunArray[i].StartIndex &&
-                        this._RunArray[i].EndIndex == otherRLESet._RunArray[i].EndIndex)
+                    for (int i = 0; i < this._RunArray.Count; i++)
                     {
-                        rtnVal = true;
-                    }
-                    else
-                    {
-                        rtnVal = false;
-                        break;
+                        if (this._RunArray[i].StartIndex == otherRLESet._RunArray[i].StartIndex &&
+                            this._RunArray[i].EndIndex == otherRLESet._RunArray[i].EndIndex)
+                        {
+                            rtnVal = true;
+                        }
+                        else
+                        {
+                            rtnVal = false;
+                            break;
+                        }
                     }
                 }
+
             }
+            
             return rtnVal;
         }
 
