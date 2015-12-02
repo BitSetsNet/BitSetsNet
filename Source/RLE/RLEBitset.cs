@@ -189,9 +189,23 @@ namespace BitsetsNET.RLE
             return rtnVal;
         }
 
+        /// <summary>
+        /// Gets the boolean value at the given index.
+        /// </summary>
+        /// <param name="index">an index</param>
+        /// <returns>a boolean</returns>
         public bool Get(int index)
         {
-            throw new NotImplementedException();
+            bool rtnVal = false;
+            foreach (Run r in this._RunArray)
+            {
+                if (index >= r.StartIndex && index <= r.EndIndex)
+                {
+                    rtnVal = true;
+                    break;
+                }
+            }
+            return rtnVal;
         }
 
         /// <summary>
@@ -323,6 +337,40 @@ namespace BitsetsNET.RLE
         public IBitset Not()
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Determines if the other IBitset is equal to this one.
+        /// </summary>
+        /// <param name="otherSet">the other IBitset</param>
+        /// <returns>a boolean</returns>
+        public bool Equals(IBitset otherSet)
+        {
+            if (!(otherSet is RLEBitset))
+            {
+                throw new ArgumentException("otherSet must be a RLEBitset to perform this operation.");
+            }
+            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset
+
+            bool rtnVal = false;
+            if (this._Length == otherRLESet._Length && 
+                this._RunArray.Count == otherRLESet._RunArray.Count)
+            {
+                for (int i = 0; i < this._RunArray.Count; i++)
+                {
+                    if (this._RunArray[i].StartIndex == otherRLESet._RunArray[i].StartIndex &&
+                        this._RunArray[i].EndIndex == otherRLESet._RunArray[i].EndIndex)
+                    {
+                        rtnVal = true;
+                    }
+                    else
+                    {
+                        rtnVal = false;
+                        break;
+                    }
+                }
+            }
+            return rtnVal;
         }
 
         #endregion
