@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace BitsetsNET
 {
@@ -226,5 +225,26 @@ namespace BitsetsNET
         {
             throw new NotImplementedException();
         }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+
+        }
+
+        public System.Collections.IEnumerator GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Cardinality()
+        {
+            return 0;
+        }
+
+        public IBitset Not()
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
