@@ -79,7 +79,7 @@ namespace BitsetsNET.RLE
         /// <returns>an RLEBitset</returns>
         public static IBitset CreateFrom(int[] indices)
         {
-            int capacity = indices.Max();
+            int capacity = indices.Max() + 1;
             return RLEBitset.CreateFrom(indices, capacity);
         }
 
