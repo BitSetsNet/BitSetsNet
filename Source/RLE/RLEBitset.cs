@@ -104,14 +104,9 @@ namespace BitsetsNET.RLE
             rtnVal._Length = capacity;
             Run currRun = new Run();
             currRun.StartIndex = indices.FirstOrDefault();
-            for (int i = 0; i < indices.Length; i++)
+            for (int i = 0; i < indices.Length - 1; i++)
             {
-                if (i == indices.Length - 1)
-                {
-                    currRun.EndIndex = indices[i];
-                    rtnVal._RunArray.Add(currRun);
-                }
-                else if(indices[i + 1] - indices[i] > 1)
+                if(indices[i + 1] - indices[i] > 1)
                 {
                     currRun.EndIndex = indices[i];
                     rtnVal._RunArray.Add(currRun);
@@ -119,6 +114,9 @@ namespace BitsetsNET.RLE
                     currRun.StartIndex = indices[i+1];
                 }
             }
+            currRun.EndIndex = indices.LastOrDefault();
+            rtnVal._RunArray.Add(currRun);
+
             return rtnVal;
         }
 
