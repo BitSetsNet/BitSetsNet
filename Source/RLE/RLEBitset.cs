@@ -159,11 +159,11 @@ namespace BitsetsNET.RLE
                 }
 
                 // iterate the counters appropriately to compare the next set of runs for overlap.
-                if (runsA[i].EndIndex > runsB[j].EndIndex)
+                if (runsA[i].EndIndex > runsB[j].EndIndex + 1)
                 {
                     j += 1;
                 }
-                else if (runsA[i].EndIndex < runsB[j].EndIndex)
+                else if (runsA[i].EndIndex < runsB[j].EndIndex - 1)
                 {
                     i += 1;
                 }
