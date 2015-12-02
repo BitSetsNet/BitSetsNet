@@ -41,10 +41,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrayContainer.cs" />
+    <Compile Include="BitsetContainer.cs" />
+    <Compile Include="Container.cs" />
+    <Compile Include="RoaringArray.cs" />
     <Compile Include="IBitset.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RLE\RLEBitset.cs" />
+    <Compile Include="RoaringBitset.cs" />
     <Compile Include="UncompressedBitArray.cs" />
+    <Compile Include="Utility.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
