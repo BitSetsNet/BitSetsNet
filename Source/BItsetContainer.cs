@@ -261,5 +261,24 @@ namespace BitsetsNET
 
             return container;
         }
+
+        public override IEnumerator<ushort> GetEnumerator()
+        {
+            ushort index = 0;
+            foreach(long value in bitmap)
+            {
+                //copy value so that we can modify it
+                long val = value;
+                for(int i = 0; i < 64; i++)
+                {
+                    if((val & 1) == 1)
+                    {
+                        yield return index;
+                    }
+                    val >>= 1;
+                    index++;
+                }
+            }
+        }
     }
 }

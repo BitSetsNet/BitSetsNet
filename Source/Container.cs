@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BitsetsNET
 {
-    public abstract class Container
+    public abstract class Container : IEnumerable<ushort>
     {
 
         /**
@@ -261,6 +262,13 @@ namespace BitsetsNET
             {
                 return BitsetContainer.Deserialize(reader, cardinality);
             }
+        }
+
+        public abstract IEnumerator<ushort> GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

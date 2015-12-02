@@ -246,5 +246,21 @@ namespace BitsetsNET
 
             return array;
         }
+
+        /// <summary>
+        /// Get an enumerator of the set indices of this bitset.
+        /// </summary>
+        /// <returns>A enumerator giving the set (i.e. for which the bit is '1' or true) indices for this bitset.</returns>
+        public IEnumerator<int> GetEnumerator()
+        {
+            for(int i = 0; i < size; i++)
+            {
+                int highbits = keys[i] << 16;
+                foreach(ushort lowbits in values[i])
+                {
+                    yield return highbits + lowbits;
+                }
+            }
+        }
     }
 }

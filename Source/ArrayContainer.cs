@@ -251,5 +251,10 @@ namespace BitsetsNET
 
             return container;
         }
+
+        public override IEnumerator<ushort> GetEnumerator()
+        {
+            return (IEnumerator<ushort>) content.GetEnumerator();
+        }
     }
 }

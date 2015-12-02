@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -277,6 +278,15 @@ namespace BitsetsNET
             }
 
             return bitset;
+        }
+
+        /// <summary>
+        /// Get an enumerator of the set indices of this bitset.
+        /// </summary>
+        /// <returns>A enumerator giving the set (i.e. for which the bit is '1' or true) indices for this bitset.</returns>
+        public IEnumerator<int> GetEnumerator()
+        {
+            return containers.GetEnumerator();
         }
     }
 }
