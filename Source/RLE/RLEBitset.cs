@@ -79,7 +79,11 @@ namespace BitsetsNET.RLE
         /// <returns>an RLEBitset</returns>
         public static IBitset CreateFrom(int[] indices)
         {
-            int capacity = indices.Max() + 1;
+            int capacity = 0;
+            if (indices.Length > 0)
+            {
+                capacity = indices.Max() + 1;
+            }
             return RLEBitset.CreateFrom(indices, capacity);
         }
 
@@ -93,29 +97,34 @@ namespace BitsetsNET.RLE
         /// <returns></returns>
         public static IBitset CreateFrom(int[] indices, int capacity)
         {
-            Array.Sort(indices); // sort the input array first.
-
-            if (indices.Last() > capacity) // capacity must be larger than highest index value in input array.
-            {
-                throw new ArgumentException("capacity cannot be less than max index value");
-            }
-          
             RLEBitset rtnVal = new RLEBitset();
             rtnVal._Length = capacity;
-            Run currRun = new Run();
-            currRun.StartIndex = indices.FirstOrDefault();
-            for (int i = 0; i < indices.Length - 1; i++)
+
+            if (indices.Length > 0)
             {
-                if(indices[i + 1] - indices[i] > 1)
+
+                Array.Sort(indices); // sort the input array first.
+                if (indices.Last() > capacity) // capacity must be larger than highest index value in input array.
                 {
-                    currRun.EndIndex = indices[i];
-                    rtnVal._RunArray.Add(currRun);
-                    currRun = new Run();
-                    currRun.StartIndex = indices[i+1];
+                    throw new ArgumentException("capacity cannot be less than max index value");
                 }
+
+                Run currRun = new Run();
+                currRun.StartIndex = indices.FirstOrDefault();
+                for (int i = 0; i < indices.Length - 1; i++)
+                {
+                    if (indices[i + 1] - indices[i] > 1)
+                    {
+                        currRun.EndIndex = indices[i];
+                        rtnVal._RunArray.Add(currRun);
+                        currRun = new Run();
+                        currRun.StartIndex = indices[i + 1];
+                    }
+                }
+                currRun.EndIndex = indices.LastOrDefault();
+                rtnVal._RunArray.Add(currRun);
+
             }
-            currRun.EndIndex = indices.LastOrDefault();
-            rtnVal._RunArray.Add(currRun);
 
             return rtnVal;
         }
