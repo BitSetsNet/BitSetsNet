@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -219,5 +220,36 @@ namespace BitsetsNET
             return false;
         }
 
+        /// <summary>
+        /// Serialize this container in a binary format.
+        /// </summary>
+        /// <param name="writer">The writer to which to serialize this container.</param>
+        /// <remarks>The serialization format is first the cardinality of the container as a 32-bit integer, followed by an array of the indices in this container as 16-bit integers.</remarks>
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.Write(cardinality);
+            foreach(ushort index in content)
+            {
+                writer.Write(index);
+            }
+        }
+
+        /// <summary>
+        /// Deserialize a container from binary format, as written by the Serialize method, minus the first 32 bits giving the cardinality.
+        /// </summary>
+        /// <param name="reader">The reader to deserialize from.</param>
+        /// <returns>The first container represented by reader.</returns>
+        public static ArrayContainer Deserialize(BinaryReader reader, int cardinality)
+        {
+            ArrayContainer container = new ArrayContainer(cardinality);
+
+            container.cardinality = cardinality;
+            for(int i = 0; i < cardinality; i++)
+            {
+                container.content[i] = (ushort) reader.ReadInt16();
+            }
+
+            return container;
+        }
     }
 }

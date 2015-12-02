@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -229,5 +230,36 @@ namespace BitsetsNET
             return false;
         }
 
+        /// <summary>
+        /// Serialize this container in a binary format.
+        /// </summary>
+        /// <param name="writer">The writer to which to serialize this container.</param>
+        /// <remarks>The format of the serialization is the cardinality of this container as a 32-bit integer, followed by the bit array. The cardinality is used in deserialization to distinguish BitsetContainers from ArrayContainers.</remarks>
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.Write(cardinality);
+            foreach(long value in bitmap)
+            {
+                writer.Write(value);
+            }
+        }
+
+        /// <summary>
+        /// Deserialize a container from binary format, as written by the Serialize method minus the first 32 bits giving the cardinality.
+        /// </summary>
+        /// <param name="reader">The reader to deserialize from.</param>
+        /// <returns>The first container represented by reader.</returns>
+        public static BitsetContainer Deserialize(BinaryReader reader, int cardinality)
+        {
+            BitsetContainer container = new BitsetContainer();
+
+            container.cardinality = cardinality;
+            for(int i = 0; i < container.bitmap.Length; i++)
+            {
+                container.bitmap[i] = reader.ReadInt64();
+            }
+
+            return container;
+        }
     }
 }

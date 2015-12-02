@@ -16,9 +16,15 @@ namespace BitsetsNET
         public Container[] values = null;
         public int size = 0;
 
-        public RoaringArray() {
-            keys = new ushort[INITIAL_CAPACITY];
-            values = new Container[INITIAL_CAPACITY];
+        public RoaringArray() : this(INITIAL_CAPACITY) {
+            //no additional work needed
+        }
+
+        public RoaringArray(int capacity)
+        {
+            size = capacity;
+            keys = new ushort[size];
+            values = new Container[size];
         }
 
         public void append(ushort key, Container value)
@@ -206,6 +212,39 @@ namespace BitsetsNET
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Serialize the roaring array into a binary format.
+        /// </summary>
+        /// <param name="writer">The writer to write the serialization to.</param>
+        public void Serialize(BinaryWriter writer)
+        {
+            writer.Write(size);
+
+            for(int i = 0; i < size; i++)
+            {
+                writer.Write(keys[i]);
+                values[i].Serialize(writer);
+            }
+        }
+
+        /// <summary>
+        /// Deserialize a roaring array from a binary format, as written by the Serialize method.
+        /// </summary>
+        /// <param name="reader">The reader from which to deserialize the roaring array.</param>
+        /// <returns></returns>
+        public static RoaringArray Deserialize(BinaryReader reader)
+        {
+            RoaringArray array = new RoaringArray(reader.ReadInt32());
+            
+            for(int i = 0; i < array.size; i++)
+            {
+                array.keys[i] = (ushort) reader.ReadInt16();
+                array.values[i] = Container.Deserialize(reader);
+            }
+
+            return array;
         }
     }
 }

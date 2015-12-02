@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -247,5 +248,35 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Write a binary serialization of this roaring bitset.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        public void Serialize(Stream stream)
+        {
+            //We don't care about the encoding, but we have to specify something to be able to set the stream as leave open.
+            using (BinaryWriter writer = new BinaryWriter(stream, Encoding.Default, true))
+            {
+                containers.Serialize(writer);
+            }
+        }
+
+        /// <summary>
+        /// Read a binary serialization of a roaring bitset, as written by the Serialize method.
+        /// </summary>
+        /// <param name="stream">The stream to read from.</param>
+        /// <returns>The bitset deserialized from the stream.</returns>
+        public static RoaringBitset Deserialize(Stream stream)
+        {
+            RoaringBitset bitset = new RoaringBitset();
+
+            //We don't care about the encoding, but we have to specify something to be able to set the stream as leave open.
+            using (BinaryReader reader = new BinaryReader(stream, Encoding.Default, true))
+            {
+                bitset.containers = RoaringArray.Deserialize(reader);
+            }
+
+            return bitset;
+        }
     }
 }
