@@ -135,12 +135,7 @@ namespace BitsetsNET.RLE
 
         public IBitset And(IBitset otherSet)
         {
-            if (!(otherSet is RLEBitset))
-            {
-                throw new ArgumentException("otherSet must be a RLEBitset to perform this operation.");
-            }
-            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset
-
+            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
             RLEBitset rtnVal = new RLEBitset(); // instantiate the return value
             
             List<Run> runsA = this._RunArray;
@@ -238,11 +233,7 @@ namespace BitsetsNET.RLE
 
         public IBitset Or(IBitset otherSet)
         {
-            //if (!(otherSet is RLEBitset))
-            //{
-            //    throw new ArgumentException("otherSet must be a RLEBitset to perform this operation.");
-            //}
-            //RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset
+            //RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
 
             //RLEBitset rtnVal = new RLEBitset(); // instantiate the return value
 
@@ -270,11 +261,7 @@ namespace BitsetsNET.RLE
 
         public void OrWith(IBitset otherSet)
         {
-            if (!(otherSet is RLEBitset))
-            {
-                throw new ArgumentException("otherSet must be a RLEBitset to perform this operation.");
-            }
-            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset
+            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
 
             List<Run> runsA = this._RunArray;
             List<Run> runsB = otherRLESet._RunArray;
@@ -353,11 +340,7 @@ namespace BitsetsNET.RLE
         /// <returns>a boolean</returns>
         public bool Equals(IBitset otherSet)
         {
-            if (!(otherSet is RLEBitset))
-            {
-                throw new ArgumentException("otherSet must be a RLEBitset to perform this operation.");
-            }
-            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset
+            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
 
             bool rtnVal = false;
             if (this._Length == otherRLESet._Length && 
