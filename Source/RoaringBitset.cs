@@ -13,7 +13,7 @@ namespace BitsetsNET
 
         RoaringArray containers = new RoaringArray();
 
-        public static RoaringBitset Crte(int[] input)
+        public static RoaringBitset Create(int[] input)
         {
             RoaringBitset rb = new RoaringBitset();
             foreach (int i in input) {
