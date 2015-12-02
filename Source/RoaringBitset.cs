@@ -46,7 +46,8 @@ namespace BitsetsNET
         }
 
         public static RoaringBitset and(RoaringBitset x1,
-                                        RoaringBitset x2) {
+                                        RoaringBitset x2)
+        {
             RoaringBitset answer = new RoaringBitset();
             int length1 = x1.containers.size, length2 = x2.containers.size;
             int pos1 = 0, pos2 = 0;
@@ -75,7 +76,48 @@ namespace BitsetsNET
             return answer;
         }
 
-        public override bool Equals(Object o) {
+        /// <summary>
+        /// Performs an in-place intersection of two Roaring Bitsets.
+        /// </summary>
+        /// <param name="other">the second Roaring Bitset to intersect</param>
+        private void andWith(RoaringBitset other)
+        {
+            int length1 = this.containers.size, length2 = other.containers.size;
+            int pos1 = 0, pos2 = 0, intersectionSize = 0;
+
+            while (pos1 < length1 && pos2 < length2)
+            {
+                ushort s1 = this.containers.getKeyAtIndex(pos1);
+                ushort s2 = other.containers.getKeyAtIndex(pos2);
+
+                if (s1 == s2)
+                {
+                    Container c1 = this.containers.getContainerAtIndex(pos1);
+                    Container c2 = other.containers.getContainerAtIndex(pos2);
+                    Container c = c1.iand(c2);
+
+                    if (c.getCardinality() > 0)
+                    {
+                        this.containers.replaceKeyAndContainerAtIndex(intersectionSize++, s1, c);
+                    }
+                        
+                    ++pos1;
+                    ++pos2;
+                }
+                else if (s1 < s2)
+                { // s1 < s2
+                    pos1 = this.containers.advanceUntil(s2, pos1);
+                }
+                else
+                { // s1 > s2
+                    pos2 = other.containers.advanceUntil(s1, pos2);
+                }
+            }
+            this.containers.resize(intersectionSize);
+        }
+
+        public override bool Equals(Object o)
+        {
             if (o is RoaringBitset) {
                 RoaringBitset srb = (RoaringBitset) o;
                 return srb.containers.Equals(this.containers);
@@ -119,9 +161,17 @@ namespace BitsetsNET
             throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitset");
         }
 
+        /// <summary>
+        /// Performs an in-place intersection of two Roaring Bitsets.
+        /// </summary>
+        /// <param name="otherSet">the second Roaring Bitset to intersect</param>
         public void AndWith(IBitset otherSet)
         {
-            throw new NotImplementedException();
+            if (otherSet is RoaringBitset)
+            {
+                andWith((RoaringBitset)otherSet);
+            }
+            throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitset");
         }
 
         public IBitset Clone()

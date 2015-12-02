@@ -136,14 +136,46 @@ namespace BitsetsNET
             return cardinality;
         }
 
-        public override Container iand(BitsetContainer x)
+        /// <summary>
+        /// Performs an intersection with another BitsetContainer. Depending on
+        /// the cardinality of the result, this will either modify the container
+        /// in place or return a new ArrayContainer.
+        /// </summary>
+        /// <param name="other">the other BitsetContainer to intersect</param>
+        public override Container iand(BitsetContainer other)
         {
-            throw new NotImplementedException();
+            int newCardinality = 0;
+            for (int k = 0; k < bitmap.Length; ++k)
+            {
+                newCardinality += Utility.longBitCount(
+                    bitmap[k] & other.bitmap[k]
+                );
+            }
+            if (newCardinality > ArrayContainer.DEFAULT_MAX_SIZE)
+            {
+                for (int k = 0; k < bitmap.Length; ++k)
+                {
+                    bitmap[k] = bitmap[k]
+                            & other.bitmap[k];
+                }
+                cardinality = newCardinality;
+                return this;
+            }
+            ArrayContainer ac = new ArrayContainer(newCardinality);
+            Utility.fillArrayAND(ref ac.content, bitmap, other.bitmap);
+            ac.cardinality = newCardinality;
+            return ac;
         }
 
-        public override Container iand(ArrayContainer x)
+        /// <summary>
+        /// Performs an "in-place" intersection with an ArrayContainer. Since
+        /// no in-place operation is actually possible, this method defaults to
+        /// calling ArrayContainer's and() method with this as input.
+        /// </summary>
+        /// <param name="other">the ArrayContainer to intersect</param>
+        public override Container iand(ArrayContainer other)
         {
-            throw new NotImplementedException();
+            return other.and(this); // No in-place possible
         }
 
         public override bool intersects(BitsetContainer x)

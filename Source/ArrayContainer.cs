@@ -123,14 +123,33 @@ namespace BitsetsNET
             return cardinality;
         }
 
-        public override Container iand(BitsetContainer x)
+        /// <summary>
+        /// Performs an in-place intersection with a BitsetContainer.
+        /// </summary>
+        /// <param name="other">the BitsetContainer to intersect</param>
+        public override Container iand(BitsetContainer other)
         {
-            throw new NotImplementedException();
+            int pos = 0;
+            for (int k = 0; k < cardinality; k++)
+            {
+                ushort v = content[k];
+                if (other.contains(v))
+                    content[pos++] = v;
+            }
+            cardinality = pos;
+            return this;
         }
 
-        public override Container iand(ArrayContainer x)
+        /// <summary>
+        /// Performs an in-place intersection with another ArrayContainer.
+        /// </summary>
+        /// <param name="other">the other ArrayContainer to intersect</param>
+        public override Container iand(ArrayContainer other)
         {
-            throw new NotImplementedException();
+            cardinality = Utility.unsignedIntersect2by2(content,
+                getCardinality(), other.content,
+                other.getCardinality(), content);
+            return this;
         }
 
         public override bool intersects(BitsetContainer x)

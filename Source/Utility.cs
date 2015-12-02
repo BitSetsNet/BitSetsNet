@@ -305,6 +305,34 @@ namespace BitsetsNET
         }
 
         /// <summary>
+        /// This is an Array extension method analogous to Java's Array.fill().
+        /// Fills a certain range of array indices with a specific value.
+        /// </summary>
+        /// <param name="array">array to modify</param>
+        /// <param name="start">the starting index</param>
+        /// <param name="end">the ending index</param>
+        /// <param name="value">value to set</param>
+        public static void Fill<T>(T[] array, int start, int end, T value)
+        {
+            if (array == null)
+            {
+                throw new ArgumentNullException("array");
+            }
+            if (start < 0 || start >= end)
+            {
+                throw new ArgumentOutOfRangeException("fromIndex");
+            }
+            if (end >= array.Length)
+            {
+                throw new ArgumentOutOfRangeException("toIndex");
+            }
+            for (int i = start; i < end; i++)
+            {
+                array[i] = value;
+            }
+        }
+
+        /// <summary>
         /// Find the smallest integer larger than pos such that array[pos] >= min.
         /// If none can be found, return length. Based on code by O. Kaser.
         /// </summary>

@@ -153,6 +153,19 @@ namespace BitsetsNET
             return this.binarySearch(0, size, x); 
         }
 
+        /// <summary>
+        /// Logically resizes the Roaring Array after an in-place operation.
+        /// Fills all keys and values after its new last index with zeros
+        /// and null, respectively, and changes the size to the new size.
+        /// </summary>
+        /// <param name="newSize">the new size of the roaring array</param>
+        public void resize (int newSize)
+        {
+            Utility.Fill(keys, newSize, size, (ushort)0);
+            Utility.Fill(values, newSize, size, null);
+            size = newSize;
+        }
+
         private int binarySearch(int begin, int end, ushort key) {
             return Utility.unsignedBinarySearch(keys, begin, end, key);
         }
@@ -175,6 +188,18 @@ namespace BitsetsNET
             Array.Copy(values, i, values, i + 1, size - i);
             values[i] = value;
             size++;
+        }
+
+        /// <summary>
+        /// Replaces the key and container value at a given index.
+        /// </summary>
+        /// <param name="i">the working index</param>
+        /// <param name="key">key to set</param>
+        /// <param name="c">container to set</param>
+        public void replaceKeyAndContainerAtIndex(int i, ushort key, Container c)
+        {
+            keys[i] = key;
+            values[i] = c;
         }
 
         // make sure there is capacity for at least k more elements
