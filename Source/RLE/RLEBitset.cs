@@ -369,6 +369,50 @@ namespace BitsetsNET
             return rtnVal;
         }
 
+        /// <summary>
+        /// Inverts all the values in the current IBitset, 
+        /// so that elements set to true are changed to false, and elements set to false are changed to true.
+        /// </summary>
+        /// <returns>a new IBitset with inverted values</returns>
+        public IBitset Not()
+        {
+            RLEBitset rtnVal = new RLEBitset();
+            rtnVal._Length = this._Length;
+            if (_RunArray.Count > 0) 
+            {
+                Run currRun = new Run();
+
+                // handle first run if needed.
+                if (_RunArray[0].StartIndex > 0)
+                {
+                    currRun.StartIndex = 0;
+                    currRun.EndIndex = _RunArray[0].StartIndex - 1;
+                    rtnVal._RunArray.Add(currRun);
+                    currRun = new Run();
+                }
+
+                // handle the middle runs.
+                currRun.StartIndex = _RunArray[0].EndIndex + 1;
+                for (int i = 0; i < _RunArray.Count; i++) 
+                {
+                    currRun.EndIndex = _RunArray[i + 1].StartIndex - 1;
+                    rtnVal._RunArray.Add(currRun);
+                    currRun = new Run();
+                    currRun.StartIndex = _RunArray[i + 1].EndIndex + 1;
+                }
+
+                // handle the last run.
+                if (_Length >= currRun.StartIndex)
+                {
+                    currRun.EndIndex = _Length - 1;
+                    rtnVal._RunArray.Add(currRun);
+                }
+
+            }
+
+            return rtnVal;
+        }
+
         #endregion
 
         #region "Private Methods"
