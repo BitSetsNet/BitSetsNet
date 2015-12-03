@@ -2,8 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace BitsetsNET.RLE
 {
@@ -308,6 +307,20 @@ namespace BitsetsNET.RLE
         }
 
         public void SetAll(bool value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBitset Not()
         {
             throw new NotImplementedException();
         }

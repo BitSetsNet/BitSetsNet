@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace BitsetsNET
 {
@@ -117,6 +118,29 @@ namespace BitsetsNET
         public void SetAll(bool value)
         {
             _Array.SetAll(value);
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            return _Array.GetEnumerator();
+        }
+
+        public IBitset Not()
+        {
+            var newSet = new UncompressedBitArray();
+            newSet._Array = _Array.Not();
+
+            return newSet;
+        }
+
+        public int Cardinality()
+        {
+            throw new NotImplementedException();
         }
     }
 }
