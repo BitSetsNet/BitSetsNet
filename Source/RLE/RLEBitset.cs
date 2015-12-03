@@ -436,8 +436,30 @@ namespace BitsetsNET
             bool rtnVal = false;
             if (first.EndIndex >= second.StartIndex)
             {
+                //overlap
                 output.StartIndex = second.StartIndex;
                 output.EndIndex = first.EndIndex;
+                rtnVal = true;
+            }
+            return rtnVal;
+        }
+
+        private bool tryCreateUnion(Run runA, Run runB, ref Run output)
+        {
+            Run first = runA;
+            Run second = runB;
+            if (runA.StartIndex > runB.StartIndex)
+            {
+                first = runB;
+                second = runA;
+            }
+
+            bool rtnVal = false;
+            if (first.EndIndex >= second.StartIndex)
+            {
+                //overlap
+                output.StartIndex = first.StartIndex;
+                output.EndIndex = second.EndIndex;
                 rtnVal = true;
             }
             return rtnVal;
