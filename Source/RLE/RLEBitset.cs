@@ -455,7 +455,7 @@ namespace BitsetsNET
             }
 
             bool rtnVal = false;
-            if (first.EndIndex >= second.StartIndex)
+            if (first.EndIndex >= second.StartIndex - 1)
             {
                 //overlap
                 output.StartIndex = first.StartIndex;
