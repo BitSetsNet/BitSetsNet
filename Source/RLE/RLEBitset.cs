@@ -148,8 +148,8 @@ namespace BitsetsNET
             while (i < runsA.Count && j < runsB.Count)
             {
                 // check for overlap of the runs.
-                Run currRun = overlapAnd(runsA[i], runsB[j]);
-                if (currRun.StartIndex <= currRun.EndIndex)
+                Run currRun = new Run();
+                if (tryCreateIntersection(runsA[i], runsB[j], ref currRun))
                 {
                     rtnVal._RunArray.Add(currRun);
                 }
@@ -422,6 +422,26 @@ namespace BitsetsNET
         #endregion
 
         #region "Private Methods"
+
+        private bool tryCreateIntersection(Run runA, Run runB, ref Run output) 
+        {
+            Run first = runA;
+            Run second = runB;
+            if (runA.StartIndex > runB.StartIndex)
+            {
+                first = runB;
+                second = runA;
+            }
+
+            bool rtnVal = false;
+            if (first.EndIndex >= second.StartIndex)
+            {
+                output.StartIndex = second.StartIndex;
+                output.EndIndex = first.EndIndex;
+                rtnVal = true;
+            }
+            return rtnVal;
+        }
 
         private Run overlapAnd(Run runA, Run runB)
         {
