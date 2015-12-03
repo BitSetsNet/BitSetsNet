@@ -164,12 +164,12 @@ namespace BitsetsNET
 
         public override Container ior(BitsetContainer x)
         {
-            throw new NotImplementedException();
+            return x.or(this);
         }
 
         public override Container ior(ArrayContainer x)
         {
-            throw new NotImplementedException();
+            return this.or(x);
         }
 
         public override Container or(BitsetContainer x)

@@ -190,12 +190,32 @@ namespace BitsetsNET
 
         public override Container ior(BitsetContainer x)
         {
-            throw new NotImplementedException();
+            this.cardinality = 0;
+            for (int k = 0; k < this.bitmap.Length; ++k)
+            {
+                long w = this.bitmap[k] | x.bitmap[k];
+                this.bitmap[k] = w;
+                this.cardinality += Utility.longBitCount(w);
+            }
+            return this;
         }
 
         public override Container ior(ArrayContainer x)
         {
-            throw new NotImplementedException();
+            int c = x.cardinality;
+            for (int k = 0; k < c; ++k)
+            {
+                ushort v = x.content[k];
+                int i = v >> 6;
+
+                long w = this.bitmap[i];
+                long aft = w | (1L << v);
+                this.bitmap[i] = aft;
+
+                this.cardinality += (int)((w - aft) >> 63);
+
+            }
+            return this;
         }
 
         public override Container or(BitsetContainer value2)
@@ -234,7 +254,22 @@ namespace BitsetsNET
 
         public override Container remove(ushort x)
         {
-            throw new NotImplementedException();
+            //review logic
+            long bef = bitmap[x];
+            long mask = (1L << x);
+            if (cardinality == ArrayContainer.DEFAULT_MAX_SIZE + 1)
+            {
+                if ((bef & mask) != 0)
+                {
+                    --cardinality;
+                    bitmap[x / 64] = bef & (~mask);
+                    return this.toArrayContainer();
+                }
+            }
+            long aft = bef & (~mask);
+            cardinality -= (int)((aft - bef) >> 63);
+            bitmap[x] = aft;
+            return this;
         }
 
         public override ushort select(int j)

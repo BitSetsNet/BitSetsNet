@@ -240,7 +240,67 @@ namespace BitsetsNET
 
         public void OrWith(IBitset otherSet)
         {
-            throw new NotImplementedException();
+            if (!(otherSet is RoaringBitset))
+                throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitSet");
+
+
+            RoaringBitset x2 = (RoaringBitset)otherSet;
+
+            int pos1 = 0, pos2 = 0;
+            int length1 = this.containers.size, length2 = x2.containers.size;
+
+            if (pos1 < length1 && pos2 < length2)
+            {
+                ushort s1 = this.containers.getKeyAtIndex(pos1);
+                ushort s2 = x2.containers.getKeyAtIndex(pos2);
+
+                while (true)
+                {
+                    if (s1 == s2)
+                    {
+                        this.containers.setContainerAtIndex(
+                            pos1,
+                            this.containers.getContainerAtIndex(pos1).ior(
+                                x2.containers.getContainerAtIndex(pos2)
+                            )
+                        );
+                        pos1++;
+                        pos2++;
+                        if ((pos1 == length1) || (pos2 == length2))
+                        {
+                            break;
+                        }
+                        s1 = this.containers.getKeyAtIndex(pos1);
+                        s2 = x2.containers.getKeyAtIndex(pos2);
+                    }
+                    else if (s1 < s2)
+                    {
+                        pos1++;
+                        if (pos1 == length1)
+                        {
+                            break;
+                        }
+                        s1 = this.containers.getKeyAtIndex(pos1);
+                    }
+                    else
+                    { // s1 > s2
+                        this.containers.insertNewKeyValueAt(pos1, s2, x2.containers.getContainerAtIndex(pos2));
+                        pos1++;
+                        length1++;
+                        pos2++;
+                        if (pos2 == length2)
+                        {
+                            break;
+                        }
+                        s2 = x2.containers.getKeyAtIndex(pos2);
+                    }
+                }
+            }
+
+            if (pos1 == length1)
+            {
+                this.containers.appendCopy(x2.containers, pos2, length2);
+            } 
         }
 
         public bool Get(int index)
