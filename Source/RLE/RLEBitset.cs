@@ -349,6 +349,12 @@ namespace BitsetsNET
                 if (this._Length == otherRLESet._Length &&
                 this._RunArray.Count == otherRLESet._RunArray.Count)
                 {
+
+                    if (this._RunArray.Count == 0)
+                    {
+                        rtnVal = true;
+                    }
+
                     for (int i = 0; i < this._RunArray.Count; i++)
                     {
                         if (this._RunArray[i].StartIndex == otherRLESet._RunArray[i].StartIndex &&
