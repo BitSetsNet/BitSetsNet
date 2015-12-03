@@ -137,7 +137,8 @@ namespace BitsetsNET
         {
             RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
             RLEBitset rtnVal = new RLEBitset(); // instantiate the return value
-            
+            rtnVal._Length = this._Length;
+
             List<Run> runsA = this._RunArray;
             List<Run> runsB = otherRLESet._RunArray;
 
