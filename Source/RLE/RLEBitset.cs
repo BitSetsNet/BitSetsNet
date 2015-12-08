@@ -344,16 +344,20 @@ namespace BitsetsNET
             RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
 
             Run current = new Run();
-            int nextThisIndex = 0; 
-            int nextOtherIndex = 0;
-
+            int nextThisIndex, nextOtherIndex; 
+ 
             if (this._RunArray.Count == 0)
             {
-                this._RunArray = new List<Run>(otherRLESet._RunArray); 
+                this._RunArray = new List<Run>(otherRLESet._RunArray);
+                this._Length = otherRLESet._Length;
+                nextThisIndex = this._RunArray.Count; //this stops the loops 
+                nextOtherIndex = this._RunArray.Count; 
+                
             }
             else if (otherRLESet._RunArray.Count == 0)
             {
-                //do nothing    
+                nextThisIndex = this._RunArray.Count; //this stops the loops
+                nextOtherIndex = this._RunArray.Count; 
             }
             else if (this._RunArray[0].StartIndex <= otherRLESet._RunArray[0].StartIndex)
             {
@@ -389,6 +393,8 @@ namespace BitsetsNET
 
             }
 
+
+
             if (nextThisIndex < this._RunArray.Count)
             {
                 //we finished the other, finish this one
@@ -402,7 +408,8 @@ namespace BitsetsNET
                 //we finished this one, finish the other
                 while (nextOtherIndex < otherRLESet._RunArray.Count)
                 {
-                    mergeOtherRun(otherRLESet, ref current, ref nextThisIndex, ref nextOtherIndex);
+                    int lastNextIndex = this._RunArray.Count;
+                    mergeOtherRun(otherRLESet, ref current, ref lastNextIndex, ref nextOtherIndex);
                 }
             }
         }
