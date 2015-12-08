@@ -442,10 +442,13 @@ namespace BitsetsNET
 
         private bool tryCreateUnion(Run runA, Run runB, ref Run output)
         {
-            bool rtnVal = false;
+
+            int startIdx = (runA.StartIndex >= runB.StartIndex ? runA.StartIndex : runB.StartIndex); // take the higher START index
+            int endIdx = (runA.EndIndex <= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the lower END index
 
             // if intersection exists, expand find the union
-            if (tryCreateIntersection(runA, runB, ref output))
+            bool rtnVal = false;
+            if (endIdx >= startIdx - 1)
             {
                 rtnVal = true;
                 output.StartIndex = (runA.StartIndex >= runB.StartIndex ? runB.StartIndex : runA.StartIndex); // take the lower START index
