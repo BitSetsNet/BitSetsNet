@@ -264,50 +264,114 @@ namespace BitsetsNET
         {
             RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
 
-            List<Run> runsA = this._RunArray;
-            List<Run> runsB = otherRLESet._RunArray;
+            Run current = new Run();
+            int nextThisIndex = 0; 
+            int nextOtherIndex = 0;
 
-            int i = 0;
-            int j = 0;
-
-            while (i < runsA.Count && j < runsB.Count)
+            if (this._RunArray.Count == 0)
             {
-                //check for overlap of the runs.
-                Run currRun = overlapOr(runsA[i], runsB[j]);
-                if (currRun.StartIndex <= currRun.EndIndex)
+                this._RunArray = otherRLESet._RunArray; //TODO this should clone
+            }
+            else if (otherRLESet._RunArray.Count == 0)
+            {
+                //do nothing    
+            }
+            else if (this._RunArray[0].StartIndex <= otherRLESet._RunArray[0].StartIndex)
+            {
+                current = this._RunArray[0];
+                nextThisIndex = 1;
+                nextOtherIndex = 0;
+            }
+            else if (tryCreateUnion(this._RunArray[0], otherRLESet._RunArray[0], ref current))
+            {
+                //first two sets overlap
+                this._RunArray[0] = current;
+                nextThisIndex = 1;
+                nextOtherIndex = 1;
+            }
+            else
+            {
+                this._RunArray.Insert(0, otherRLESet._RunArray[0]);
+                nextThisIndex = 1;
+                nextOtherIndex = 1;
+            }
+
+            while ((nextThisIndex < this._RunArray.Count) && (nextOtherIndex < otherRLESet._RunArray.Count))
+            {
+                if (this._RunArray[nextThisIndex].StartIndex >
+                    otherRLESet._RunArray[nextOtherIndex].StartIndex)
                 {
-                    runsA[i] = currRun;
-
-                    // the run we just created and replaced in place may encompass (partially or fully) the next run in the same array.
-                    // so we loop on that array building it out until we find that it DOES NOT encompass the next run by anything.
-                    while (i < runsA.Count -1 && runsA[i].EndIndex >= runsA[i+1].StartIndex)
-                    {
-                        if (runsA[i].EndIndex >= runsA[i + 1].EndIndex)
-                        {
-                            runsA.RemoveAt(i + 1);
-                        }
-                        else
-                        {
-                            runsA[i] = overlapOr(runsA[i], runsA[i + 1]);
-                            runsA.RemoveAt(i + 1);
-                        }
-                    }
-
-                    // the run in i'th position of runsA may have grown, so we catch up iterator j for runsB.
-                    while (j < runsB.Count && runsA[i].EndIndex >= runsB[j].EndIndex)
-                    {
-                        j += 1;
-                    }
+                    mergeOtherRun(otherRLESet, ref current, ref nextThisIndex, ref nextOtherIndex);
                 }
-
-                // if there's now a gap in overlap, we can move iterator i.             
-                if (j < runsB.Count && runsA[i].EndIndex - runsB[j].StartIndex < -1)
-                {
-                    i += 1;
+                else
+                {    
+                    mergeExistingRun(ref current, ref nextThisIndex);   
                 }
 
             }
 
+            if (nextThisIndex < this._RunArray.Count)
+            {
+                //we finished the other, finish this one
+                while (nextThisIndex < this._RunArray.Count)
+                {
+                    mergeExistingRun(ref current, ref nextThisIndex);
+                }
+            }
+            else
+            {
+                //we finished this one, finish the other
+                while (nextOtherIndex < otherRLESet._RunArray.Count)
+                {
+                    mergeOtherRun(otherRLESet, ref current, ref nextThisIndex, ref nextOtherIndex);
+                }
+            }
+        }
+
+        private void mergeOtherRun(RLEBitset other, ref Run current, ref int nextThisIndex, ref int nextOtherIndex)
+        {
+            Run next = other._RunArray[nextOtherIndex];
+            nextOtherIndex++;
+            if (!merge(ref current, ref next, true, nextThisIndex - 1))
+            {
+                //no merge, so a new interval has been inserted
+                nextThisIndex++;
+            }
+        }
+
+        private void mergeExistingRun(ref Run current, ref int nextIndex)
+        {
+            Run next = this._RunArray[nextIndex];
+            if (merge(ref current, ref next, false, nextIndex - 1))
+            {
+                //next has been merged, remove it
+                _RunArray.RemoveAt(nextIndex);
+            }
+            else
+            {
+                nextIndex++;
+            }
+        }
+
+        private bool merge(ref Run current, ref Run next, bool shouldInsert, int index)
+        {
+            bool mergedOverlappingIntervalIndicator = false;
+            if (tryCreateUnion(current, next, ref current))
+            {
+                //union made. Replace the current in place
+                this._RunArray[index] = current;
+                mergedOverlappingIntervalIndicator = true;
+            }
+            else
+            {
+                current = next;
+                if (shouldInsert)
+                {
+                    this._RunArray.Insert(index + 1, next);   
+                }
+            }
+
+            return mergedOverlappingIntervalIndicator;
         }
 
         public void Set(int index, bool value)
@@ -454,7 +518,7 @@ namespace BitsetsNET
                 output.StartIndex = (runA.StartIndex >= runB.StartIndex ? runB.StartIndex : runA.StartIndex); // take the lower START index
                 output.EndIndex = (runA.EndIndex >= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the higher END index
             }
-
+            
             return rtnVal;
         }
 
