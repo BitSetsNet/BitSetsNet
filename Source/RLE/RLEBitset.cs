@@ -157,16 +157,16 @@ namespace BitsetsNET
                 // iterate the counters appropriately to compare the next set of runs for overlap.
                 if (runsA[i].EndIndex > runsB[j].EndIndex + 1)
                 {
-                    j += 1;
+                    j++;
                 }
                 else if (runsA[i].EndIndex < runsB[j].EndIndex - 1)
                 {
-                    i += 1;
+                    i++;
                 }
                 else
                 {
-                    i += 1;
-                    j += 1;
+                    i++;
+                    j++;
                 }
 
             }
@@ -176,10 +176,94 @@ namespace BitsetsNET
 
         public void AndWith(IBitset otherSet)
         {
-            throw new NotImplementedException();
-        }
+    
 
-        /// <summary>
+            /*
+            if (otherSet.Cardinality() == 0)
+            {
+                this._RunArray.Clear();
+            }
+             */
+
+
+            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset
+
+
+
+            List<Run> runsA = this._RunArray;
+            List<Run> runsB = otherRLESet._RunArray;
+             
+            int i = 0;
+            int j = 0;
+
+            Run foo = new Run();
+            foo.StartIndex = 6;
+
+            while (i < runsA.Count && j < runsB.Count)
+            {
+                int x = runsA[i].StartIndex;
+                int y = runsA[i].EndIndex;
+                int w = runsB[j].StartIndex;
+                int z = runsB[j].EndIndex;
+
+                if (x < w)
+                {
+                    if (y < w)
+                    {
+                        runsA.RemoveAt(i);
+                    }
+                    else // (y >= w)
+                    {
+                        Run ithRun = runsA[i];
+                        ithRun.StartIndex = w;
+                        runsA[i] = ithRun;
+                        var what = this._RunArray[i];
+                        if (y <= z)
+                        {
+                            i++;
+                        }
+                        else // (y > z )
+                        {
+                            Run newRun =  new Run(z + 1, y);
+                            Run newRun2 = runsA[i];
+                            newRun2.EndIndex = z;
+                            runsA[i] = newRun2;
+                            runsA.Insert(i + 1, newRun); 
+                            i++;
+                            j++;
+                        }
+                    }
+                }
+                else // (x >= w)
+                {
+                    if (y <= z)
+                    {
+                        i++;
+                    }
+                    else // (y > z)
+                    {
+                        if (x <= z)
+                        {
+                            Run newRun = new Run(z + 1, y);
+                            Run newRun2 = runsA[i];
+                            newRun2.EndIndex = z;
+                            runsA[i] = newRun2;
+                            runsA.Insert(i + 1, newRun); 
+                            i++;
+                            j++;
+                        }
+                        else 
+                        {
+                            j++;
+                        }
+                    }
+                }
+            }
+            this._RunArray = this._RunArray.Take(i).ToList();
+        }
+             
+
+       /// <summary>
         /// Returns a deep copy of this RLEBitset.
         /// </summary>
         public IBitset Clone()
