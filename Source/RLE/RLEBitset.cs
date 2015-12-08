@@ -424,43 +424,34 @@ namespace BitsetsNET
 
         private bool tryCreateIntersection(Run runA, Run runB, ref Run output) 
         {
-            Run first = runA;
-            Run second = runB;
-            if (runA.StartIndex > runB.StartIndex)
-            {
-                first = runB;
-                second = runA;
-            }
 
+            int startIdx = (runA.StartIndex >= runB.StartIndex ? runA.StartIndex : runB.StartIndex); // take the higher START index
+            int endIdx = (runA.EndIndex <= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the lower END index
+
+            // determine if there is an intersection overlap and set return values accordingly
             bool rtnVal = false;
-            if (first.EndIndex >= second.StartIndex)
+            if (endIdx >= startIdx)
             {
-                //overlap
-                output.StartIndex = second.StartIndex;
-                output.EndIndex = first.EndIndex;
                 rtnVal = true;
+                output.StartIndex = startIdx;
+                output.EndIndex = endIdx;
             }
+            
             return rtnVal;
         }
 
         private bool tryCreateUnion(Run runA, Run runB, ref Run output)
         {
-            Run first = runA;
-            Run second = runB;
-            if (runA.StartIndex > runB.StartIndex)
+            bool rtnVal = false;
+
+            // if intersection exists, expand find the union
+            if (tryCreateIntersection(runA, runB, ref output))
             {
-                first = runB;
-                second = runA;
+                rtnVal = true;
+                output.StartIndex = (runA.StartIndex >= runB.StartIndex ? runB.StartIndex : runA.StartIndex); // take the lower START index
+                output.EndIndex = (runA.EndIndex >= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the higher END index
             }
 
-            bool rtnVal = false;
-            if (first.EndIndex >= second.StartIndex - 1)
-            {
-                //overlap
-                output.StartIndex = first.StartIndex;
-                output.EndIndex = second.EndIndex;
-                rtnVal = true;
-            }
             return rtnVal;
         }
 
