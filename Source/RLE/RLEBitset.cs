@@ -353,7 +353,7 @@ namespace BitsetsNET
 
                 // handle the middle runs.
                 currRun.StartIndex = _RunArray[0].EndIndex + 1;
-                for (int i = 0; i < _RunArray.Count; i++)
+                for (int i = 0; i < _RunArray.Count - 1; i++)
                 {
                     currRun.EndIndex = _RunArray[i + 1].StartIndex - 1;
                     rtnVal._RunArray.Add(currRun);
@@ -362,12 +362,16 @@ namespace BitsetsNET
                 }
 
                 // handle the last run.
-                if (_Length >= currRun.StartIndex)
+                if (_Length > currRun.StartIndex)
                 {
                     currRun.EndIndex = _Length - 1;
                     rtnVal._RunArray.Add(currRun);
                 }
 
+            }
+            else 
+            {
+                rtnVal._RunArray.Add(new Run(0, _Length - 1));
             }
 
             return rtnVal;
