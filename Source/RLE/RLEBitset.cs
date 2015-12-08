@@ -270,7 +270,7 @@ namespace BitsetsNET
 
             if (this._RunArray.Count == 0)
             {
-                this._RunArray = otherRLESet._RunArray; //TODO this should clone
+                this._RunArray = new List<Run>(otherRLESet._RunArray); 
             }
             else if (otherRLESet._RunArray.Count == 0)
             {
