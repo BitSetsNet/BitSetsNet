@@ -174,30 +174,21 @@ namespace BitsetsNET
             return rtnVal;
         }
 
+        /// <summary>
+        /// Intersects an IBitset with another IBitset, modifying the first IBitset rather 
+        /// than creating a new IBitset
+        /// </summary>
+        /// <param name="otherSet">the other IBitset</param>
+        /// <returns>void</returns>
         public void AndWith(IBitset otherSet)
         {
-    
-
-            /*
-            if (otherSet.Cardinality() == 0)
-            {
-                this._RunArray.Clear();
-            }
-             */
-
-
             RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset
-
-
 
             List<Run> runsA = this._RunArray;
             List<Run> runsB = otherRLESet._RunArray;
              
             int i = 0;
             int j = 0;
-
-            Run foo = new Run();
-            foo.StartIndex = 6;
 
             while (i < runsA.Count && j < runsB.Count)
             {
@@ -214,6 +205,8 @@ namespace BitsetsNET
                     }
                     else // (y >= w)
                     {
+                        // crops the current run in runsA from the left to align with 
+                        // the start of the current run in runsB
                         Run ithRun = runsA[i];
                         ithRun.StartIndex = w;
                         runsA[i] = ithRun;
@@ -224,6 +217,7 @@ namespace BitsetsNET
                         }
                         else // (y > z )
                         {
+                            // splits the run from runsA into two runs
                             Run newRun =  new Run(z + 1, y);
                             Run newRun2 = runsA[i];
                             newRun2.EndIndex = z;
@@ -244,6 +238,7 @@ namespace BitsetsNET
                     {
                         if (x <= z)
                         {
+                            // splits the run from runsA into two runs
                             Run newRun = new Run(z + 1, y);
                             Run newRun2 = runsA[i];
                             newRun2.EndIndex = z;
@@ -259,11 +254,11 @@ namespace BitsetsNET
                     }
                 }
             }
+            //this truncates runsA if we've considered all of the runs in runsB
             this._RunArray = this._RunArray.Take(i).ToList();
         }
              
-
-       /// <summary>
+        /// <summary>
         /// Returns a deep copy of this RLEBitset.
         /// </summary>
         public IBitset Clone()
