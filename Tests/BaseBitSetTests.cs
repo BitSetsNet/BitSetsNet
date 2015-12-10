@@ -87,10 +87,12 @@ namespace BitsetsNET.Tests
             int[] first = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
             int[] second = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
             int[] result = first.Union(second).ToArray();
+
             IBitset testSet = CreateSetFromIndicies(first, TEST_SET_LENGTH);
             testSet.OrWith(CreateSetFromIndicies(second, TEST_SET_LENGTH));
 
-            Assert.AreEqual(CreateSetFromIndicies(result, TEST_SET_LENGTH), testSet);
+            Assert.AreEqual(CreateSetFromIndicies(result, TEST_SET_LENGTH), testSet, generateMessage("OrWith", first, second, result));
+
         }
 
         [TestMethod()]
@@ -103,6 +105,28 @@ namespace BitsetsNET.Tests
         public virtual void SetAllTest()
         {
 
+        }
+
+        private string generateMessage(string functionName, int[] setA, int[] setB, int[] expected)
+        {
+            var builder = new System.Text.StringBuilder();
+            builder.AppendLine("Testing " + functionName);
+            builder.AppendLine("Set A " + generateSetMessage(setA));
+            builder.AppendLine("Set B " + generateSetMessage(setB));
+            builder.AppendLine("Expected " + generateSetMessage(expected));
+
+            return builder.ToString();
+        }
+
+        private string generateSetMessage(int[] indicies)
+        {
+            var builder = new System.Text.StringBuilder();
+            foreach (int i in indicies)
+            {
+                builder.Append(i); builder.Append(',');
+            }
+
+            return builder.ToString();
         }
 
     }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace BitsetsNET.RLE
+namespace BitsetsNET
 {
     public class RLEBitset : IBitset
     {
@@ -79,7 +79,11 @@ namespace BitsetsNET.RLE
         /// <returns>an RLEBitset</returns>
         public static IBitset CreateFrom(int[] indices)
         {
-            int capacity = indices.Max();
+            int capacity = 0;
+            if (indices.Length > 0)
+            {
+                capacity = indices.Max() + 1;
+            }
             return RLEBitset.CreateFrom(indices, capacity);
         }
 
@@ -93,32 +97,35 @@ namespace BitsetsNET.RLE
         /// <returns></returns>
         public static IBitset CreateFrom(int[] indices, int capacity)
         {
-            Array.Sort(indices); // sort the input array first.
-
-            if (indices.Last() > capacity) // capacity must be larger than highest index value in input array.
-            {
-                throw new ArgumentException("capacity cannot be less than max index value");
-            }
-          
             RLEBitset rtnVal = new RLEBitset();
             rtnVal._Length = capacity;
-            Run currRun = new Run();
-            currRun.StartIndex = indices.FirstOrDefault();
-            for (int i = 0; i < indices.Length; i++)
+
+            if (indices.Length > 0)
             {
-                if (i == indices.Length - 1)
+
+                Array.Sort(indices); // sort the input array first.
+                if (indices.Last() > capacity) // capacity must be larger than highest index value in input array.
                 {
-                    currRun.EndIndex = indices[i];
-                    rtnVal._RunArray.Add(currRun);
+                    throw new ArgumentException("capacity cannot be less than max index value");
                 }
-                else if(indices[i + 1] - indices[i] > 1)
+
+                Run currRun = new Run();
+                currRun.StartIndex = indices.FirstOrDefault();
+                for (int i = 0; i < indices.Length - 1; i++)
                 {
-                    currRun.EndIndex = indices[i];
-                    rtnVal._RunArray.Add(currRun);
-                    currRun = new Run();
-                    currRun.StartIndex = indices[i+1];
+                    if (indices[i + 1] - indices[i] > 1)
+                    {
+                        currRun.EndIndex = indices[i];
+                        rtnVal._RunArray.Add(currRun);
+                        currRun = new Run();
+                        currRun.StartIndex = indices[i + 1];
+                    }
                 }
+                currRun.EndIndex = indices.LastOrDefault();
+                rtnVal._RunArray.Add(currRun);
+
             }
+
             return rtnVal;
         }
 
@@ -128,14 +135,10 @@ namespace BitsetsNET.RLE
 
         public IBitset And(IBitset otherSet)
         {
-            if (!(otherSet is RLEBitset))
-            {
-                throw new ArgumentException("otherSet must be a RLEBitset to perform this operation.");
-            }
-            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset
-
+            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
             RLEBitset rtnVal = new RLEBitset(); // instantiate the return value
-            
+            rtnVal._Length = this._Length;
+
             List<Run> runsA = this._RunArray;
             List<Run> runsB = otherRLESet._RunArray;
 
@@ -145,25 +148,25 @@ namespace BitsetsNET.RLE
             while (i < runsA.Count && j < runsB.Count)
             {
                 // check for overlap of the runs.
-                Run currRun = overlapAnd(runsA[i], runsB[j]);
-                if (currRun.StartIndex <= currRun.EndIndex)
+                Run currRun = new Run();
+                if (tryCreateIntersection(runsA[i], runsB[j], ref currRun))
                 {
                     rtnVal._RunArray.Add(currRun);
                 }
 
                 // iterate the counters appropriately to compare the next set of runs for overlap.
-                if (runsA[i].EndIndex > runsB[j].EndIndex)
+                if (runsA[i].EndIndex > runsB[j].EndIndex + 1)
                 {
-                    j += 1;
+                    j++;
                 }
-                else if (runsA[i].EndIndex < runsB[j].EndIndex)
+                else if (runsA[i].EndIndex < runsB[j].EndIndex - 1)
                 {
-                    i += 1;
+                    i++;
                 }
                 else
                 {
-                    i += 1;
-                    j += 1;
+                    i++;
+                    j++;
                 }
 
             }
@@ -171,11 +174,90 @@ namespace BitsetsNET.RLE
             return rtnVal;
         }
 
+        /// <summary>
+        /// Intersects an IBitset with another IBitset, modifying the first IBitset rather 
+        /// than creating a new IBitset
+        /// </summary>
+        /// <param name="otherSet">the other IBitset</param>
+        /// <returns>void</returns>
         public void AndWith(IBitset otherSet)
         {
-            throw new NotImplementedException();
-        }
+            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset
 
+            List<Run> runsA = this._RunArray;
+            List<Run> runsB = otherRLESet._RunArray;
+             
+            int i = 0;
+            int j = 0;
+
+            while (i < runsA.Count && j < runsB.Count)
+            {
+                int x = runsA[i].StartIndex;
+                int y = runsA[i].EndIndex;
+                int w = runsB[j].StartIndex;
+                int z = runsB[j].EndIndex;
+
+                if (x < w)
+                {
+                    if (y < w)
+                    {
+                        runsA.RemoveAt(i);
+                    }
+                    else // (y >= w)
+                    {
+                        // crops the current run in runsA from the left to align with 
+                        // the start of the current run in runsB
+                        Run ithRun = runsA[i];
+                        ithRun.StartIndex = w;
+                        runsA[i] = ithRun;
+                        var what = this._RunArray[i];
+                        if (y <= z)
+                        {
+                            i++;
+                        }
+                        else // (y > z )
+                        {
+                            // splits the run from runsA into two runs
+                            Run newRun =  new Run(z + 1, y);
+                            Run newRun2 = runsA[i];
+                            newRun2.EndIndex = z;
+                            runsA[i] = newRun2;
+                            runsA.Insert(i + 1, newRun); 
+                            i++;
+                            j++;
+                        }
+                    }
+                }
+                else // (x >= w)
+                {
+                    if (y <= z)
+                    {
+                        i++;
+                    }
+                    else // (y > z)
+                    {
+                        if (x <= z)
+                        {
+                            // splits the run from runsA into two runs
+                            Run newRun = new Run(z + 1, y);
+                            Run newRun2 = runsA[i];
+                            newRun2.EndIndex = z;
+                            runsA[i] = newRun2;
+                            runsA.Insert(i + 1, newRun); 
+                            i++;
+                            j++;
+                        }
+                        else 
+                        {
+                            j++;
+                        }
+                    }
+                }
+            }
+            //this truncates runsA if we've considered all of the runs in runsB
+            this._RunArray = this._RunArray.Take(i).ToList();
+        }
+             
         /// <summary>
         /// Returns a deep copy of this RLEBitset.
         /// </summary>
@@ -189,9 +271,23 @@ namespace BitsetsNET.RLE
             return rtnVal;
         }
 
+        /// <summary>
+        /// Gets the boolean value at the given index.
+        /// </summary>
+        /// <param name="index">an index</param>
+        /// <returns>a boolean</returns>
         public bool Get(int index)
         {
-            throw new NotImplementedException();
+            bool rtnVal = false;
+            foreach (Run r in this._RunArray)
+            {
+                if (index >= r.StartIndex && index <= r.EndIndex)
+                {
+                    rtnVal = true;
+                    break;
+                }
+            }
+            return rtnVal;
         }
 
         /// <summary>
@@ -217,11 +313,7 @@ namespace BitsetsNET.RLE
 
         public IBitset Or(IBitset otherSet)
         {
-            //if (!(otherSet is RLEBitset))
-            //{
-            //    throw new ArgumentException("otherSet must be a RLEBitset to perform this operation.");
-            //}
-            //RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset
+            //RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
 
             //RLEBitset rtnVal = new RLEBitset(); // instantiate the return value
 
@@ -249,56 +341,123 @@ namespace BitsetsNET.RLE
 
         public void OrWith(IBitset otherSet)
         {
-            if (!(otherSet is RLEBitset))
+            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
+
+            Run current = new Run();
+            int nextThisIndex, nextOtherIndex; 
+ 
+            if (this._RunArray.Count == 0)
             {
-                throw new ArgumentException("otherSet must be a RLEBitset to perform this operation.");
+                this._RunArray = new List<Run>(otherRLESet._RunArray);
+                this._Length = otherRLESet._Length;
+                nextThisIndex = this._RunArray.Count; //this stops the loops 
+                nextOtherIndex = this._RunArray.Count; 
+                
             }
-            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset
-
-            List<Run> runsA = this._RunArray;
-            List<Run> runsB = otherRLESet._RunArray;
-
-            int i = 0;
-            int j = 0;
-
-            while (i < runsA.Count && j < runsB.Count)
+            else if (otherRLESet._RunArray.Count == 0)
             {
-                //check for overlap of the runs.
-                Run currRun = overlapOr(runsA[i], runsB[j]);
-                if (currRun.StartIndex <= currRun.EndIndex)
-                {
-                    runsA[i] = currRun;
-
-                    // the run we just created and replaced in place may encompass (partially or fully) the next run in the same array.
-                    // so we loop on that array building it out until we find that it DOES NOT encompass the next run by anything.
-                    while (i < runsA.Count -1 && runsA[i].EndIndex >= runsA[i+1].StartIndex)
-                    {
-                        if (runsA[i].EndIndex >= runsA[i + 1].EndIndex)
-                        {
-                            runsA.RemoveAt(i + 1);
-                        }
-                        else
-                        {
-                            runsA[i] = overlapOr(runsA[i], runsA[i + 1]);
-                            runsA.RemoveAt(i + 1);
-                        }
-                    }
-
-                    // the run in i'th position of runsA may have grown, so we catch up iterator j for runsB.
-                    while (j < runsB.Count && runsA[i].EndIndex >= runsB[j].EndIndex)
-                    {
-                        j += 1;
-                    }
-                }
-
-                // if there's now a gap in overlap, we can move iterator i.             
-                if (j < runsB.Count && runsA[i].EndIndex - runsB[j].StartIndex < -1)
-                {
-                    i += 1;
-                }
-
+                nextThisIndex = this._RunArray.Count; //this stops the loops
+                nextOtherIndex = this._RunArray.Count; 
+            }
+            else if (this._RunArray[0].StartIndex <= otherRLESet._RunArray[0].StartIndex)
+            {
+                current = this._RunArray[0];
+                nextThisIndex = 1;
+                nextOtherIndex = 0;
+            }
+            else if (tryCreateUnion(this._RunArray[0], otherRLESet._RunArray[0], ref current))
+            {
+                //first two sets overlap
+                this._RunArray[0] = current;
+                nextThisIndex = 1;
+                nextOtherIndex = 1;
+            }
+            else
+            {
+                this._RunArray.Insert(0, otherRLESet._RunArray[0]);
+                nextThisIndex = 1;
+                nextOtherIndex = 1;
             }
 
+            while ((nextThisIndex < this._RunArray.Count) && (nextOtherIndex < otherRLESet._RunArray.Count))
+            {
+                if (this._RunArray[nextThisIndex].StartIndex >
+                    otherRLESet._RunArray[nextOtherIndex].StartIndex)
+                {
+                    mergeOtherRun(otherRLESet, ref current, ref nextThisIndex, ref nextOtherIndex);
+                }
+                else
+                {    
+                    mergeExistingRun(ref current, ref nextThisIndex);   
+                }
+
+            }
+
+
+
+            if (nextThisIndex < this._RunArray.Count)
+            {
+                //we finished the other, finish this one
+                while (nextThisIndex < this._RunArray.Count)
+                {
+                    mergeExistingRun(ref current, ref nextThisIndex);
+                }
+            }
+            else
+            {
+                //we finished this one, finish the other
+                while (nextOtherIndex < otherRLESet._RunArray.Count)
+                {
+                    int lastNextIndex = this._RunArray.Count;
+                    mergeOtherRun(otherRLESet, ref current, ref lastNextIndex, ref nextOtherIndex);
+                }
+            }
+        }
+
+        private void mergeOtherRun(RLEBitset other, ref Run current, ref int nextThisIndex, ref int nextOtherIndex)
+        {
+            Run next = other._RunArray[nextOtherIndex];
+            nextOtherIndex++;
+            if (!merge(ref current, ref next, true, nextThisIndex - 1))
+            {
+                //no merge, so a new interval has been inserted
+                nextThisIndex++;
+            }
+        }
+
+        private void mergeExistingRun(ref Run current, ref int nextIndex)
+        {
+            Run next = this._RunArray[nextIndex];
+            if (merge(ref current, ref next, false, nextIndex - 1))
+            {
+                //next has been merged, remove it
+                _RunArray.RemoveAt(nextIndex);
+            }
+            else
+            {
+                nextIndex++;
+            }
+        }
+
+        private bool merge(ref Run current, ref Run next, bool shouldInsert, int index)
+        {
+            bool mergedOverlappingIntervalIndicator = false;
+            if (tryCreateUnion(current, next, ref current))
+            {
+                //union made. Replace the current in place
+                this._RunArray[index] = current;
+                mergedOverlappingIntervalIndicator = true;
+            }
+            else
+            {
+                current = next;
+                if (shouldInsert)
+                {
+                    this._RunArray.Insert(index + 1, next);   
+                }
+            }
+
+            return mergedOverlappingIntervalIndicator;
         }
 
         public void Set(int index, bool value)
@@ -320,14 +479,134 @@ namespace BitsetsNET.RLE
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Inverts all the values in the current IBitset, 
+        /// so that elements set to true are changed to false, and elements set to false are changed to true.
+        /// </summary>
+        /// <returns>a new IBitset with inverted values</returns>
         public IBitset Not()
         {
-            throw new NotImplementedException();
+            RLEBitset rtnVal = new RLEBitset();
+            rtnVal._Length = this._Length;
+            if (_RunArray.Count > 0)
+            {
+                Run currRun = new Run();
+
+                // handle first run if needed.
+                if (_RunArray[0].StartIndex > 0)
+                {
+                    currRun.StartIndex = 0;
+                    currRun.EndIndex = _RunArray[0].StartIndex - 1;
+                    rtnVal._RunArray.Add(currRun);
+                    currRun = new Run();
+                }
+
+                // handle the middle runs.
+                currRun.StartIndex = _RunArray[0].EndIndex + 1;
+                for (int i = 0; i < _RunArray.Count - 1; i++)
+                {
+                    currRun.EndIndex = _RunArray[i + 1].StartIndex - 1;
+                    rtnVal._RunArray.Add(currRun);
+                    currRun = new Run();
+                    currRun.StartIndex = _RunArray[i + 1].EndIndex + 1;
+                }
+
+                // handle the last run.
+                if (_Length > currRun.StartIndex)
+                {
+                    currRun.EndIndex = _Length - 1;
+                    rtnVal._RunArray.Add(currRun);
+                }
+
+            }
+            else 
+            {
+                rtnVal._RunArray.Add(new Run(0, _Length - 1));
+            }
+
+            return rtnVal;
+        }
+
+        /// <summary>
+        /// Determines if the other IBitset is equal to this one.
+        /// </summary>
+        /// <param name="otherSet">the other IBitset</param>
+        /// <returns>a boolean</returns>
+        public override bool Equals(object otherSet)
+        {
+            bool rtnVal = false;
+            if ((otherSet is RLEBitset))
+            {
+                RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
+
+                if (this._Length == otherRLESet._Length &&
+                this._RunArray.Count == otherRLESet._RunArray.Count)
+                {
+
+                    if (this._RunArray.Count == 0)
+                    {
+                        rtnVal = true;
+                    }
+
+                    for (int i = 0; i < this._RunArray.Count; i++)
+                    {
+                        if (this._RunArray[i].StartIndex == otherRLESet._RunArray[i].StartIndex &&
+                            this._RunArray[i].EndIndex == otherRLESet._RunArray[i].EndIndex)
+                        {
+                            rtnVal = true;
+                        }
+                        else
+                        {
+                            rtnVal = false;
+                            break;
+                        }
+                    }
+                }
+
+            }
+            
+            return rtnVal;
         }
 
         #endregion
 
         #region "Private Methods"
+
+        private bool tryCreateIntersection(Run runA, Run runB, ref Run output) 
+        {
+
+            int startIdx = (runA.StartIndex >= runB.StartIndex ? runA.StartIndex : runB.StartIndex); // take the higher START index
+            int endIdx = (runA.EndIndex <= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the lower END index
+
+            // determine if there is an intersection overlap and set return values accordingly
+            bool rtnVal = false;
+            if (endIdx >= startIdx)
+            {
+                rtnVal = true;
+                output.StartIndex = startIdx;
+                output.EndIndex = endIdx;
+            }
+            
+            return rtnVal;
+        }
+
+        private bool tryCreateUnion(Run runA, Run runB, ref Run output)
+        {
+
+            int startIdx = (runA.StartIndex >= runB.StartIndex ? runA.StartIndex : runB.StartIndex); // take the higher START index
+            int endIdx = (runA.EndIndex <= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the lower END index
+
+            // if intersection exists, expand find the union
+            bool rtnVal = false;
+            if (endIdx >= startIdx - 1)
+            {
+                rtnVal = true;
+                output.StartIndex = (runA.StartIndex >= runB.StartIndex ? runB.StartIndex : runA.StartIndex); // take the lower START index
+                output.EndIndex = (runA.EndIndex >= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the higher END index
+            }
+            
+            return rtnVal;
+        }
 
         private Run overlapAnd(Run runA, Run runB)
         {

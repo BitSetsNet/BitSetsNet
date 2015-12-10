@@ -12,7 +12,7 @@ namespace BitsetsNET.Tests
     {
         protected override IBitset CreateSetFromIndicies(int[] indices, int length)
         {
-            return RLE.RLEBitset.CreateFrom(indices);
+            return RLEBitset.CreateFrom(indices, length);
         }
     }
 }
