@@ -482,6 +482,26 @@ namespace BitsetsNET
             AndWith(otherRLESet.Not());
         }
 
+        /// <summary>
+        /// Sets all bits in the given range to the specified value.
+        /// </summary>
+        /// <param name="startIndex">The zero-based start position of the range.</param>
+        /// <param name="count">The number of bits in the range.</param>
+        /// <param name="value">The Boolean value to assign to the bits.</param>
+        public void SetRange(int startIndex, int count, bool value)
+        {
+            RLEBitset other = new RLEBitset();
+            other._RunArray.Add(new Run(startIndex, startIndex + count - 1));
+            if (value)
+            {
+                OrWith(other);
+            }
+            else
+            {
+                DiffWith(other);
+            }
+        }
+
         public void Set(int index, bool value)
         {
             throw new NotImplementedException();
