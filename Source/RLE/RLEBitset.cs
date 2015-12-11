@@ -460,6 +460,28 @@ namespace BitsetsNET
             return mergedOverlappingIntervalIndicator;
         }
 
+        /// <summary>
+        /// Performs the set difference, defined as the set in A and not in B.
+        /// </summary>
+        /// <param name="otherSet">the other IBitset</param>
+        /// <returns>The set difference of this set and the other.</returns>
+        public IBitset Diff(IBitset otherSet)
+        {
+            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
+            IBitset rtnVal = And(otherRLESet.Not());
+            return rtnVal;
+        }
+
+        /// <summary>
+        /// Performs the set difference, defined as the set in A and not in B.
+        /// </summary>
+        /// <param name="otherSet">the other IBitset</param>
+        public void DiffWith(IBitset otherSet)
+        {
+            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
+            AndWith(otherRLESet.Not());
+        }
+
         public void Set(int index, bool value)
         {
             throw new NotImplementedException();
