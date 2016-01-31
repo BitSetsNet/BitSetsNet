@@ -16,9 +16,14 @@ namespace BitsetsNET
         public Container[] values = null;
         public int size = 0;
 
-        public RoaringArray() {
-            keys = new ushort[INITIAL_CAPACITY];
-            values = new Container[INITIAL_CAPACITY];
+        public RoaringArray() : this(INITIAL_CAPACITY) {
+            //no additional work needed
+        }
+
+        public RoaringArray(int capacity)
+        {
+            keys = new ushort[capacity];
+            values = new Container[capacity];
         }
 
         public void append(ushort key, Container value)
@@ -147,6 +152,19 @@ namespace BitsetsNET
             return this.binarySearch(0, size, x); 
         }
 
+        /// <summary>
+        /// Logically resizes the Roaring Array after an in-place operation.
+        /// Fills all keys and values after its new last index with zeros
+        /// and null, respectively, and changes the size to the new size.
+        /// </summary>
+        /// <param name="newSize">the new size of the roaring array</param>
+        public void resize (int newSize)
+        {
+            Utility.Fill(keys, newSize, size, (ushort)0);
+            Utility.Fill(values, newSize, size, null);
+            size = newSize;
+        }
+
         private int binarySearch(int begin, int end, ushort key) {
             return Utility.unsignedBinarySearch(keys, begin, end, key);
         }
@@ -169,6 +187,18 @@ namespace BitsetsNET
             Array.Copy(values, i, values, i + 1, size - i);
             values[i] = value;
             size++;
+        }
+
+        /// <summary>
+        /// Replaces the key and container value at a given index.
+        /// </summary>
+        /// <param name="i">the working index</param>
+        /// <param name="key">key to set</param>
+        /// <param name="c">container to set</param>
+        public void replaceKeyAndContainerAtIndex(int i, ushort key, Container c)
+        {
+            keys[i] = key;
+            values[i] = c;
         }
 
         // make sure there is capacity for at least k more elements
@@ -206,6 +236,55 @@ namespace BitsetsNET
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Serialize the roaring array into a binary format.
+        /// </summary>
+        /// <param name="writer">The writer to write the serialization to.</param>
+        public void Serialize(BinaryWriter writer)
+        {
+            writer.Write(size);
+
+            for(int i = 0; i < size; i++)
+            {
+                writer.Write(keys[i]);
+                values[i].Serialize(writer);
+            }
+        }
+
+        /// <summary>
+        /// Deserialize a roaring array from a binary format, as written by the Serialize method.
+        /// </summary>
+        /// <param name="reader">The reader from which to deserialize the roaring array.</param>
+        /// <returns></returns>
+        public static RoaringArray Deserialize(BinaryReader reader)
+        {
+            RoaringArray array = new RoaringArray(reader.ReadInt32());
+            
+            for(int i = 0; i < array.size; i++)
+            {
+                array.keys[i] = (ushort) reader.ReadInt16();
+                array.values[i] = Container.Deserialize(reader);
+            }
+
+            return array;
+        }
+
+        /// <summary>
+        /// Get an enumerator of the set indices of this bitset.
+        /// </summary>
+        /// <returns>A enumerator giving the set (i.e. for which the bit is '1' or true) indices for this bitset.</returns>
+        public IEnumerator<int> GetEnumerator()
+        {
+            for(int i = 0; i < size; i++)
+            {
+                int highbits = keys[i] << 16;
+                foreach(ushort lowbits in values[i])
+                {
+                    yield return highbits + lowbits;
+                }
+            }
         }
     }
 }

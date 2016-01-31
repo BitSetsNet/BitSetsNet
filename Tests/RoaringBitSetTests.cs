@@ -12,7 +12,7 @@ namespace BitsetsNET.Tests
     {
         protected override IBitset CreateSetFromIndicies(int[] indices, int length)
         {
-            return RoaringBitset.Crte(indices);
+            return RoaringBitset.Create(indices);
         }
     }
 }

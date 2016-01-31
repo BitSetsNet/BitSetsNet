@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BitsetsNET
 {
-    public abstract class Container
+    public abstract class Container : IEnumerable<ushort>
     {
 
         /**
@@ -238,6 +239,36 @@ namespace BitsetsNET
         public abstract ushort select(int j);
 
 
+        /// <summary>
+        /// Serialize this container in a binary format.
+        /// </summary>
+        /// <param name="writer">The binary writer to write the serialization to.</param>
+        public abstract void Serialize(System.IO.BinaryWriter writer);
 
+        /// <summary>
+        /// Deserialize a container from a binary reader.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns>The next container represented by the reader.</returns>
+        /// <remarks>The binary format for deserialization is the format written by the Serialize method.</remarks>
+        public static Container Deserialize(System.IO.BinaryReader reader)
+        {
+            int cardinality = reader.ReadInt32();
+            if(cardinality < ArrayContainer.DEFAULT_MAX_SIZE)
+            {
+                return ArrayContainer.Deserialize(reader, cardinality);
+            }
+            else
+            {
+                return BitsetContainer.Deserialize(reader, cardinality);
+            }
+        }
+
+        public abstract IEnumerator<ushort> GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

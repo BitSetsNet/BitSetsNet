@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -135,14 +136,46 @@ namespace BitsetsNET
             return cardinality;
         }
 
-        public override Container iand(BitsetContainer x)
+        /// <summary>
+        /// Performs an intersection with another BitsetContainer. Depending on
+        /// the cardinality of the result, this will either modify the container
+        /// in place or return a new ArrayContainer.
+        /// </summary>
+        /// <param name="other">the other BitsetContainer to intersect</param>
+        public override Container iand(BitsetContainer other)
         {
-            throw new NotImplementedException();
+            int newCardinality = 0;
+            for (int k = 0; k < bitmap.Length; ++k)
+            {
+                newCardinality += Utility.longBitCount(
+                    bitmap[k] & other.bitmap[k]
+                );
+            }
+            if (newCardinality > ArrayContainer.DEFAULT_MAX_SIZE)
+            {
+                for (int k = 0; k < bitmap.Length; ++k)
+                {
+                    bitmap[k] = bitmap[k]
+                            & other.bitmap[k];
+                }
+                cardinality = newCardinality;
+                return this;
+            }
+            ArrayContainer ac = new ArrayContainer(newCardinality);
+            Utility.fillArrayAND(ref ac.content, bitmap, other.bitmap);
+            ac.cardinality = newCardinality;
+            return ac;
         }
 
-        public override Container iand(ArrayContainer x)
+        /// <summary>
+        /// Performs an "in-place" intersection with an ArrayContainer. Since
+        /// no in-place operation is actually possible, this method defaults to
+        /// calling ArrayContainer's and() method with this as input.
+        /// </summary>
+        /// <param name="other">the ArrayContainer to intersect</param>
+        public override Container iand(ArrayContainer other)
         {
-            throw new NotImplementedException();
+            return other.and(this); // No in-place possible
         }
 
         public override bool intersects(BitsetContainer x)
@@ -157,12 +190,32 @@ namespace BitsetsNET
 
         public override Container ior(BitsetContainer x)
         {
-            throw new NotImplementedException();
+            this.cardinality = 0;
+            for (int k = 0; k < this.bitmap.Length; ++k)
+            {
+                long w = this.bitmap[k] | x.bitmap[k];
+                this.bitmap[k] = w;
+                this.cardinality += Utility.longBitCount(w);
+            }
+            return this;
         }
 
         public override Container ior(ArrayContainer x)
         {
-            throw new NotImplementedException();
+            int c = x.cardinality;
+            for (int k = 0; k < c; ++k)
+            {
+                ushort v = x.content[k];
+                int i = v >> 6;
+
+                long w = this.bitmap[i];
+                long aft = w | (1L << v);
+                this.bitmap[i] = aft;
+
+                this.cardinality += (int)((w - aft) >> 63);
+
+            }
+            return this;
         }
 
         public override Container or(BitsetContainer value2)
@@ -201,7 +254,22 @@ namespace BitsetsNET
 
         public override Container remove(ushort x)
         {
-            throw new NotImplementedException();
+            //review logic
+            long bef = bitmap[x];
+            long mask = (1L << x);
+            if (cardinality == ArrayContainer.DEFAULT_MAX_SIZE + 1)
+            {
+                if ((bef & mask) != 0)
+                {
+                    --cardinality;
+                    bitmap[x / 64] = bef & (~mask);
+                    return this.toArrayContainer();
+                }
+            }
+            long aft = bef & (~mask);
+            cardinality -= (int)((aft - bef) >> 63);
+            bitmap[x] = aft;
+            return this;
         }
 
         public override ushort select(int j)
@@ -229,5 +297,55 @@ namespace BitsetsNET
             return false;
         }
 
+        /// <summary>
+        /// Serialize this container in a binary format.
+        /// </summary>
+        /// <param name="writer">The writer to which to serialize this container.</param>
+        /// <remarks>The format of the serialization is the cardinality of this container as a 32-bit integer, followed by the bit array. The cardinality is used in deserialization to distinguish BitsetContainers from ArrayContainers.</remarks>
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.Write(cardinality);
+            foreach(long value in bitmap)
+            {
+                writer.Write(value);
+            }
+        }
+
+        /// <summary>
+        /// Deserialize a container from binary format, as written by the Serialize method minus the first 32 bits giving the cardinality.
+        /// </summary>
+        /// <param name="reader">The reader to deserialize from.</param>
+        /// <returns>The first container represented by reader.</returns>
+        public static BitsetContainer Deserialize(BinaryReader reader, int cardinality)
+        {
+            BitsetContainer container = new BitsetContainer();
+
+            container.cardinality = cardinality;
+            for(int i = 0; i < container.bitmap.Length; i++)
+            {
+                container.bitmap[i] = reader.ReadInt64();
+            }
+
+            return container;
+        }
+
+        public override IEnumerator<ushort> GetEnumerator()
+        {
+            ushort index = 0;
+            foreach(long value in bitmap)
+            {
+                //copy value so that we can modify it
+                long val = value;
+                for(int i = 0; i < 64; i++)
+                {
+                    if((val & 1) == 1)
+                    {
+                        yield return index;
+                    }
+                    val >>= 1;
+                    index++;
+                }
+            }
+        }
     }
 }
