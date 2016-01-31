@@ -22,9 +22,8 @@ namespace BitsetsNET
 
         public RoaringArray(int capacity)
         {
-            size = capacity;
-            keys = new ushort[size];
-            values = new Container[size];
+            keys = new ushort[capacity];
+            values = new Container[capacity];
         }
 
         public void append(ushort key, Container value)
