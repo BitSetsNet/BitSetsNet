@@ -172,7 +172,10 @@ namespace BitsetsNET
             {
                 andWith((RoaringBitset)otherSet);
             }
-            throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitset");
+            else
+            {
+                throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitset");
+            }
         }
 
         public IBitset Clone()
