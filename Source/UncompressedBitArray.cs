@@ -142,5 +142,13 @@ namespace BitsetsNET
         {
             throw new NotImplementedException();
         }
+
+        public void Set(int start, int end, bool value)
+        {
+            for (int i = start; i <= end; i++ )
+            {
+                _Array.Set(i, value);
+            }
+        }
     }
 }

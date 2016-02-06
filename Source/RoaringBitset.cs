@@ -422,5 +422,9 @@ namespace BitsetsNET
             return containers.GetEnumerator();
         }
 
+        public void Set(int start, int end, bool value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -650,6 +650,11 @@ namespace BitsetsNET
             return rtnVal;
         }
 
+        public void Set(int start, int end, bool value)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
     }

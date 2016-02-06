@@ -24,6 +24,8 @@ namespace BitsetsNET
 
         void Set(int index, bool value);
 
+        void Set(int start, int end, bool value);
+
         void SetAll(bool value);
 
         bool Equals(object obj);
