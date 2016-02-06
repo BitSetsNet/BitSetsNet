@@ -254,11 +254,15 @@ namespace BitsetsNET
 
         public override Container remove(ushort x)
         {
-            //review logic
-            long bef = bitmap[x];
+            int index = x / 64;
+            long bef = bitmap[index];
             long mask = (1L << x);
+
             if (cardinality == ArrayContainer.DEFAULT_MAX_SIZE + 1)
-            {
+            {// this is
+             // the
+             // uncommon
+             // path
                 if ((bef & mask) != 0)
                 {
                     --cardinality;
@@ -266,9 +270,10 @@ namespace BitsetsNET
                     return this.toArrayContainer();
                 }
             }
+
             long aft = bef & (~mask);
-            cardinality -= (int)((aft - bef) >> 63);
-            bitmap[x] = aft;
+            cardinality -= (aft - bef) != 0 ? 1 : 0;
+            bitmap[index] = aft;
             return this;
         }
 

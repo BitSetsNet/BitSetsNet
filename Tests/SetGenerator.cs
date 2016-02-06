@@ -31,5 +31,16 @@ namespace BitsetsNET.Tests
 
             return indexSet.ToArray();
         }
+
+        public static int[] GetContiguousArray(int start, int end)
+        {
+            int[] set = new int[end - start];
+            for (int i = start; i < end; i++)
+            {
+                set[i - start] = i;
+            }
+
+            return set;
+        }
     }
 }

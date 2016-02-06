@@ -109,8 +109,8 @@ namespace BitsetsNET.Tests
         [TestMethod()]
         public virtual void SetFalseTest()
         {
-            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
+            int[] set = { 1, 2, 3 };
+            IBitset testSet = CreateSetFromIndicies(set, 4);
             testSet.Set(2, false);
             bool expected = false;
             bool result = testSet.Get(2);

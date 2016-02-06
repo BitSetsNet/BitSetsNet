@@ -332,10 +332,34 @@ namespace BitsetsNET
             return getCardinality();
         }
 
+        /// <summary>
+        /// Adds the current index to the set if value is true, otherwise 
+        /// removes it if the set contains it.
+        /// </summary>
+        /// <param name="index">
+        /// the index to set
+        /// </param>
+        /// <param name="value">
+        /// boolean of whether to add or remove the index
+        /// </param>
         public void Set(int index, bool value)
         {
-            throw new NotImplementedException();
-            //add(index); //This only sets something to true.
+            if (value)
+            {
+                add(index);
+            } else { 
+                ushort hb = Utility.GetHighBits(index);
+                int containerIndex = containers.getIndex(hb);
+
+                if (containerIndex > -1)
+                {
+                    Container updatedContainer = 
+                        containers.getContainerAtIndex(containerIndex).remove(
+                            Utility.GetLowBits(index)
+                        );
+                    containers.setContainerAtIndex(containerIndex, updatedContainer);
+                }
+            }
         }
 
         public void SetAll(bool value)

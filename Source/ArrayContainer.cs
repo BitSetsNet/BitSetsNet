@@ -218,7 +218,14 @@ namespace BitsetsNET
 
         public override Container remove(ushort x)
         {
-            throw new NotImplementedException();
+            int loc = Utility.unsignedBinarySearch(content, 0, cardinality, x);
+            if (loc >= 0)
+            {
+                // insertion
+                Array.Copy(content, loc + 1, content, loc, cardinality - loc - 1);
+                --cardinality;
+            }
+            return this;
         }
 
         public override ushort select(int j)
