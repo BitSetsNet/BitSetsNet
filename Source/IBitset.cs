@@ -72,6 +72,10 @@ namespace BitsetsNET
 
         bool Equals(object obj);
 
+        /// <summary>
+        /// The number of members of the set
+        /// </summary>
+        /// <returns>an integer for the number of members in the set</returns>
         int Cardinality();
 
 

@@ -140,7 +140,14 @@ namespace BitsetsNET
 
         public int Cardinality()
         {
-            throw new NotImplementedException();
+            int rtnValue = 0;
+
+            for (int i = 0; i < _Array.Length; i++)
+            {
+                if (_Array[i]) rtnValue += 1;
+            }
+
+            return rtnValue;
         }
 
         public void Set(int start, int end, bool value)
@@ -178,7 +185,7 @@ namespace BitsetsNET
             {
                 if (workset._Array[i] && i < this.Length())
                 {
-                    this.Set(i, false);
+                    newArray.Set(i, false);
                 }
             }
 
