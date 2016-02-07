@@ -255,19 +255,9 @@ namespace BitsetsNET
                 }
                 leftover -= thiscard;
             }
-            throw new ArgumentOutOfRangeException("select " + j + " when the cardinality is " + this.getCardinality());
+            throw new ArgumentOutOfRangeException("select " + j + " when the cardinality is " + this.Cardinality());
         }
-
-        public int getCardinality()
-        {
-            int size = 0;
-            for (int i = 0; i < this.containers.size; i++)
-            {
-                size += this.containers.getContainerAtIndex(i).getCardinality();
-            }
-            return size;
-        }
-
+        
         public IBitset And(IBitset otherSet)
         {
             if (otherSet is RoaringBitset) {
@@ -494,7 +484,12 @@ namespace BitsetsNET
 
         public int Cardinality()
         {
-            return 0;
+            int size = 0;
+            for (int i = 0; i < this.containers.size; i++)
+            {
+                size += this.containers.getContainerAtIndex(i).getCardinality();
+            }
+            return size;
         }
 
         /// <summary>
