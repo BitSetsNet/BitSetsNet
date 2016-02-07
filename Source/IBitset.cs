@@ -55,6 +55,14 @@ namespace BitsetsNET
         /// <param name="end">the index to stop at (exclusive)</param>
         void Flip(int start, int end);
 
+        /// <summary>
+        /// Creates a new IBitSet that has the members of this BitSet that are 
+        /// not members of the otherSet.
+        /// </summary>
+        /// <param name="otherSet"></param>
+        /// <returns>a new IBitSet</returns>
+        IBitset Difference(IBitset otherSet);
+
         bool Equals(object obj);
 
         int Cardinality();

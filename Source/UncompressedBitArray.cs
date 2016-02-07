@@ -163,5 +163,26 @@ namespace BitsetsNET
                 Flip(i);
             }
         }
+
+        public IBitset Difference(IBitset otherSet)
+        {
+            UncompressedBitArray workset = null;
+            if (otherSet is UncompressedBitArray)
+                workset = (UncompressedBitArray)otherSet;
+            else
+                throw new InvalidOperationException("otherSet is not an UncompressedBitArray");
+
+            UncompressedBitArray newArray = (UncompressedBitArray) this.Clone();
+
+            for (int i = 0; i < workset._Array.Length; i++)
+            {
+                if (workset._Array[i] && i < this.Length())
+                {
+                    this.Set(i, false);
+                }
+            }
+
+            return newArray;
+        }
     }
 }

@@ -541,5 +541,10 @@ namespace BitsetsNET
         {
             throw new NotImplementedException();
         }
+
+        public IBitset Difference(IBitset otherSet)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
