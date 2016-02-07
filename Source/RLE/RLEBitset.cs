@@ -665,6 +665,11 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
+        public BitArray ToBitArray()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
     }

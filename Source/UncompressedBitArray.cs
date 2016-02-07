@@ -184,5 +184,10 @@ namespace BitsetsNET
 
             return newArray;
         }
+
+        public BitArray ToBitArray()
+        {
+            return new BitArray(this._Array);
+        }
     }
 }

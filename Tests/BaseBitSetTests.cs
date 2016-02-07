@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Linq;
-using System.Collections.Generic;
+using System.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BitsetsNET.Tests
@@ -199,6 +199,31 @@ namespace BitsetsNET.Tests
             bool expected2 = true;
             bool result2 = testSet1.Get(3);
             Assert.AreEqual(expected2, result2);
+        }
+
+        [TestMethod]
+        public virtual void ToBitArrayTest()
+        {
+            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
+            BitArray setArray = new BitArray(TEST_SET_LENGTH);
+
+            foreach (int index in set)
+            {
+                setArray[index] = true;
+            }
+
+            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
+            BitArray testArray = testSet.ToBitArray();
+
+            bool expected = true;
+            bool actual = setArray.Length == testArray.Length;
+
+            for (int i = 0; i < setArray.Length; i++)
+            {
+                actual &= setArray[i] == testArray[i];
+            }
+
+            Assert.AreEqual(expected, actual);
         }
 
         private string generateMessage(string functionName, int[] setA, int[] setB, int[] expected)

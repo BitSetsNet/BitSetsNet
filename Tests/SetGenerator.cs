@@ -22,7 +22,7 @@ namespace BitsetsNET.Tests
 
             var indexSet = new HashSet<int>();
            
-            int numberOfOnes = numberGenerator.Next(maxNumberOfOnes);
+            int numberOfOnes = Math.Max(numberGenerator.Next(maxNumberOfOnes), 1);
 
             for (int i = 0; i<numberOfOnes; i++)
             {
