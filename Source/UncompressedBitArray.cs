@@ -155,5 +155,13 @@ namespace BitsetsNET
         {
             _Array[index] = !_Array[index];
         }
+
+        public void Flip(int start, int end)
+        {
+            for (int i = start; i < end; i++)
+            {
+                Flip(i);
+            }
+        }
     }
 }

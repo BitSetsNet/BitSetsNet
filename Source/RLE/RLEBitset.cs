@@ -655,6 +655,11 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
+        public void Flip(int start, int end)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
     }

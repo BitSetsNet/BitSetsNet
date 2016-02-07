@@ -536,6 +536,10 @@ namespace BitsetsNET
         {
             return containers.GetEnumerator();
         }
-        
+
+        public void Flip(int start, int end)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
