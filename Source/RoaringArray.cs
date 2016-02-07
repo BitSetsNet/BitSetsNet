@@ -178,7 +178,37 @@ namespace BitsetsNET
             return values[i];
         }
 
-        // insert a new key, it is assumed that it does not exist
+        public void removeAtIndex(int i)
+        {
+            Array.Copy(keys, i + 1, keys, i, size - i - 1);
+            keys[size - 1] = 0;
+            Array.Copy(values, i + 1, values, i, size - i - 1);
+            values[size - 1] = null;
+            size--;
+        }
+
+        public void removeIndexRange(int begin, int end)
+        {
+            if (end <= begin) return;
+                int range = end - begin;
+
+            Array.Copy(keys, end, keys, begin, size - end);
+            Array.Copy(values, end, values, begin, size - end);
+
+            for (int i = 1; i <= range; ++i)
+            {
+                keys[size - i] = 0;
+                values[size - i] = null;
+            }
+            size -= range;
+        }
+        
+        /// <summary>
+        /// insert a new key, it is assumed that it does not exist
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void insertNewKeyValueAt(int i, ushort key, Container value)
         {
             extendArray(1);

@@ -25,6 +25,18 @@ namespace BitsetsNET
             this.cardinality = cardinality;
             this.bitmap = bitmap;
         }
+        
+        /// <summary>
+        /// Recomputes the cardinality of the bitmap.
+        /// </summary>
+        protected void computeCardinality()
+        {
+            this.cardinality = 0;
+            for (int k = 0; k < this.bitmap.Length; k++)
+            {
+                this.cardinality += Utility.longBitCount(this.bitmap[k]);
+            }
+        }
 
         public override Container add(ushort x)
         {
@@ -34,6 +46,15 @@ namespace BitsetsNET
             if (prevVal != newVal) ++cardinality;
             return this;
         }
+
+        public override Container add(ushort rangeStart, ushort rangeEnd)
+        {
+            // TODO: may need to convert to a RunContainer
+            Utility.setBitmapRange(bitmap, rangeStart, rangeEnd);
+            computeCardinality();
+            return this;
+        }
+
 
         public void loadData(ArrayContainer arrayContainer)
         {
@@ -254,11 +275,15 @@ namespace BitsetsNET
 
         public override Container remove(ushort x)
         {
-            //review logic
-            long bef = bitmap[x];
+            int index = x / 64;
+            long bef = bitmap[index];
             long mask = (1L << x);
+
             if (cardinality == ArrayContainer.DEFAULT_MAX_SIZE + 1)
-            {
+            {// this is
+             // the
+             // uncommon
+             // path
                 if ((bef & mask) != 0)
                 {
                     --cardinality;
@@ -266,9 +291,21 @@ namespace BitsetsNET
                     return this.toArrayContainer();
                 }
             }
+
             long aft = bef & (~mask);
-            cardinality -= (int)((aft - bef) >> 63);
-            bitmap[x] = aft;
+            cardinality -= (aft - bef) != 0 ? 1 : 0;
+            bitmap[index] = aft;
+            return this;
+        }
+        
+        public override Container remove(ushort begin, ushort end)
+        {
+            Utility.resetBitmapRange(bitmap, begin, end);
+            computeCardinality();
+
+            if (getCardinality() <= ArrayContainer.DEFAULT_MAX_SIZE)
+                return toArrayContainer();
+
             return this;
         }
 

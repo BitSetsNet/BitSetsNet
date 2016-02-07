@@ -14,5 +14,49 @@ namespace BitsetsNET.Tests
         {
             return RoaringBitset.Create(indices);
         }
+
+        [TestMethod()]
+        public virtual void SetTrueLarge()
+        {
+            int[] set = SetGenerator.GetContiguousArray(9, 5009);
+            IBitset testSet = CreateSetFromIndicies(set, 5000);
+            testSet.Set(8, true);
+            bool expected = true;
+            bool result = testSet.Get(8);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod()]
+        public virtual void SetFalseLarge()
+        {
+            int[] set = SetGenerator.GetContiguousArray(0, 5000);
+            IBitset testSet = CreateSetFromIndicies(set, 5000);
+            testSet.Set(2, false);
+            bool expected = false;
+            bool result = testSet.Get(2);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod()]
+        public virtual void SetRangeTrueLargeTest()
+        {
+            int[] set = SetGenerator.GetContiguousArray(0, 5000);
+            IBitset testSet = CreateSetFromIndicies(set, 5000);
+            testSet.Set(5007, 5009, true);
+            bool expected = true;
+            bool result = testSet.Get(8);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod()]
+        public virtual void SetRangeFalseLargeTest()
+        {
+            int[] set = SetGenerator.GetContiguousArray(0, 5000); ;
+            IBitset testSet = CreateSetFromIndicies(set, 5000);
+            testSet.Set(1, 3, false);
+            bool expected = false;
+            bool result = testSet.Get(2);
+            Assert.AreEqual(expected, result);
+        }
     }
 }

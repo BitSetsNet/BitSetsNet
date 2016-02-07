@@ -96,9 +96,47 @@ namespace BitsetsNET.Tests
         }
 
         [TestMethod()]
-        public virtual void SetTest()
+        public virtual void SetTrueTest()
         {
+            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
+            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
+            testSet.Set(8, true);
+            bool expected = true;
+            bool result = testSet.Get(8);
+            Assert.AreEqual(expected, result);
+        }
 
+        [TestMethod()]
+        public virtual void SetFalseTest()
+        {
+            int[] set = { 1, 2, 3 };
+            IBitset testSet = CreateSetFromIndicies(set, 4);
+            testSet.Set(2, false);
+            bool expected = false;
+            bool result = testSet.Get(2);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod()]
+        public virtual void SetRangeTrueTest()
+        {
+            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
+            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
+            testSet.Set(7,9, true);
+            bool expected = true;
+            bool result = testSet.Get(8);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod()]
+        public virtual void SetRangeFalseTest()
+        {
+            int[] set = { 1, 2, 3 };
+            IBitset testSet = CreateSetFromIndicies(set, 4);
+            testSet.Set(1, 3, false);
+            bool expected = false;
+            bool result = testSet.Get(2);
+            Assert.AreEqual(expected, result);
         }
 
         [TestMethod()]

@@ -46,6 +46,120 @@ namespace BitsetsNET
 
         }
 
+        /// <summary>
+        /// Add to the current bitmap all integers in [rangeStart,rangeEnd).
+        /// </summary>
+        /// <param name="rangeStart">inclusive beginning of range</param>
+        /// <param name="rangeEnd">exclusive ending of range</param>
+        public void add(int rangeStart, int rangeEnd)
+        {
+            if (rangeStart >= rangeEnd)
+                return; // empty range
+
+            ushort hbStart = Utility.GetHighBits(rangeStart);
+            ushort lbStart = Utility.GetLowBits(rangeStart);
+            ushort hbLast = Utility.GetHighBits(rangeEnd - 1);
+            ushort lbLast = Utility.GetLowBits(rangeEnd - 1);
+
+            for (ushort hb = hbStart; hb <= hbLast; ++hb)
+            {
+
+                // first container may contain partial range
+                ushort containerStart = 0;
+                if (hb == hbStart) { containerStart = lbStart; }
+
+                // last container may contain partial range
+                ushort containerLast = (hb == hbLast) ? lbLast : ushort.MaxValue;
+                int containerIndex = containers.getIndex(hb);
+
+                if (containerIndex >= 0)
+                {
+                    Container c = containers.getContainerAtIndex(containerIndex).add(
+                                   containerStart, (ushort)(containerLast + 1));
+                    containers.setContainerAtIndex(containerIndex, c);
+                }
+                else {
+                    Container newContainer = new ArrayContainer(100);
+                    newContainer = newContainer.add(lbStart, lbLast);
+                    containers.insertNewKeyValueAt(-containerIndex - 1, hb, newContainer);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove from the current bitmap all integers in [rangeStart,rangeEnd).
+        /// </summary>
+        /// <param name="rangeStart">inclusive beginning of range</param>
+        /// <param name="rangeEnd">exclusive ending of range</param>
+        public void remove(int rangeStart, int rangeEnd)
+        {
+            if (rangeStart >= rangeEnd)
+                return; // empty range
+
+            ushort hbStart = Utility.GetHighBits(rangeStart);
+            ushort lbStart = Utility.GetLowBits(rangeStart);
+            ushort hbLast = Utility.GetHighBits(rangeEnd - 1);
+            ushort lbLast = Utility.GetLowBits(rangeEnd - 1);
+
+            if (hbStart == hbLast)
+            {
+                int containerIndex = containers.getIndex(hbStart);
+
+                if (containerIndex < 0) return;
+
+                Container c = containers.getContainerAtIndex(containerIndex).remove(
+                        lbStart, (ushort)(lbLast + 1));
+
+                if (c.getCardinality() > 0)
+                    containers.setContainerAtIndex(containerIndex, c);
+                else
+                    containers.removeAtIndex(containerIndex);
+                return;
+            }
+
+            int ifirst = containers.getIndex(hbStart);
+            int ilast = containers.getIndex(hbLast);
+
+            if (ifirst >= 0)
+            {
+                if (lbStart != 0)
+                {
+                    Container c = containers.getContainerAtIndex(ifirst).remove(
+                             lbStart, ushort.MaxValue);
+
+                    if (c.getCardinality() > 0)
+                    {
+                        containers.setContainerAtIndex(ifirst, c);
+                        ifirst++;
+                    }
+                }
+            }
+            else {
+                ifirst = -ifirst - 1;
+            }
+
+            if (ilast >= 0)
+            {
+                if (lbLast != ushort.MaxValue)
+                {
+                    Container c = containers.getContainerAtIndex(ilast).remove(
+                            0, (ushort)(lbLast + 1));
+
+                    if (c.getCardinality() > 0)
+                    {
+                        containers.setContainerAtIndex(ilast, c);
+                    }
+                    else ilast++;
+                }
+                else ilast++;
+            }
+            else {
+                ilast = -ilast - 1;
+            }
+
+            containers.removeIndexRange(ifirst, ilast);
+        }
+
         public static RoaringBitset and(RoaringBitset x1,
                                         RoaringBitset x2)
         {
@@ -332,10 +446,45 @@ namespace BitsetsNET
             return getCardinality();
         }
 
+        /// <summary>
+        /// Adds the current index to the set if value is true, otherwise 
+        /// removes it if the set contains it.
+        /// </summary>
+        /// <param name="index">
+        /// the index to set
+        /// </param>
+        /// <param name="value">
+        /// boolean of whether to add or remove the index
+        /// </param>
         public void Set(int index, bool value)
         {
-            throw new NotImplementedException();
-            //add(index); //This only sets something to true.
+            if (value)
+            {
+                add(index);
+            } else { 
+                ushort hb = Utility.GetHighBits(index);
+                int containerIndex = containers.getIndex(hb);
+
+                if (containerIndex > -1)
+                {
+                    Container updatedContainer = 
+                        containers.getContainerAtIndex(containerIndex).remove(
+                            Utility.GetLowBits(index)
+                        );
+                    containers.setContainerAtIndex(containerIndex, updatedContainer);
+                }
+            }
+        }
+
+        public void Set(int start, int end, bool value)
+        {
+            if (value)
+            {
+                add(start, end);
+            } else
+            {
+                remove(start, end);
+            }
         }
 
         public void SetAll(bool value)
@@ -397,6 +546,6 @@ namespace BitsetsNET
         {
             return containers.GetEnumerator();
         }
-
+        
     }
 }

@@ -64,6 +64,61 @@ namespace BitsetsNET
             return this;
         }
 
+        public override Container add(ushort begin, ushort end)
+        {
+            int indexstart = 
+                Utility.unsignedBinarySearch(content, 0, cardinality, begin);
+            if (indexstart < 0)
+                indexstart = -indexstart - 1;
+            int indexend = 
+                Utility.unsignedBinarySearch(content, 0, cardinality, (ushort)(end - 1));
+
+            if (indexend < 0)
+                indexend = -indexend - 1;
+            else
+                indexend++;
+
+            int rangelength = end - begin;
+            int newcardinality = 
+                indexstart + (cardinality - indexend) + rangelength;
+
+            if (newcardinality > DEFAULT_MAX_SIZE)
+            {
+                BitsetContainer a = this.toBitsetContainer();
+                return a.add(begin, end);
+            }
+
+            if (newcardinality >= this.content.Length)
+                increaseCapacity(newcardinality);
+
+            Array.Copy(content, indexend, this.content, indexstart
+                    + rangelength, cardinality - indexend);
+
+            for (int k = 0; k < rangelength; ++k)
+            {
+                this.content[k + indexstart] = (ushort)(begin + k);
+            }
+
+            this.cardinality = newcardinality;
+
+            return this;
+        }
+
+        private void increaseCapacity(int min)
+        {
+            int newCapacity = (this.content.Length == 0) ? DEFAULT_INIT_SIZE : this.content.Length < 64 ? this.content.Length * 2
+                    : this.content.Length < 1024 ? this.content.Length * 3 / 2
+                    : this.content.Length * 5 / 4;
+            if (newCapacity < min) newCapacity = min;
+            // never allocate more than we will ever need
+            if (newCapacity > ArrayContainer.DEFAULT_MAX_SIZE)
+                newCapacity = ArrayContainer.DEFAULT_MAX_SIZE;
+            // if we are within 1/16th of the max, go to max 
+            if (newCapacity < ArrayContainer.DEFAULT_MAX_SIZE - ArrayContainer.DEFAULT_MAX_SIZE / 16)
+                newCapacity = ArrayContainer.DEFAULT_MAX_SIZE;
+            Array.Resize(ref this.content, newCapacity);
+        }
+
         //TODO: This needs to be optimized. It should increase capacity by more than just 1 each time
         public void increaseCapacity()
         {
@@ -218,13 +273,44 @@ namespace BitsetsNET
 
         public override Container remove(ushort x)
         {
-            throw new NotImplementedException();
+            int loc = Utility.unsignedBinarySearch(content, 0, cardinality, x);
+            if (loc >= 0)
+            {
+                // insertion
+                Array.Copy(content, loc + 1, content, loc, cardinality - loc - 1);
+                --cardinality;
+            }
+            return this;
+        }
+
+        public override Container remove(ushort begin, ushort end)
+        {
+            int indexstart = 
+                Utility.unsignedBinarySearch(content, 0, cardinality, begin);
+
+            if (indexstart < 0)
+                indexstart = -indexstart - 1;
+
+            int indexend = 
+                Utility.unsignedBinarySearch(content, 0, cardinality, (ushort)(end - 1));
+
+            if (indexend < 0)
+                indexend = -indexend - 1;
+            else
+                indexend++;
+
+            int rangelength = indexend - indexstart;
+            Array.Copy(content, indexstart + rangelength, content, indexstart,
+                    cardinality - indexstart - rangelength);
+            cardinality -= rangelength;
+            return this;
         }
 
         public override ushort select(int j)
         {
             return this.content[j];
         }
+
         public override bool Equals(Object o) {
             if (o is ArrayContainer) {
                 ArrayContainer srb = (ArrayContainer) o;
