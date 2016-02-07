@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Linq;
-using System.Collections.Generic;
+using System.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BitsetsNET.Tests
@@ -58,14 +58,6 @@ namespace BitsetsNET.Tests
             bool expected = set.Contains(2);
             bool result = testSet.Get(2);
             Assert.AreEqual(expected, result);
-        }
-
-        [TestMethod()]
-        public virtual void LengthTest()
-        {
-            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
-            Assert.AreEqual(TEST_SET_LENGTH, testSet.Length());
         }
 
         [TestMethod()]
@@ -143,6 +135,95 @@ namespace BitsetsNET.Tests
         public virtual void SetAllTest()
         {
 
+        }
+
+        [TestMethod()]
+        public virtual void FlipTrueTest()
+        {
+            int[] set = { 1, 2, 3, 5 };
+            IBitset testSet = CreateSetFromIndicies(set, 6);
+            testSet.Flip(4);
+            bool expected = true;
+            bool result = testSet.Get(4);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod()]
+        public virtual void FlipFalseTest()
+        {
+            int[] set = { 1, 2, 3, 5 };
+            IBitset testSet = CreateSetFromIndicies(set, 6);
+            testSet.Flip(2);
+            bool expected = false;
+            bool result = testSet.Get(2);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod()]
+        public virtual void FlipRangeTrueTest()
+        {
+            int[] set = { 1, 2, 3, 7 };
+            IBitset testSet = CreateSetFromIndicies(set, 8);
+            testSet.Flip(4,6);
+            bool expected = true;
+            bool result = testSet.Get(5);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod()]
+        public virtual void FlipRangeFalseTest()
+        {
+            int[] set = { 1, 2, 3, 7 };
+            IBitset testSet = CreateSetFromIndicies(set, 8);
+            testSet.Flip(2,4);
+            bool expected = false;
+            bool result = testSet.Get(3);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod()]
+        public virtual void DifferenceTest()
+        {
+            int[] set1 = { 1, 2, 3, 7 };
+            IBitset testSet1 = CreateSetFromIndicies(set1, 8);
+
+            int[] set2 = { 1, 7 };
+            IBitset testSet2 = CreateSetFromIndicies(set2, 8);
+
+            testSet1.Difference(testSet2);
+
+            bool expected1 = false;
+            bool result1 = testSet1.Get(1);
+            Assert.AreEqual(expected1, result1);
+
+            bool expected2 = true;
+            bool result2 = testSet1.Get(3);
+            Assert.AreEqual(expected2, result2);
+        }
+
+        [TestMethod]
+        public virtual void ToBitArrayTest()
+        {
+            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
+            BitArray setArray = new BitArray(TEST_SET_LENGTH);
+
+            foreach (int index in set)
+            {
+                setArray[index] = true;
+            }
+
+            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
+            BitArray testArray = testSet.ToBitArray();
+
+            bool expected = true;
+            bool actual = setArray.Length == testArray.Length;
+
+            for (int i = 0; i < setArray.Length; i++)
+            {
+                actual &= setArray[i] == testArray[i];
+            }
+
+            Assert.AreEqual(expected, actual);
         }
 
         private string generateMessage(string functionName, int[] setA, int[] setB, int[] expected)

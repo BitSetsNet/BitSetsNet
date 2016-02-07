@@ -487,11 +487,6 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
-        public void SetAll(bool value)
-        {
-            throw new NotImplementedException();
-        }
-
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
         }
@@ -651,6 +646,26 @@ namespace BitsetsNET
         }
 
         public void Set(int start, int end, bool value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Flip(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Flip(int start, int end)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBitset Difference(IBitset otherSet)
+        {
+            throw new NotImplementedException();
+        }
+
+        public BitArray ToBitArray()
         {
             throw new NotImplementedException();
         }

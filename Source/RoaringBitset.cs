@@ -440,12 +440,7 @@ namespace BitsetsNET
                 return false;
             }
         }
-
-        public int Length()
-        {
-            return getCardinality();
-        }
-
+        
         /// <summary>
         /// Adds the current index to the set if value is true, otherwise 
         /// removes it if the set contains it.
@@ -486,8 +481,8 @@ namespace BitsetsNET
                 remove(start, end);
             }
         }
-
-        public void SetAll(bool value)
+        
+        public void Flip(int index)
         {
             throw new NotImplementedException();
         }
@@ -500,11 +495,6 @@ namespace BitsetsNET
         public int Cardinality()
         {
             return 0;
-        }
-
-        public IBitset Not()
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -546,6 +536,20 @@ namespace BitsetsNET
         {
             return containers.GetEnumerator();
         }
-        
+
+        public void Flip(int start, int end)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBitset Difference(IBitset otherSet)
+        {
+            throw new NotImplementedException();
+        }
+
+        public BitArray ToBitArray()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
