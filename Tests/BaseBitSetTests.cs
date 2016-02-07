@@ -226,6 +226,17 @@ namespace BitsetsNET.Tests
             Assert.AreEqual(expected, actual);
         }
 
+        [TestMethod]
+        public virtual void CardinalityTest()
+        {
+            int[] set = SetGenerator.GetContiguousArray(1, 5000);
+            IBitset testSet = CreateSetFromIndicies(set, set.Max() + 1);
+
+            int expected = set.Length;
+            int actual = testSet.Cardinality();
+            Assert.AreEqual(expected, actual);
+        }
+
         private string generateMessage(string functionName, int[] setA, int[] setB, int[] expected)
         {
             var builder = new System.Text.StringBuilder();
