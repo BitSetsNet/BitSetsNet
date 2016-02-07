@@ -20,17 +20,11 @@ namespace BitsetsNET
 
         bool Get(int index);
 
-        int Length();
-
         void Set(int index, bool value);
 
         void Set(int start, int end, bool value);
 
-        void SetAll(bool value);
-
         bool Equals(object obj);
-
-        IBitset Not();
 
         int Cardinality();
 

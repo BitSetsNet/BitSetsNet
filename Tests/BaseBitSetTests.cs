@@ -61,14 +61,6 @@ namespace BitsetsNET.Tests
         }
 
         [TestMethod()]
-        public virtual void LengthTest()
-        {
-            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
-            Assert.AreEqual(TEST_SET_LENGTH, testSet.Length());
-        }
-
-        [TestMethod()]
         public virtual void OrTest()
         {
             int[] first = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
