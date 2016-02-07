@@ -190,14 +190,14 @@ namespace BitsetsNET.Tests
             int[] set2 = { 1, 7 };
             IBitset testSet2 = CreateSetFromIndicies(set2, 8);
 
-            testSet1.Difference(testSet2);
+            IBitset diffSet = testSet1.Difference(testSet2);
 
             bool expected1 = false;
-            bool result1 = testSet1.Get(1);
+            bool result1 = diffSet.Get(1);
             Assert.AreEqual(expected1, result1);
 
             bool expected2 = true;
-            bool result2 = testSet1.Get(3);
+            bool result2 = diffSet.Get(3);
             Assert.AreEqual(expected2, result2);
         }
 

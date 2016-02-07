@@ -178,7 +178,7 @@ namespace BitsetsNET
             {
                 if (workset._Array[i] && i < this.Length())
                 {
-                    this.Set(i, false);
+                    newArray.Set(i, false);
                 }
             }
 

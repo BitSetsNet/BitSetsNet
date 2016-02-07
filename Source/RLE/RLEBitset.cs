@@ -465,7 +465,7 @@ namespace BitsetsNET
         /// </summary>
         /// <param name="otherSet">the other IBitset</param>
         /// <returns>The set difference of this set and the other.</returns>
-        public IBitset Diff(IBitset otherSet)
+        public IBitset Difference(IBitset otherSet)
         {
             RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
             IBitset rtnVal = And(otherRLESet.Not());
@@ -476,7 +476,7 @@ namespace BitsetsNET
         /// Performs the set difference, defined as the set in A and not in B.
         /// </summary>
         /// <param name="otherSet">the other IBitset</param>
-        public void DiffWith(IBitset otherSet)
+        public void DifferenceWith(IBitset otherSet)
         {
             RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
             AndWith(otherRLESet.Not());
@@ -656,11 +656,6 @@ namespace BitsetsNET
         }
 
         public void Flip(int start, int end)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IBitset Difference(IBitset otherSet)
         {
             throw new NotImplementedException();
         }
