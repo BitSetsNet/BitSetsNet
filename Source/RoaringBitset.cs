@@ -482,6 +482,11 @@ namespace BitsetsNET
             }
         }
         
+        public void Flip(int index)
+        {
+            throw new NotImplementedException();
+        }
+
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
 

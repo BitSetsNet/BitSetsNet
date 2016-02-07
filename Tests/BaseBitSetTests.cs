@@ -137,6 +137,28 @@ namespace BitsetsNET.Tests
 
         }
 
+        [TestMethod()]
+        public virtual void FlipTrueTest()
+        {
+            int[] set = { 1, 2, 3, 5 };
+            IBitset testSet = CreateSetFromIndicies(set, 6);
+            testSet.Flip(4);
+            bool expected = true;
+            bool result = testSet.Get(4);
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod()]
+        public virtual void FlipFalseTest()
+        {
+            int[] set = { 1, 2, 3, 5 };
+            IBitset testSet = CreateSetFromIndicies(set, 6);
+            testSet.Flip(2);
+            bool expected = false;
+            bool result = testSet.Get(2);
+            Assert.AreEqual(expected, result);
+        }
+
         private string generateMessage(string functionName, int[] setA, int[] setB, int[] expected)
         {
             var builder = new System.Text.StringBuilder();

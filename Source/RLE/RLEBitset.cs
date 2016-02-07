@@ -650,6 +650,11 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
+        public void Flip(int index)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
     }

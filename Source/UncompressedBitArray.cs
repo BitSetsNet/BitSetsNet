@@ -150,5 +150,10 @@ namespace BitsetsNET
                 _Array.Set(i, value);
             }
         }
+
+        public void Flip(int index)
+        {
+            _Array[index] = !_Array[index];
+        }
     }
 }

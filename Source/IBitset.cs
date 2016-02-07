@@ -24,6 +24,8 @@ namespace BitsetsNET
 
         void Set(int start, int end, bool value);
 
+        void Flip(int index);
+
         bool Equals(object obj);
 
         int Cardinality();
