@@ -9,14 +9,27 @@ namespace BitsetsNET
 {
     public abstract class Container : IEnumerable<ushort>
     {
+        
+        /// <summary>
+        /// Add a short to the container. May generate a new container.
+        /// </summary>
+        /// <param name="x">short to be added</param>
+        /// <returns>this container modified</returns>
+        public abstract Container add(ushort x);
 
         /**
-         * Add a short to the container. May generate a new container.
-         *
-         * @param x short to be added
-         * @return the new container
-         */
-        public abstract Container add(ushort x);
+        * Add to the current bitmap all integers in [rangeStart,rangeEnd).
+        *
+        * @param rangeStart inclusive beginning of range
+        * @param rangeEnd   exclusive ending of range
+        */
+
+        /// <summary>
+        /// Add to the current bitmap all integers in [rangeStart,rangeEnd).
+        /// </summary>
+        /// <param name="rangeStart">inclusive beginning of range</param>
+        /// <param name="rangeEnd">exclusive ending of range</param>
+        public abstract Container add(ushort rangeStart, ushort rangeEnd);
 
         /**
          * Computes the bitwise AND of this container with another
@@ -220,14 +233,21 @@ namespace BitsetsNET
                 return or((ArrayContainer)x);
             return or((BitsetContainer)x);
         }
-
-        /**
-         * Remove the short from this container. May create a new container.
-         *
-         * @param x to be removed
-         * @return New container
-         */
+        
+        /// <summary>
+        /// Remove the short from this container. May create a new container.
+        /// </summary>
+        /// <param name="x">to be removed</param>
+        /// <returns>the new container</returns>
         public abstract Container remove(ushort x);
+
+        /// <summary>
+        /// Remove shorts in [begin,end) using an unsigned interpretation. May generate a new container.
+        /// </summary>
+        /// <param name="begin">start of range (inclusive)</param>
+        /// <param name="end">end of range (exclusive)</param>
+        /// <returns>the new container</returns>
+        public abstract Container remove(ushort begin, ushort end);
 
         /**
          * Return the jth value 

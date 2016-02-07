@@ -122,7 +122,7 @@ namespace BitsetsNET.Tests
         {
             int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
             IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
-            testSet.Set(7,8, true);
+            testSet.Set(7,9, true);
             bool expected = true;
             bool result = testSet.Get(8);
             Assert.AreEqual(expected, result);
@@ -133,7 +133,7 @@ namespace BitsetsNET.Tests
         {
             int[] set = { 1, 2, 3 };
             IBitset testSet = CreateSetFromIndicies(set, 4);
-            testSet.Set(1, 2, false);
+            testSet.Set(1, 3, false);
             bool expected = false;
             bool result = testSet.Get(2);
             Assert.AreEqual(expected, result);

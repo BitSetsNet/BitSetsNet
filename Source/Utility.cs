@@ -445,5 +445,59 @@ namespace BitsetsNET
             }
             return seen + counter;
         }
+        
+        /// <summary>
+        /// clear bits at start, start+1,..., end-1
+        /// </summary>
+        /// <param name="bitmap">bitmap array of words to be modified</param>
+        /// <param name="start">start first index to be modified (inclusive)</param>
+        /// <param name="end">end last index to be modified (exclusive)</param>
+        public static void resetBitmapRange(long[] bitmap, int start, int end)
+        {
+            if (start == end) return;
+
+            int firstword = start / 64;
+            int endword = (end - 1) / 64;
+
+            if (firstword == endword)
+            {
+                bitmap[firstword] &= ~((~0L << start) & (long)(~0UL >> -end));
+                return;
+            }
+
+            bitmap[firstword] &= ~(~0L << start);
+
+            for (int i = firstword + 1; i < endword; i++)
+                bitmap[i] = 0;
+
+            bitmap[endword] &= (long)~(~0UL >> -end);
+        }
+
+        /// <summary>
+        /// set bits at start, start+1,..., end-1
+        /// </summary>
+        /// <param name="bitmap">array of words to be modified</param>
+        /// <param name="start">first index to be modified (inclusive)</param>
+        /// <param name="end">last index to be modified (exclusive)</param>
+        public static void setBitmapRange(long[] bitmap, ushort start, ushort end)
+        {
+            if (start == end) return;
+
+            int firstword = start / 64;
+            int endword = (end - 1) / 64;
+
+            if (firstword == endword)
+            {
+                bitmap[firstword] |= (~0L << start) & (long)(~0UL >> -end);
+                return;
+            }
+
+            bitmap[firstword] |= ~0L << start;
+
+            for (int i = firstword + 1; i < endword; i++)
+                bitmap[i] = ~0L;
+
+            bitmap[endword] |= (long)(~0UL >> -end);
+        }
     }
 }
