@@ -487,11 +487,6 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
-        public void SetAll(bool value)
-        {
-            throw new NotImplementedException();
-        }
-
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
         }

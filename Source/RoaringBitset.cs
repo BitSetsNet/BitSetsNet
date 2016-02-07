@@ -440,12 +440,7 @@ namespace BitsetsNET
                 return false;
             }
         }
-
-        public int Length()
-        {
-            return getCardinality();
-        }
-
+        
         /// <summary>
         /// Adds the current index to the set if value is true, otherwise 
         /// removes it if the set contains it.
@@ -486,12 +481,7 @@ namespace BitsetsNET
                 remove(start, end);
             }
         }
-
-        public void SetAll(bool value)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
 
@@ -500,11 +490,6 @@ namespace BitsetsNET
         public int Cardinality()
         {
             return 0;
-        }
-
-        public IBitset Not()
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
