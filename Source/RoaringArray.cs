@@ -68,6 +68,20 @@ namespace BitsetsNET
         }
 
         /// <summary>
+        /// Copies a range of keys and values from one location in 
+        /// the roaring array to another.
+        /// </summary>
+        /// <param name="begin">Original starting index</param>
+        /// <param name="end">Original ending index</param>
+        /// <param name="newBegin">New starting index</param>
+        internal void copyRange(int begin, int end, int newBegin)
+        {
+            int range = end - begin;
+            Array.Copy(this.keys, begin, this.keys, newBegin, range);
+            Array.Copy(this.values, begin, this.values, newBegin, range);
+        }
+
+        /// <summary>
         /// Append copies of the values from another array
         /// </summary>
         /// <param name="sa">

@@ -90,7 +90,28 @@ namespace BitsetsNET
                 return andNot((ArrayContainer) x);
             return andNot((BitsetContainer) x);
         }
-        
+
+        /// <summary>
+        /// Computes the bitwise ANDNOT of this container with another
+        /// (difference). Modifies the current container in place.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        public abstract Container iandNot(ArrayContainer x);
+
+        /// <summary>
+        /// Computes the bitwise ANDNOT of this container with another
+        /// (difference). Modifies the current container in place.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        public abstract Container iandNot(BitsetContainer x);
+
+        public Container iandNot(Container x)
+        {
+            if (x is ArrayContainer)
+                return iandNot((ArrayContainer)x);
+            return iandNot((BitsetContainer)x);
+        }
+
         public abstract Container clone();
 
         /**

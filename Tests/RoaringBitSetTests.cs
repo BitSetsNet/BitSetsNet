@@ -58,5 +58,25 @@ namespace BitsetsNET.Tests
             bool result = testSet.Get(2);
             Assert.AreEqual(expected, result);
         }
+
+        [TestMethod()]
+        public virtual void DifferenceWithTest()
+        {
+            int[] set1 = { 1, 2, 3, 7 };
+            RoaringBitset testSet1 = RoaringBitset.Create(set1);
+
+            int[] set2 = { 1, 7 };
+            RoaringBitset testSet2 = RoaringBitset.Create(set2);
+
+            testSet1.DifferenceWith(testSet2);
+
+            bool expected1 = false;
+            bool result1 = testSet1.Get(1);
+            Assert.AreEqual(expected1, result1);
+
+            bool expected2 = true;
+            bool result2 = testSet1.Get(3);
+            Assert.AreEqual(expected2, result2);
+        }
     }
 }

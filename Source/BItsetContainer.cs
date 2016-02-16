@@ -213,6 +213,52 @@ namespace BitsetsNET
         }
 
         /// <summary>
+        /// Returns the elements of this BitsetContainer that are not in the
+        /// ArrayContainer by modifying the current container in place. 
+        /// </summary>
+        /// <param name="x">the ArrayContainer to compare against</param>
+        /// <returns>A new container with the differences</returns>
+        public override Container iandNot(ArrayContainer x)
+        {
+            for (int k = 0; k < x.cardinality; ++k)
+            {
+                this.remove(x.content[k]);
+            }
+            if (cardinality <= ArrayContainer.DEFAULT_MAX_SIZE)
+                return this.toArrayContainer();
+            return this;
+        }
+
+        /// <summary>
+        /// Returns the elements of this BitsetContainer that are not in the
+        /// other BitsetContainer. Depending on the cardinality of the result, 
+        /// this will either modify the container in place or return a new ArrayContainer.
+        /// </summary>
+        /// <param name="x">the other BitsetContainer</param>
+        /// <returns>The current container, modified the differences</returns>
+        public override Container iandNot(BitsetContainer x)
+        {
+            int newCardinality = 0;
+            for (int k = 0; k < this.bitmap.Length; ++k)
+            {
+                newCardinality += Utility.longBitCount(this.bitmap[k] & (~x.bitmap[k]));
+            }
+            if (newCardinality > ArrayContainer.DEFAULT_MAX_SIZE)
+            {
+                for (int k = 0; k < this.bitmap.Length; ++k)
+                {
+                    this.bitmap[k] = this.bitmap[k] & (~x.bitmap[k]);
+                }
+                this.cardinality = newCardinality;
+                return this;
+            }
+            ArrayContainer ac = new ArrayContainer(newCardinality);
+            Utility.fillArrayANDNOT(ac.content, this.bitmap, x.bitmap);
+            ac.cardinality = newCardinality;
+            return ac;
+        }
+
+        /// <summary>
         /// Performs an intersection with another BitsetContainer. Depending on
         /// the cardinality of the result, this will either modify the container
         /// in place or return a new ArrayContainer.
