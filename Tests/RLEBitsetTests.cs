@@ -10,7 +10,7 @@ namespace BitsetsNET.Tests
     [TestClass()]
     public class RLEBitsetTests : BaseBitSetTests
     {
-        protected override IBitset CreateSetFromIndicies(int[] indices, int length)
+        protected override IBitset CreateSetFromIndices(int[] indices, int length)
         {
             return RLEBitset.CreateFrom(indices, length);
         }
