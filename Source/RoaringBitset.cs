@@ -260,7 +260,8 @@ namespace BitsetsNET
         
         public IBitset And(IBitset otherSet)
         {
-            if (otherSet is RoaringBitset) {
+            if (otherSet is RoaringBitset)
+            {
                 return and(this, (RoaringBitset)otherSet);
             }
             throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitset");
@@ -537,9 +538,67 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Finds members of this bitset that are not in the other set (ANDNOT).
+        /// This does not modify either bitset.
+        /// </summary>
+        /// <param name="otherSet">The set to compare against</param>
+        /// <returns>A new IBitset containing the members that are in
+        /// this bitset but not in the other.</returns>
+        public IBitset andNot(RoaringBitset otherSet)
+        {
+            RoaringBitset answer = new RoaringBitset();
+            int pos1 = 0, pos2 = 0;
+            int length1 = this.containers.size, length2 = otherSet.containers.size;
+
+            while (pos1 < length1 && pos2 < length2)
+            {
+                ushort s1 = this.containers.getKeyAtIndex(pos1);
+                ushort s2 = otherSet.containers.getKeyAtIndex(pos2);
+                if (s1 == s2)
+                {
+                    Container c1 = this.containers.getContainerAtIndex(pos1);
+                    Container c2 = otherSet.containers.getContainerAtIndex(pos2);
+                    Container c = c1.andNot(c2);
+                    if (c.getCardinality() > 0)
+                    {
+                        answer.containers.append(s1, c);
+                    }
+                    ++pos1;
+                    ++pos2;
+                }
+                else if (Utility.compareUnsigned(s1, s2) < 0)
+                { // s1 < s2
+                    int nextPos1 = this.containers.advanceUntil(s2, pos1);
+                    answer.containers.appendCopy(this.containers, pos1, nextPos1);
+                    pos1 = nextPos1;
+                }
+                else
+                { // s1 > s2
+                    pos2 = otherSet.containers.advanceUntil(s1, pos2);
+                }
+            }
+            if (pos2 == length2)
+            {
+                answer.containers.appendCopy(this.containers, pos1, length1);
+            }
+            return answer;
+        }
+
+        /// <summary>
+        /// Finds members of this bitset that are not in the other set (ANDNOT).
+        /// This does not modify either bitset.
+        /// </summary>
+        /// <param name="otherSet">The set to compare against</param>
+        /// <returns>A new IBitset containing the members that are in
+        /// this bitset but not in the other.</returns>
         public IBitset Difference(IBitset otherSet)
         {
-            throw new NotImplementedException();
+            if (otherSet is RoaringBitset)
+            {
+                return this.andNot((RoaringBitset) otherSet);
+            }
+            throw new ArgumentOutOfRangeException("Other set must be a roaring bitset");      
         }
 
         public BitArray ToBitArray()

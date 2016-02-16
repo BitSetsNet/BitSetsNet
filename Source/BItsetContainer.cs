@@ -158,6 +158,61 @@ namespace BitsetsNET
         }
 
         /// <summary>
+        /// Returns the elements of this BitsetContainer that are not in the
+        /// ArrayContainer.
+        /// </summary>
+        /// <param name="x">the ArrayContainer to compare against</param>
+        /// <returns>A new container with the differences</returns>
+        public override Container andNot(ArrayContainer x)
+        {
+            BitsetContainer answer = (BitsetContainer) clone();
+            int c = x.cardinality;
+            for (int k = 0; k < c; ++k)
+            {
+                ushort v = x.content[k];
+                uint i = Utility.toIntUnsigned(v) >> 6;
+                long w = answer.bitmap[i];
+                long aft = w & (~(1L << v));
+                answer.bitmap[i] = aft;
+                answer.cardinality -= (int) ((w ^ aft) >> v);
+            }
+            if (answer.cardinality <= ArrayContainer.DEFAULT_MAX_SIZE)
+                return answer.toArrayContainer();
+            return answer;
+        }
+
+        /// <summary>
+        /// Returns the elements of this BitsetContainer that are not in the
+        /// other BitsetContainer.
+        /// </summary>
+        /// <param name="x">the other BitsetContainer</param>
+        /// <returns>A new container with the differences</returns>
+        public override Container andNot(BitsetContainer x)
+        {
+            int newCardinality = 0;
+            for (int k = 0; k < this.bitmap.Length; ++k)
+            {
+                newCardinality += Utility.longBitCount(this.bitmap[k]
+                        & (~x.bitmap[k]));
+            }
+            if (newCardinality > ArrayContainer.DEFAULT_MAX_SIZE)
+            {
+                BitsetContainer answer = new BitsetContainer();
+                for (int k = 0; k < answer.bitmap.Length; ++k)
+                {
+                    answer.bitmap[k] = this.bitmap[k]
+                            & (~x.bitmap[k]);
+                }
+                answer.cardinality = newCardinality;
+                return answer;
+            }
+            ArrayContainer ac = new ArrayContainer(newCardinality);
+            Utility.fillArrayANDNOT(ac.content, this.bitmap, x.bitmap);
+            ac.cardinality = newCardinality;
+            return ac;
+        }
+
+        /// <summary>
         /// Performs an intersection with another BitsetContainer. Depending on
         /// the cardinality of the result, this will either modify the container
         /// in place or return a new ArrayContainer.

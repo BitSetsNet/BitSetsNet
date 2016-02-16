@@ -64,6 +64,47 @@ namespace BitsetsNET
             return this;
         }
 
+        /// <summary>
+        /// Returns the elements of this ArrayContainer that are not in the
+        /// other ArrayContainer.
+        /// </summary>
+        /// <param name="x">the other ArrayContainer</param>
+        /// <returns>A new container with the differences</returns>
+        public override Container andNot (ArrayContainer x)
+        {
+            int desiredCapacity = this.getCardinality();
+            var answer = new ArrayContainer(desiredCapacity);
+
+            // Compute the cardinality of the new container
+            answer.cardinality = Utility.unsignedDifference(this.content,
+                                                            desiredCapacity,
+                                                            x.content,
+                                                            x.getCardinality(),
+                                                            answer.content);
+            return answer;
+
+        }
+
+        /// <summary>
+        /// Returns the elements of this ArrayContainer that are not in the
+        /// other BitSetContainer.
+        /// </summary>
+        /// <param name="x">the BitSetContainer to compare against</param>
+        /// <returns>A new container with the differences</returns>
+        public override Container andNot (BitsetContainer x)
+        {
+            var answer = new ArrayContainer(content.Length);
+            int pos = 0;
+            for (int k = 0; k < cardinality; ++k)
+            {
+                ushort val = this.content[k];
+                if (!x.contains(val))
+                    answer.content[pos++] = val;
+            }
+            answer.cardinality = pos;
+            return answer;
+        }
+
         public override Container add(ushort begin, ushort end)
         {
             int indexstart = 
