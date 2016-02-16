@@ -10,7 +10,7 @@ namespace BitsetsNET.Tests
     [TestClass()]
     public class RoaringBitSetTests : BaseBitSetTests 
     {
-        protected override IBitset CreateSetFromIndicies(int[] indices, int length)
+        protected override IBitset CreateSetFromIndices(int[] indices, int length)
         {
             return RoaringBitset.Create(indices);
         }
@@ -19,7 +19,7 @@ namespace BitsetsNET.Tests
         public virtual void SetTrueLarge()
         {
             int[] set = SetGenerator.GetContiguousArray(9, 5009);
-            IBitset testSet = CreateSetFromIndicies(set, 5000);
+            IBitset testSet = CreateSetFromIndices(set, 5000);
             testSet.Set(8, true);
             bool expected = true;
             bool result = testSet.Get(8);
@@ -30,7 +30,7 @@ namespace BitsetsNET.Tests
         public virtual void SetFalseLarge()
         {
             int[] set = SetGenerator.GetContiguousArray(0, 5000);
-            IBitset testSet = CreateSetFromIndicies(set, 5000);
+            IBitset testSet = CreateSetFromIndices(set, 5000);
             testSet.Set(2, false);
             bool expected = false;
             bool result = testSet.Get(2);
@@ -41,7 +41,7 @@ namespace BitsetsNET.Tests
         public virtual void SetRangeTrueLargeTest()
         {
             int[] set = SetGenerator.GetContiguousArray(0, 5000);
-            IBitset testSet = CreateSetFromIndicies(set, 5000);
+            IBitset testSet = CreateSetFromIndices(set, 5000);
             testSet.Set(5007, 5009, true);
             bool expected = true;
             bool result = testSet.Get(8);
@@ -52,7 +52,7 @@ namespace BitsetsNET.Tests
         public virtual void SetRangeFalseLargeTest()
         {
             int[] set = SetGenerator.GetContiguousArray(0, 5000); ;
-            IBitset testSet = CreateSetFromIndicies(set, 5000);
+            IBitset testSet = CreateSetFromIndices(set, 5000);
             testSet.Set(1, 3, false);
             bool expected = false;
             bool result = testSet.Get(2);
