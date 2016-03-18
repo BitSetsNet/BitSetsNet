@@ -543,6 +543,79 @@ namespace BitsetsNET
         }
 
         /// <summary>
+        /// Flips the bit at the specified index.
+        /// </summary>
+        /// <param name="index">Index to be flipped</param>
+        public void Flip(int index)
+        {
+            if (_RunArray.Count == 0)
+            {
+                _RunArray.Add(new Run(index, index));
+            }
+            else
+            {
+                if (this.Get(index) == true)
+                {
+                    this.Set(index, false);
+                }
+                else
+                {
+                    this.Set(index, true);
+                }
+            }
+        }
+
+        public void Flip(int start, int end)
+        {
+            int length = _RunArray.Count;
+            int startOfNextNewRun = start;
+
+            if (end < start)
+            {
+                throw new ArgumentException("end must be greater than or equal to start");
+            }
+
+            if (length == 0)
+            {
+                _RunArray.Add(new Run(start, end));
+            }
+
+            for (int i = 0; i < length; i++)
+            {
+                int curRunStart = _RunArray[i].StartIndex;
+                int curRunEnd = _RunArray[i].EndIndex;
+                if (curRunStart < start && curRunEnd > end) // operation only flips one subsection of one run
+                {
+                    _RunArray.Insert(i + 1, new Run(end + 1, curRunEnd));
+                    _RunArray[i] = new Run(curRunStart, start - 1);
+                    return;
+                }
+                else if (curRunStart < start && curRunEnd > start) // start splits an existing run
+                {
+                    startOfNextNewRun = curRunEnd + 1;
+                    _RunArray[i] = new Run(curRunStart, start - 1);
+                }
+                else if (curRunStart >= start && curRunEnd <= end) // current run to be completely flipped
+                {
+                    int tmp = _RunArray[i].EndIndex;
+                    _RunArray[i] = new Run(startOfNextNewRun, curRunStart - 1);
+                    startOfNextNewRun = tmp + 1;
+                }
+                else if (curRunStart < end && curRunEnd > end) // end splits an existing run
+                {
+                    _RunArray.Insert(i, new Run(startOfNextNewRun, curRunStart - 1));
+                    _RunArray[i + 1] = new Run(end + 1, curRunEnd);
+                    return;
+                }
+                else if (curRunStart > end) // end does not split a run
+                {
+                    _RunArray.Insert(i, new Run(startOfNextNewRun, end));
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
         /// Inverts all the values in the current IBitset, 
         /// so that elements set to true are changed to false, and elements set to false are changed to true.
         /// </summary>
@@ -631,49 +704,18 @@ namespace BitsetsNET
             return rtnVal;
         }
 
-        public void Flip(int index)
+        public override int GetHashCode()
         {
-            throw new NotImplementedException();
-        }
-
-        public void Flip(int start, int end)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Returns the contents of this set as a bit array where the value is
-        /// set to true for each index that is a member of this set
-        /// </summary>
-        /// <returns>a new BitArray</returns>
-        public BitArray ToBitArray()
-        {
-            int arrayLength = 0;
-            if (this._RunArray.Count > 0)
+            unchecked
             {
-                arrayLength = this._RunArray.Last().EndIndex + 1;
-            }
-
-            BitArray rtnVal = new BitArray(arrayLength, false);
-
-            foreach (Run r in this._RunArray)
-            {
-                for (int i = r.StartIndex; i < r.EndIndex + 1; i++)
+                int hash = _Length;
+                foreach (var run in _RunArray)
                 {
-                    rtnVal[i] = true;
+                    hash = unchecked(17 * hash + run.StartIndex);
+                    hash = unchecked(17 * hash + run.EndIndex);
                 }
+                return hash;
             }
-
-            return rtnVal;
-        }
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            throw new NotImplementedException();
         }
 
         #endregion
@@ -734,6 +776,20 @@ namespace BitsetsNET
                 rtnVal.EndIndex = (runA.EndIndex >= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the higher END index
             }
             return rtnVal;
+        }
+
+        public BitArray ToBitArray()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion 

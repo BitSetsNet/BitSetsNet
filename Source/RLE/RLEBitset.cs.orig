@@ -542,6 +542,48 @@ namespace BitsetsNET
             }
         }
 
+        public void Flip(int index)
+        {
+            int length = _RunArray.Count;
+            for (int i = 0; i < length; i++)
+            {
+                int curEndIndex = _RunArray[i].EndIndex;
+                int curStartIndex = _RunArray[i].StartIndex;
+                if (curEndIndex > index)
+                {
+                    if (curStartIndex < index)
+                    {
+                        _RunArray.RemoveAt(i);
+                        _RunArray.AddRange( new[] { new Run(curStartIndex, index - 1), 
+                                                    new Run(index + 1, curEndIndex)} );
+                    }
+                    else if (curStartIndex == index)
+                    {
+                        _RunArray[i] = new Run(curStartIndex + 1, curEndIndex);
+                    }
+                    else
+                    {
+                        _RunArray.Insert(i, new Run(index, index));
+                    }
+                    break;
+                }
+                else if (curEndIndex == index)
+                {
+                    _RunArray[i] = new Run(curStartIndex, curEndIndex - 1);
+                    break;
+                }
+            }
+        }
+
+        public void Flip(int start, int end)
+        {
+            int length = _RunArray.Count;
+            for (int i = 0; i < length; i++)
+            {
+
+            }
+        }
+
         /// <summary>
         /// Inverts all the values in the current IBitset, 
         /// so that elements set to true are changed to false, and elements set to false are changed to true.
@@ -631,8 +673,8 @@ namespace BitsetsNET
             return rtnVal;
         }
 
-        public void Flip(int index)
 <<<<<<< HEAD
+        public void Flip(int index)
         {
             throw new NotImplementedException();
         }
@@ -642,9 +684,30 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Returns the contents of this set as a bit array where the value is
+        /// set to true for each index that is a member of this set
+        /// </summary>
+        /// <returns>a new BitArray</returns>
         public BitArray ToBitArray()
         {
-            throw new NotImplementedException();
+            int arrayLength = 0;
+            if (this._RunArray.Count > 0)
+            {
+                arrayLength = this._RunArray.Last().EndIndex + 1;
+            }
+
+            BitArray rtnVal = new BitArray(arrayLength, false);
+
+            foreach (Run r in this._RunArray)
+            {
+                for (int i = r.StartIndex; i < r.EndIndex + 1; i++)
+                {
+                    rtnVal[i] = true;
+                }
+            }
+
+            return rtnVal;
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -655,28 +718,19 @@ namespace BitsetsNET
         {
             throw new NotImplementedException();
 =======
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Flip(int start, int end)
-        {
-            throw new NotImplementedException();
-        }
-
         public override int GetHashCode()
         {
             unchecked
             {
                 int hash = _Length;
-                foreach(var run in _RunArray)
+                foreach (var run in _RunArray)
                 {
                     hash = unchecked(17 * hash + run.StartIndex);
                     hash = unchecked(17 * hash + run.EndIndex);
                 }
                 return hash;
             }
->>>>>>> revised rle gethashcode
+>>>>>>> a126e38... added Flip
         }
 
         #endregion
@@ -739,21 +793,7 @@ namespace BitsetsNET
             return rtnVal;
         }
 
-<<<<<<< HEAD
         #endregion 
-=======
-        public void Set(int start, int end, bool value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public BitArray ToBitArray()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
->>>>>>> revised rle gethashcode
 
     }
 }
