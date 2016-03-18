@@ -282,6 +282,19 @@ namespace BitsetsNET
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = size;
+                for (int i = 0; i < size; i++)
+                {
+                    hash = unchecked(17 * hash + keys[i]);
+                }
+                return hash;
+            }
+        }
+
         /// <summary>
         /// Serialize the roaring array into a binary format.
         /// </summary>
