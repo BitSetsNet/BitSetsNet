@@ -498,6 +498,19 @@ namespace BitsetsNET
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = cardinality;
+                for (int i = 0; i < cardinality; i++)
+                {
+                    hash = unchecked(17 * hash + (int) (bitmap[i] << 32 >> 32));
+                }
+                return hash;
+            }
+        }
+
         /// <summary>
         /// Serialize this container in a binary format.
         /// </summary>
