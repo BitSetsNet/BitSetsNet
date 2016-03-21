@@ -187,18 +187,38 @@ namespace BitsetsNET.Tests
             int[] set1 = { 1, 2, 3, 7 };
             IBitset testSet1 = CreateSetFromIndices(set1, 8);
 
-            int[] set2 = { 1, 7 };
+            int[] set2 = { 1, 4, 7 };
             IBitset testSet2 = CreateSetFromIndices(set2, 8);
 
-            IBitset diffSet = testSet1.Difference(testSet2);
+            // These sparse sets will all use array containers.
+            IBitset arrayContainerDiffSet = testSet1.Difference(testSet2);
 
-            bool expected1 = false;
-            bool result1 = diffSet.Get(1);
-            Assert.AreEqual(expected1, result1);
+            Assert.AreEqual(false, arrayContainerDiffSet.Get(1));
+            Assert.AreEqual(true, arrayContainerDiffSet.Get(3));
 
-            bool expected2 = true;
-            bool result2 = diffSet.Get(3);
-            Assert.AreEqual(expected2, result2);
+            // Test difference from large contiguous bitset to exercise bitsetcontainers.
+            int[] set3 = SetGenerator.GetContiguousArray(0, 5000);
+            IBitset testSet3 = CreateSetFromIndices(set3, 5000);
+
+            int[] setExceptions = { 4 };
+            int[] set4 = SetGenerator.GetContiguousArrayWithExceptions(0, 5000, setExceptions);
+            IBitset testSet4 = CreateSetFromIndices(set4, 5000);
+
+            // Both sets are using bitset containers
+            IBitset bitsetContainerDiffSet = testSet3.Difference(testSet4);
+
+            Assert.AreEqual(false, bitsetContainerDiffSet.Get(1));
+            Assert.AreEqual(true, bitsetContainerDiffSet.Get(4));
+
+            // Diff sets using bitset containers with array containers and vice versa
+            IBitset mixedDiffSet1 = testSet4.Difference(testSet2);
+            IBitset mixedDiffSet2 = testSet2.Difference(testSet4);
+
+            Assert.AreEqual(false, mixedDiffSet1.Get(1));
+            Assert.AreEqual(true, mixedDiffSet1.Get(3));
+
+            Assert.AreEqual(false, mixedDiffSet2.Get(1));
+            Assert.AreEqual(true, mixedDiffSet2.Get(4));
         }
 
         [TestMethod]

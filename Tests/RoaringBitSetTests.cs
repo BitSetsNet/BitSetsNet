@@ -62,21 +62,43 @@ namespace BitsetsNET.Tests
         [TestMethod()]
         public virtual void DifferenceWithTest()
         {
+            // Test arrayContainer-based sets
             int[] set1 = { 1, 2, 3, 7 };
             RoaringBitset testSet1 = RoaringBitset.Create(set1);
 
-            int[] set2 = { 1, 7 };
+            int[] set2 = { 1, 4, 7 };
             RoaringBitset testSet2 = RoaringBitset.Create(set2);
 
             testSet1.DifferenceWith(testSet2);
 
-            bool expected1 = false;
-            bool result1 = testSet1.Get(1);
-            Assert.AreEqual(expected1, result1);
+            Assert.AreEqual(false, testSet1.Get(1));
+            Assert.AreEqual(true, testSet1.Get(3));
 
-            bool expected2 = true;
-            bool result2 = testSet1.Get(3);
-            Assert.AreEqual(expected2, result2);
+            // Test bitsetContainer-based sets
+            int[] set3 = SetGenerator.GetContiguousArray(0, 5000);
+            RoaringBitset testSet3 = RoaringBitset.Create(set3);
+
+            int[] setExceptions = { 4 };
+            int[] set4 = SetGenerator.GetContiguousArrayWithExceptions(0, 5000, setExceptions);
+            RoaringBitset testSet4 = RoaringBitset.Create(set4);
+
+            // Reduce contiguous array to single value (4) via DifferenceWith
+            testSet3.DifferenceWith(testSet4);
+
+            Assert.AreEqual(false, testSet3.Get(2));
+            Assert.AreEqual(true, testSet3.Get(4));
+
+            // 
+            // Reduce testSet2 to 4 as well
+            testSet2.DifferenceWith(testSet4);
+            Assert.AreEqual(false, testSet2.Get(1));
+            Assert.AreEqual(true, testSet2.Get(4));
+
+            // Remove contents of set1 from set4
+            testSet4.DifferenceWith(testSet1);
+            Assert.AreEqual(false, testSet4.Get(2));
+            Assert.AreEqual(true, testSet4.Get(6));
+
         }
     }
 }

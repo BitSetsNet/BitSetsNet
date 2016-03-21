@@ -42,5 +42,46 @@ namespace BitsetsNET.Tests
 
             return set;
         }
+
+        /// <summary>
+        /// Knocks out a few selected values from a contiguous array to allow meaningful
+        /// difference testing.This would ordinarily be done by just using GetContiguousArray
+        /// and flipping the bits off with Set() or Flip(), but those are not currently
+        /// Implemented in RLE.
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="exceptions"></param>
+        /// <returns></returns>
+        public static int[] GetContiguousArrayWithExceptions(int start, int end, int[] exceptions)
+        {
+            int irrelevantExceptions = 0;
+            foreach (int exception in exceptions)
+            {
+                if (exception > end || exception < start)
+                {
+                    // We're not going to come across these exceptions in
+                    // set generation.
+                    irrelevantExceptions++;
+                }
+            }
+
+            int relevantExceptions = exceptions.Length - irrelevantExceptions;
+            int[] set = new int[end - start - relevantExceptions];
+            int skipped = 0;
+            for (int i = start; i < end; i++)
+            {
+                if(exceptions.Contains(i))
+                {
+                    skipped++;
+                }
+                else
+                {
+                    set[i - start - skipped] = i;
+                }
+            }
+
+            return set;
+        }
     }
 }
