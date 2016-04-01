@@ -101,6 +101,31 @@ namespace BitsetsNET
             }
         }
         
+        /// <summary>
+        /// Computes the bitwise ANDNOT between two long arrays and writes
+        /// the set bits in the container.
+        /// </summary>
+        /// <param name="container"> Writing here</param>
+        /// <param name="bitmap1"></param>
+        /// <param name="bitmap2"></param>
+        public static void fillArrayANDNOT(ushort[] container,
+                                           long[] bitmap1,
+                                           long[] bitmap2)
+        {
+            int pos = 0;
+            if (bitmap1.Length != bitmap2.Length)
+                throw new ArgumentOutOfRangeException("Bitmaps need to be the same length");
+            for (int k = 0; k < bitmap1.Length; ++k)
+            {
+                long bitset = bitmap1[k] & (~bitmap2[k]);
+                while (bitset != 0)
+                {
+                    long t = bitset & -bitset;
+                    container[pos++] = (ushort)(k * 64 + Utility.longBitCount(t - 1));
+                    bitset ^= t;
+                }
+            }
+        }
         
         /**
  * Unite two sorted lists and write the result to the provided
@@ -302,6 +327,90 @@ namespace BitsetsNET
             }
             return pos;
 
+        }
+
+        /// <summary>
+        /// Compares the two specified unsigned short values, treating them as
+        /// unsigned values between 0 and 2^16 - 1 inclusive.
+        /// </summary>
+        /// <param name="a">the first unsigned short to compare</param>
+        /// <param name="b">the second unsigned short to compare</param>
+        /// <returns>A negative value if a is less than b, a positive value if a is 
+        /// greater than b, or zero if they are equal</returns>
+        public static uint compareUnsigned(ushort a, ushort b)
+        {
+            return toIntUnsigned(a) - toIntUnsigned(b);
+        }
+
+        /// <summary>
+        /// Compute the difference between two sorted lists and write the result to the provided
+        /// output array
+        /// </summary>
+        /// <returns>Cardinality of the difference</returns>
+        public static int unsignedDifference(ushort[] set1, 
+                                             int length1,
+                                             ushort[] set2,
+                                             int length2,
+                                             ushort[] buffer)
+        {
+            int pos = 0;
+            int k1 = 0, k2 = 0;
+
+            // If nothing to diff with, use original cardinality
+            if (length2 == 0)
+            {
+                Array.Copy(set1, 0, buffer, 0, length1);
+                return length1;
+            }
+
+            // Cardinality must be zero
+            if (length1 == 0)
+            {
+                return 0;
+            }
+
+            ushort s1 = set1[k1];
+            ushort s2 = set2[k2];
+            while (true)
+            {
+                if (toIntUnsigned(s1) < toIntUnsigned(s2))
+                {
+                    buffer[pos++] = s1;
+                    ++k1;
+                    if (k1 >= length1)
+                    {
+                        break;
+                    }
+                    s1 = set1[k1];
+                }
+                else if (toIntUnsigned(s1) == toIntUnsigned(s2))
+                {
+                    ++k1;
+                    ++k2;
+                    if (k1 >= length1)
+                    {
+                        break;
+                    }
+                    if (k2 >= length2)
+                    {
+                        Array.Copy(set1, k1, buffer, pos, length1 - k1);
+                        return pos + length1 - k1;
+                    }
+                    s1 = set1[k1];
+                    s2 = set2[k2];
+                }
+                else
+                {
+                    ++k2;
+                    if (k2 >= length2)
+                    {
+                        Array.Copy(set1, k1, buffer, pos, length1 - k1);
+                        return pos + length1 - k1;
+                    }
+                    s2 = set2[k2];
+                }
+            }
+            return pos;
         }
 
         /// <summary>

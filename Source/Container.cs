@@ -66,7 +66,52 @@ namespace BitsetsNET
             return and((BitsetContainer) x);
         }
 
-        
+        /// <summary>
+        /// Computes the bitwise ANDNOT of this container with another
+        /// (difference). This container as well as the provided container are
+        /// left unaffected. 
+        /// </summary>
+        /// <param name="x">Other container</param>
+        /// <returns>A new container with the result</returns>
+        public abstract Container andNot(ArrayContainer x);
+
+        /// <summary>
+        /// Computes the bitwise ANDNOT of this container with another
+        /// (difference). This container as well as the provided container are
+        /// left unaffected. 
+        /// </summary>
+        /// <param name="x">Other container</param>
+        /// <returns>A new container with the result</returns>
+        public abstract Container andNot(BitsetContainer x);
+
+        public Container andNot(Container x)
+        {
+            if (x is ArrayContainer)
+                return andNot((ArrayContainer) x);
+            return andNot((BitsetContainer) x);
+        }
+
+        /// <summary>
+        /// Computes the bitwise ANDNOT of this container with another
+        /// (difference). Modifies the current container in place.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        public abstract Container iandNot(ArrayContainer x);
+
+        /// <summary>
+        /// Computes the bitwise ANDNOT of this container with another
+        /// (difference). Modifies the current container in place.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        public abstract Container iandNot(BitsetContainer x);
+
+        public Container iandNot(Container x)
+        {
+            if (x is ArrayContainer)
+                return iandNot((ArrayContainer)x);
+            return iandNot((BitsetContainer)x);
+        }
+
         public abstract Container clone();
 
         /**
