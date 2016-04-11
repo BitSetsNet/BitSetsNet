@@ -671,9 +671,23 @@ namespace BitsetsNET
         {
         }
 
+        /// <summary>
+        /// Get an enumerator of the set indices of this bitset. 
+        /// Meaning, it returns the indicies where the value is set to "true" or "1".
+        /// </summary>
+        /// <returns>A enumerator giving the set (i.e. for which the bit is '1' or true) indices for this bitset.</returns>
         public IEnumerator GetEnumerator()
         {
-            throw new NotImplementedException();
+            List<int> rtnVal = new List<int>();
+            foreach (Run r in this._RunArray)
+            {
+                for (int i = r.StartIndex; i<r.EndIndex +1; i++)
+                {
+                    rtnVal.Add(i);
+                }
+            }
+
+            return rtnVal.GetEnumerator();
         }
 
         #endregion
@@ -713,26 +727,6 @@ namespace BitsetsNET
                 output.EndIndex = (runA.EndIndex >= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the higher END index
             }
 
-            return rtnVal;
-        }
-
-        private Run overlapAnd(Run runA, Run runB)
-        {
-            Run rtnVal = new Run();
-            rtnVal.StartIndex = (runA.StartIndex >= runB.StartIndex ? runA.StartIndex : runB.StartIndex); // take the higher START index
-            rtnVal.EndIndex = (runA.EndIndex <= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the lower END index
-            return rtnVal;
-        }
-
-        private Run overlapOr(Run runA, Run runB)
-        {
-            Run rtnVal = overlapAnd(runA, runB);
-            //if (rtnVal.StartIndex <= rtnVal.EndIndex)
-            if (rtnVal.EndIndex - rtnVal.StartIndex >= -1)
-            {
-                rtnVal.StartIndex = (runA.StartIndex >= runB.StartIndex ? runB.StartIndex : runA.StartIndex); // take the lower START index
-                rtnVal.EndIndex = (runA.EndIndex >= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the higher END index
-            }
             return rtnVal;
         }
 
