@@ -542,15 +542,6 @@ namespace BitsetsNET
             }
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Inverts all the values in the current IBitset, 
         /// so that elements set to true are changed to false, and elements set to false are changed to true.
@@ -640,11 +631,35 @@ namespace BitsetsNET
             return rtnVal;
         }
 
+        public void Flip(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Flip(int start, int end)
+        {
+            throw new NotImplementedException();
+        }
+
+        public BitArray ToBitArray()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region "Private Methods"
 
-        private bool tryCreateIntersection(Run runA, Run runB, ref Run output) 
+        private bool tryCreateIntersection(Run runA, Run runB, ref Run output)
         {
 
             int startIdx = (runA.StartIndex >= runB.StartIndex ? runA.StartIndex : runB.StartIndex); // take the higher START index
@@ -658,7 +673,7 @@ namespace BitsetsNET
                 output.StartIndex = startIdx;
                 output.EndIndex = endIdx;
             }
-            
+
             return rtnVal;
         }
 
@@ -676,7 +691,7 @@ namespace BitsetsNET
                 output.StartIndex = (runA.StartIndex >= runB.StartIndex ? runB.StartIndex : runA.StartIndex); // take the lower START index
                 output.EndIndex = (runA.EndIndex >= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the higher END index
             }
-            
+
             return rtnVal;
         }
 
@@ -700,27 +715,7 @@ namespace BitsetsNET
             return rtnVal;
         }
 
-        public void Set(int start, int end, bool value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Flip(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Flip(int start, int end)
-        {
-            throw new NotImplementedException();
-        }
-
-        public BitArray ToBitArray()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+        #endregion 
 
     }
 }
