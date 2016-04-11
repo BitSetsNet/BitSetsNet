@@ -482,18 +482,64 @@ namespace BitsetsNET
             AndWith(otherRLESet.Not());
         }
 
+        /// <summary>
+        /// Sets the bit at a specific position in the IBitset to the specified value.
+        /// </summary>
+        /// <param name="index">The zero-based index of the bit to set.</param>
+        /// <param name="value">The Boolean value to assign to the bit.</param>
         public void Set(int index, bool value)
         {
-            throw new NotImplementedException();
+            int[] tmpIndices = { index };
+            IBitset other = RLEBitset.CreateFrom(tmpIndices);
+            if (value)
+            {
+                OrWith(other);
+            }
+            else
+            {
+                DifferenceWith(other);
+            }
+
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        /// <summary>
+        /// For indices in the range [start, end] add the index to the set if
+        /// the value is true, otherwise remove it.
+        /// </summary>
+        /// <param name="start">the index to start from (inclusive)</param>
+        /// <param name="end">the index to stop at (exclusive)</param>
+        public void Set(int start, int end, bool value)
         {
+            RLEBitset other = new RLEBitset();
+            other._RunArray.Add(new Run(start, end - 1));
+            if (value)
+            {
+                OrWith(other);
+            }
+            else
+            {
+                DifferenceWith(other);
+            }
         }
 
-        public IEnumerator GetEnumerator()
+        /// <summary>
+        /// Sets all bits in the given range to the specified value.
+        /// </summary>
+        /// <param name="startIndex">The zero-based start position of the range.</param>
+        /// <param name="count">The number of bits in the range.</param>
+        /// <param name="value">The Boolean value to assign to the bits.</param>
+        public void SetRange(int startIndex, int count, bool value)
         {
-            throw new NotImplementedException();
+            RLEBitset other = new RLEBitset();
+            other._RunArray.Add(new Run(startIndex, startIndex + count - 1));
+            if (value)
+            {
+                OrWith(other);
+            }
+            else
+            {
+                DifferenceWith(other);
+            }
         }
 
         /// <summary>
@@ -585,11 +631,35 @@ namespace BitsetsNET
             return rtnVal;
         }
 
+        public void Flip(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Flip(int start, int end)
+        {
+            throw new NotImplementedException();
+        }
+
+        public BitArray ToBitArray()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region "Private Methods"
 
-        private bool tryCreateIntersection(Run runA, Run runB, ref Run output) 
+        private bool tryCreateIntersection(Run runA, Run runB, ref Run output)
         {
 
             int startIdx = (runA.StartIndex >= runB.StartIndex ? runA.StartIndex : runB.StartIndex); // take the higher START index
@@ -603,7 +673,7 @@ namespace BitsetsNET
                 output.StartIndex = startIdx;
                 output.EndIndex = endIdx;
             }
-            
+
             return rtnVal;
         }
 
@@ -621,7 +691,7 @@ namespace BitsetsNET
                 output.StartIndex = (runA.StartIndex >= runB.StartIndex ? runB.StartIndex : runA.StartIndex); // take the lower START index
                 output.EndIndex = (runA.EndIndex >= runB.EndIndex ? runA.EndIndex : runB.EndIndex);           // take the higher END index
             }
-            
+
             return rtnVal;
         }
 
@@ -645,27 +715,7 @@ namespace BitsetsNET
             return rtnVal;
         }
 
-        public void Set(int start, int end, bool value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Flip(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Flip(int start, int end)
-        {
-            throw new NotImplementedException();
-        }
-
-        public BitArray ToBitArray()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+        #endregion 
 
     }
 }
