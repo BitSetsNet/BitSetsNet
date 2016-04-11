@@ -132,12 +132,6 @@ namespace BitsetsNET.Tests
         }
 
         [TestMethod()]
-        public virtual void SetAllTest()
-        {
-
-        }
-
-        [TestMethod()]
         public virtual void FlipTrueTest()
         {
             int[] set = { 1, 2, 3, 5 };
