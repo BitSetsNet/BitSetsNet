@@ -230,11 +230,18 @@ namespace BitsetsNET.Tests
             BitArray testArray = testSet.ToBitArray();
 
             bool expected = true;
-            bool actual = setArray.Length == testArray.Length;
+            bool actual = true;
 
             for (int i = 0; i < setArray.Length; i++)
             {
-                actual &= setArray[i] == testArray[i];
+                if (setArray[i])
+                {
+                    actual &= setArray[i] == testArray[i];
+                }
+                else
+                {
+                    //do nothing
+                }
             }
 
             Assert.AreEqual(expected, actual);
