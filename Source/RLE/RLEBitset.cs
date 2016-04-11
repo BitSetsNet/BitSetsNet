@@ -483,6 +483,118 @@ namespace BitsetsNET
         }
 
         /// <summary>
+        /// Sets the bit at a specific position in the IBitset to the specified value.
+        /// </summary>
+        /// <param name="index">The zero-based index of the bit to set.</param>
+        /// <param name="value">The Boolean value to assign to the bit.</param>
+        public void Set(int index, bool value)
+        {
+            //int[] tmpIndices = {index};
+            //if (value)
+            //{
+            //    OrWith(RLEBitset.CreateFrom(tmpIndices));
+            //}
+            //else
+            //{
+            //    DiffWith(RLEBitset.CreateFrom(tmpIndices));
+            //}
+
+
+            if (value) // we are setting to true, so look in gaps between runs.
+            {
+                int loopStart = 0;
+                // handle a leading gap if needed.
+                if (_RunArray[0].StartIndex > 0 && index < _RunArray[0].StartIndex)
+                {
+                    if (_RunArray[0].StartIndex - index > 1)
+                    {
+                        // insert a new run
+                        _RunArray.Insert(0, new Run(index, index));
+                        loopStart = _RunArray.Count; //skip next looping section.
+                    }
+                    else 
+                    {
+                        // expand the first run 
+                        _RunArray[0] = new Run(_RunArray[0].StartIndex - 1, _RunArray[0].EndIndex);
+                        loopStart = _RunArray.Count; //skip next looping section.
+                    }
+                }
+
+                // handle the middle gaps.
+                for (int i = loopStart; i < _RunArray.Count - 1; i++)
+                {
+                    if (index > _RunArray[i].EndIndex && index < _RunArray[i + 1].StartIndex)
+                    {
+                        if (index - _RunArray[i].EndIndex == 1)
+                        {
+                            // expand end of run[i] by 1
+                            _RunArray[i] = new Run(_RunArray[i].StartIndex, _RunArray[i].EndIndex + 1);
+                            break;
+                        }
+                        else if (_RunArray[i + 1].StartIndex - index == 1)
+                        {
+                            // expand start of run[i+1] by 1
+                            _RunArray[i+1] = new Run(_RunArray[i+1].StartIndex - 1, _RunArray[i+1].EndIndex);
+                            break;
+                        }
+                        else
+                        {
+                            // insert a new run of length 1
+                            _RunArray.Insert(i + 1, new Run(index, index));
+                            break;
+                        }
+                    }
+                }
+
+                // handle the trailing gap.
+                if (index > _RunArray[_RunArray.Count - 1].EndIndex)
+                {
+                    if (index - _RunArray[_RunArray.Count - 1].EndIndex == 1)
+                    {
+                        // expand end of the last run by 1
+                        _RunArray[_RunArray.Count - 1] = new Run(_RunArray[_RunArray.Count - 1].StartIndex, _RunArray[_RunArray.Count - 1].EndIndex + 1);
+                    }
+                    else
+                    {
+                        // insert a new run of length 1
+                        _RunArray.Add(new Run(index, index));
+                    }
+                }
+
+            }
+            else // we are setting to false, so look within runs.
+            {
+                for (int i = 0; i < _RunArray.Count; i++)
+                {
+                    Run tmpRun = _RunArray[i];
+                    if (index >= tmpRun.StartIndex && index <= tmpRun.EndIndex)
+                    {
+                        if (index == tmpRun.StartIndex)
+                        {
+                            tmpRun.StartIndex = tmpRun.StartIndex + 1;
+                            _RunArray[i] = tmpRun;
+                            break;
+                        }
+                        else if (index == tmpRun.EndIndex)
+                        {
+                            tmpRun.EndIndex = tmpRun.EndIndex - 1;
+                            _RunArray[i] = tmpRun;
+                            break;
+                        }
+                        else
+                        {
+                            Run before = new Run(tmpRun.StartIndex, index - 1);
+                            Run latter = new Run(index + 1, tmpRun.EndIndex);
+                            _RunArray[i] = before;
+                            _RunArray.Insert(i + 1, latter);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Sets all bits in the given range to the specified value.
         /// </summary>
         /// <param name="startIndex">The zero-based start position of the range.</param>
@@ -502,7 +614,7 @@ namespace BitsetsNET
             }
         }
 
-        public void Set(int index, bool value)
+        public void SetAll(bool value)
         {
             throw new NotImplementedException();
         }
