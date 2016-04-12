@@ -187,12 +187,37 @@ namespace BitsetsNET
          * @param x other container
          * @return whether they intersect
          */
+
+        
+        public abstract Container inot(int start, int end);
+
         public bool intersects(Container x)
         {
             if (x is ArrayContainer)
                 return intersects((ArrayContainer)x);
             return intersects((BitsetContainer)x);
         }
+
+        /// <summary>
+        /// Create a container initialized with a range of consecutive values
+        /// </summary>
+        /// <param name="start">first index</param>
+        /// <param name="last">last index</param>
+        /// <returns>return a new container initialized with the specified values</returns>
+        /// <remarks>In the original lemire version, there is some optimization here
+        /// to choose between an ArrayContainer and a RunContainer based on serialized size.
+        /// For now, this has been stripped out and always uses an ArrayContainer.</remarks>
+        public static Container rangeOfOnes(ushort start, ushort last)
+        {
+            //TODO: Add in logic for RunContainers
+            Container answer = new ArrayContainer();
+            answer = answer.iadd(start, last);
+            return answer;
+        }
+
+        public abstract Container flip(ushort x);
+
+        public abstract Container iadd(ushort begin, ushort end);
 
         /**
          * Returns true if the current container intersects the other container.

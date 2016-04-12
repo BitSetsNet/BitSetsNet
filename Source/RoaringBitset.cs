@@ -472,11 +472,6 @@ namespace BitsetsNET
                 remove(start, end);
             }
         }
-        
-        public void Flip(int index)
-        {
-            throw new NotImplementedException();
-        }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
@@ -533,9 +528,74 @@ namespace BitsetsNET
             return containers.GetEnumerator();
         }
 
+        public void Flip(int x)
+        {
+            ushort hb = Utility.GetHighBits(x);
+            int i = containers.getIndex(hb);
+
+            if (i >= 0)
+            {
+                Container c = containers.getContainerAtIndex(i).flip(Utility.GetLowBits(x));
+                if (c.getCardinality() > 0)
+                {
+                    containers.setContainerAtIndex(i, c);
+                }
+                else
+                {
+                    containers.removeAtIndex(i);
+                }
+            }
+            else
+            {
+                ArrayContainer newac = new ArrayContainer();
+                containers.insertNewKeyValueAt(-i - 1, hb, newac.add(Utility.GetLowBits(x)));
+            }
+        }
+
+        /// <summary>
+        /// Toggles the values for the given range of indices.
+        /// </summary>
+        /// <param name="start">The starting index</param>
+        /// <param name="end">The ending index</param>
         public void Flip(int start, int end)
         {
-            throw new NotImplementedException();
+            if (start >= end)
+            {
+                return; // empty range
+            }
+
+            // Separate out the ranges of higher and lower-order bits
+            int hbStart = Utility.toIntUnsigned(Utility.GetHighBits(start));
+            int lbStart = Utility.toIntUnsigned(Utility.GetLowBits(start));
+            int hbLast = Utility.toIntUnsigned(Utility.GetHighBits(end - 1));
+            int lbLast = Utility.toIntUnsigned(Utility.GetLowBits(end - 1));
+
+            for (int hb = hbStart; hb <= hbLast; hb++)
+            {
+                // first container may contain partial range
+                int containerStart = (hb == hbStart) ? lbStart : 0;
+                // last container may contain partial range
+                int containerLast = (hb == hbLast) ? lbLast : Utility.GetMaxLowBitAsInteger();
+                int i = containers.getIndex((ushort)hb);
+
+                if (i >= 0)
+                {
+                    Container c = containers.getContainerAtIndex(i).inot(containerStart, containerLast + 1);
+                    if (c.getCardinality() > 0)
+                    {
+                        containers.setContainerAtIndex(i, c);
+                    }
+                    else
+                    {
+                        containers.removeAtIndex(i);
+                    }
+                }
+                else
+                {
+                    containers.insertNewKeyValueAt(-i - 1, (ushort)hb,
+                        Container.rangeOfOnes((ushort) containerStart, (ushort) (containerLast + 1)));
+                }
+            }
         }
 
         /// <summary>

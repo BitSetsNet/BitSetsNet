@@ -22,6 +22,11 @@ namespace BitsetsNET
                 EndIndex = endIdx;
             }
 
+            internal static int serializedSizeInBytes(int numberOfRuns)
+            {
+                return 2 + 2 * 2 * numberOfRuns;
+            }
+
         }
 
         #endregion

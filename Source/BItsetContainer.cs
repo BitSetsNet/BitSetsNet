@@ -134,6 +134,69 @@ namespace BitsetsNET
             return answer;
         }
 
+        public override Container flip(ushort i)
+        {
+            int x = Utility.toIntUnsigned(i);
+            int index = x / 64;
+            long bef = bitmap[index];
+            long mask = 1L << x;
+            if (cardinality == ArrayContainer.DEFAULT_MAX_SIZE + 1)
+            {// this is
+             // the
+             // uncommon
+             // path
+                if ((bef & mask) != 0)
+                {
+                    --cardinality;
+                    bitmap[index] &= ~mask;
+                    return this.toArrayContainer();
+                }
+            }
+            // TODO: check whether a branchy version could be faster
+            cardinality += 1 - 2 * (int)((bef & mask) >> x);
+            bitmap[index] ^= mask;
+            return this;
+        }
+
+        public override Container iadd(ushort begin, ushort end)
+        {
+            // TODO: may need to convert to a RunContainer
+            if (end == begin)
+            {
+                return this;
+            }
+            if (begin > end)
+            {
+                throw new ArgumentException("Invalid range [" + begin + "," + end + ")");
+            }
+            Utility.setBitmapRange(bitmap, begin, end);
+            computeCardinality();
+            return this;
+        }
+
+        public override Container inot(int firstOfRange, int lastOfRange)
+        {
+            if (lastOfRange - firstOfRange == MAX_CAPACITY)
+            {
+                Utility.flipBitsetRange(bitmap, firstOfRange, lastOfRange);
+                cardinality = MAX_CAPACITY - cardinality;
+            }
+            else if (lastOfRange - firstOfRange > MAX_CAPACITY / 2)
+            {
+                Utility.flipBitsetRange(bitmap, firstOfRange, lastOfRange);
+                computeCardinality();
+            }
+            else
+            {
+                cardinality += Utility.flipBitsetRangeAndCardinalityChange(bitmap, firstOfRange, lastOfRange);
+            }
+            if (cardinality <= ArrayContainer.DEFAULT_MAX_SIZE)
+            {
+                return toArrayContainer();
+            }
+            return this;
+        }
+
         public override Container clone()
         {
             long[] newBitmap = new long[this.bitmap.Length];
@@ -170,7 +233,7 @@ namespace BitsetsNET
             for (int k = 0; k < c; ++k)
             {
                 ushort v = x.content[k];
-                uint i = Utility.toIntUnsigned(v) >> 6;
+                uint i = (uint) (Utility.toIntUnsigned(v) >> 6);
                 long w = answer.bitmap[i];
                 long aft = w & (~(1L << v));
                 answer.bitmap[i] = aft;
