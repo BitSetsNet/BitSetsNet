@@ -641,9 +641,30 @@ namespace BitsetsNET
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Returns the contents of this set as a bit array where the value is
+        /// set to true for each index that is a member of this set
+        /// </summary>
+        /// <returns>a new BitArray</returns>
         public BitArray ToBitArray()
         {
-            throw new NotImplementedException();
+            int arrayLength = 0;
+            if (this._RunArray.Count > 0)
+            {
+                arrayLength = this._RunArray.Last().EndIndex + 1;
+            }
+
+            BitArray rtnVal = new BitArray(arrayLength, false);
+
+            foreach (Run r in this._RunArray)
+            {
+                for (int i = r.StartIndex; i < r.EndIndex + 1; i++)
+                {
+                    rtnVal[i] = true;
+                }
+            }
+
+            return rtnVal;
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
