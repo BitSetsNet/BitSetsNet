@@ -433,7 +433,12 @@ namespace BitsetsNET
 
         public override IEnumerator<ushort> GetEnumerator()
         {
-            return (IEnumerator<ushort>) content.GetEnumerator();
+            int index = 0;
+
+            while (index < cardinality) {
+                yield return content[index];
+                index++;
+            }
         }
     }
 }

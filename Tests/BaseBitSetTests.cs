@@ -2,6 +2,7 @@
 using System.Text;
 using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BitsetsNET.Tests
@@ -256,6 +257,19 @@ namespace BitsetsNET.Tests
             int expected = set.Length;
             int actual = testSet.Cardinality();
             Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public virtual void EnumerationTest()
+        {
+            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
+            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
+            List<int> enumeratedList = new List<int>();
+            foreach (int i in testSet)
+            {
+                enumeratedList.Add(i);
+            }
+            CollectionAssert.AreEquivalent(enumeratedList.ToArray(), set);
         }
 
         private string generateMessage(string functionName, int[] setA, int[] setB, int[] expected)
