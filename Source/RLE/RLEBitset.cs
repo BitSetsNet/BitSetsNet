@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -808,6 +810,48 @@ namespace BitsetsNET
         }
 
         /// <summary>
+        /// Write a binary serialization of this RLE bitset.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        public void Serialize(Stream stream)
+        {
+            //We don't care about the encoding, but we have to specify something to be able to set the stream as leave open.
+            using (BinaryWriter writer = new BinaryWriter(stream, Encoding.Default, true))
+            {
+                writer.Write(this._Length);
+                foreach (Run r in this._RunArray)
+                {
+                    writer.Write(r.StartIndex);
+                    writer.Write(r.EndIndex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Read a binary serialization of a RLE bitset, as written by the Serialize method.
+        /// </summary>
+        /// <param name="stream">The stream to read from.</param>
+        /// <returns>The bitset deserialized from the stream.</returns>
+        public static RLEBitset Deserialize(Stream stream)
+        {
+            RLEBitset bitset = new RLEBitset();
+
+            //We don't care about the encoding, but we have to specify something to be able to set the stream as leave open.
+            using (BinaryReader reader = new BinaryReader(stream, Encoding.Default, true))
+            {
+                bitset._Length = reader.ReadInt32();
+                while (stream.Position < stream.Length - 1)
+                {
+                    Run currRun = new Run();
+                    currRun.StartIndex = reader.ReadInt32();
+                    currRun.EndIndex = reader.ReadInt32();
+                    bitset._RunArray.Add(currRun);
+                }
+            }
+            return bitset;
+        }
+		
+		/// <summary>
         /// Get an enumerator of the set indices of this bitset. 
         /// Meaning, it returns the indicies where the value is set to "true" or "1".
         /// </summary>
@@ -816,7 +860,7 @@ namespace BitsetsNET
         {
             foreach (Run r in this._RunArray)
             {
-                for (int i = r.StartIndex; i<r.EndIndex +1; i++)
+                for (int i = r.StartIndex; i < r.EndIndex +1; i++)
                 {
                     yield return i;
                 }
