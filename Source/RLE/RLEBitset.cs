@@ -565,52 +565,43 @@ namespace BitsetsNET
             }
         }
 
+        /// <summary>
+        /// Flips each bit in the specified range
+        /// </summary>
+        /// <param name="start">Start of range</param>
+        /// <param name="end">End of range</param>
         public void Flip(int start, int end)
         {
-            int length = _RunArray.Count;
-            int startOfNextNewRun = start;
-
             if (end < start)
             {
-                throw new ArgumentException("end must be greater than or equal to start");
+                throw new ArgumentException("parameter 'end' must be greater than or equal to 'start'");
             }
 
-            if (length == 0)
+            if (_RunArray.Count == 0)
             {
                 _RunArray.Add(new Run(start, end));
             }
-
-            for (int i = 0; i < length; i++)
+            else
             {
-                int curRunStart = _RunArray[i].StartIndex;
-                int curRunEnd = _RunArray[i].EndIndex;
-                if (curRunStart < start && curRunEnd > end) // operation only flips one subsection of one run
+                List<Run> rangeToFlip = this.getRange(start, end);
+
+                this.Set(rangeToFlip[0].StartIndex, rangeToFlip[0].EndIndex, false);
+
+                int rangeCount = rangeToFlip.Count;
+                for (int i = 1; i < rangeCount; i++)
                 {
-                    _RunArray.Insert(i + 1, new Run(end + 1, curRunEnd));
-                    _RunArray[i] = new Run(curRunStart, start - 1);
-                    return;
+                    this.Set(rangeToFlip[i].StartIndex, rangeToFlip[i].EndIndex, false);
+                    this.Set(rangeToFlip[i - 1].EndIndex + 1, rangeToFlip[i].StartIndex - 1, true);
                 }
-                else if (curRunStart < start && curRunEnd > start) // start splits an existing run
+
+                if (start < rangeToFlip[0].StartIndex)
                 {
-                    startOfNextNewRun = curRunEnd + 1;
-                    _RunArray[i] = new Run(curRunStart, start - 1);
+                    this.Set(start, rangeToFlip[0].StartIndex - 1, true);
                 }
-                else if (curRunStart >= start && curRunEnd <= end) // current run to be completely flipped
+
+                if (end > rangeToFlip[rangeCount - 1].EndIndex)
                 {
-                    int tmp = _RunArray[i].EndIndex;
-                    _RunArray[i] = new Run(startOfNextNewRun, curRunStart - 1);
-                    startOfNextNewRun = tmp + 1;
-                }
-                else if (curRunStart < end && curRunEnd > end) // end splits an existing run
-                {
-                    _RunArray.Insert(i, new Run(startOfNextNewRun, curRunStart - 1));
-                    _RunArray[i + 1] = new Run(end + 1, curRunEnd);
-                    return;
-                }
-                else if (curRunStart > end) // end does not split a run
-                {
-                    _RunArray.Insert(i, new Run(startOfNextNewRun, end));
-                    return;
+                    this.Set(rangeToFlip[rangeCount - 1].EndIndex + 1, end, true);
                 }
             }
         }
@@ -721,6 +712,35 @@ namespace BitsetsNET
         #endregion
 
         #region "Private Methods"
+
+        private List<Run> getRange(int start, int end)
+        {
+            List<Run> range = new List<Run>();
+            for (int i = 0; i < _RunArray.Count; i++)
+            {
+                if(_RunArray[i].StartIndex >= start && _RunArray[i].EndIndex <= end)
+                {
+                    range.Add(_RunArray[i]);
+                }
+                else if(_RunArray[i].StartIndex < start && _RunArray[i].EndIndex <= end)
+                {
+                    range.Add(new Run(start, _RunArray[i].EndIndex));
+                }
+                else if(_RunArray[i].StartIndex < start && _RunArray[i].EndIndex > end)
+                {
+                    range.Add(new Run(start, end));
+                    break;
+                }
+                else if(_RunArray[i].StartIndex >= start && _RunArray[i].EndIndex > end)
+                {
+                    range.Add(new Run(_RunArray[i].StartIndex, end));
+                    break;
+                }
+            }
+
+            return range;
+        }
+
 
         private bool tryCreateIntersection(Run runA, Run runB, ref Run output)
         {
