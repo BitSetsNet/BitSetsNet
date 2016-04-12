@@ -399,6 +399,20 @@ namespace BitsetsNET
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = cardinality;
+                for (int i = 0; i < cardinality; i++)
+                {
+                    hash = 17 * hash + content[i];
+                }
+                return hash;
+            }
+
+        }
+
         /// <summary>
         /// Serialize this container in a binary format.
         /// </summary>

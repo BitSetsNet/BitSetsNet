@@ -240,6 +240,11 @@ namespace BitsetsNET
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            return containers.GetHashCode();
+        }
+
         public int select(int j)
         {
             int leftover = j;
