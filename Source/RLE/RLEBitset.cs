@@ -331,7 +331,7 @@ namespace BitsetsNET
                 {
                     //there is an overlap
                     //now compare the overlapping run you created to the previous run you added to see if they should be merged
-                    mergeRunToRLE(ref rtnVal, currRun);
+                    addRunToRLE(ref rtnVal, currRun);
 
                     //now move the counters.
                     if (runsA[i].EndIndex < runsB[j].EndIndex)
@@ -354,12 +354,12 @@ namespace BitsetsNET
                     //no overlap, so let's just add lower run and step that counter.
                     if (runsA[i].StartIndex < runsB[j].StartIndex)
                     {
-                        mergeRunToRLE(ref rtnVal, runsA[i]);
+                        addRunToRLE(ref rtnVal, runsA[i]);
                         i++;
                     }
                     else
                     {
-                        mergeRunToRLE(ref rtnVal, runsB[j]);
+                        addRunToRLE(ref rtnVal, runsB[j]);
                         j++;
                     }
                 }
@@ -383,7 +383,7 @@ namespace BitsetsNET
 
             while (remCounter < remRuns.Count)
             {
-                mergeRunToRLE(ref rtnVal, remRuns[remCounter]);
+                addRunToRLE(ref rtnVal, remRuns[remCounter]);
                 remCounter++;
             }
 
@@ -393,14 +393,13 @@ namespace BitsetsNET
 
         /// <summary>
         /// Helper function for Or operations. 
-        /// Adds the given run to the run-array by:
-        ///  a) either merging it with the previous run if overlap with previous in array
-        ///  or 
-        ///  b) just adding it as next run if no overlap with previous in array
+        /// Adds the given run to the run-array by. Either:
+        ///  a) merges it with the previous run if overlap with previous in array 
+        ///  b) adds it as next run if no overlap with previous in array
         /// </summary>
         /// <param name="currRLE">the RLE to be modified</param>
         /// <param name="runToAdd">the Run to add</param>
-        private void mergeRunToRLE(ref RLEBitset currRLE, Run runToAdd)
+        private void addRunToRLE(ref RLEBitset currRLE, Run runToAdd)
         {
             Run currRun = new Run();
             if (tryCreateUnion(currRLE._RunArray.LastOrDefault(), runToAdd, ref currRun) && currRLE._RunArray.Count > 0)
