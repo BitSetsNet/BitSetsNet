@@ -78,6 +78,7 @@ namespace BitsetsNET
         /// <returns>an integer for the number of members in the set</returns>
         int Cardinality();
 
+        void Serialize(System.IO.Stream stream);
 
     }
        
