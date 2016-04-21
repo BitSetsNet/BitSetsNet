@@ -318,30 +318,106 @@ namespace BitsetsNET
 
         public IBitset Or(IBitset otherSet)
         {
-            //RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
+            RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
 
-            //RLEBitset rtnVal = new RLEBitset(); // instantiate the return value
+            RLEBitset rtnVal = new RLEBitset(); // instantiate the return value
+            rtnVal._Length = (this._Length > otherRLESet._Length) ? this._Length : otherRLESet._Length;
 
-            //List<Run> runsA = this._RunArray;
-            //List<Run> runsB = otherRLESet._RunArray;
+            List<Run> runsA = this._RunArray;
+            List<Run> runsB = otherRLESet._RunArray;
 
-            //int i = 0;
-            //int j = 0;
+            int i = 0;
+            int j = 0;
 
-            //while (i < runsA.Count && j < runsB.Count)
-            //{
-            //    //check for overlap of the runs.
-            //    Run currRun = overlapOr(runsA[i], runsB[j]);
-            //    if (currRun.StartIndex <= currRun.EndIndex)
-            //    {
-            //        rtnVal._RunArray.Add(currRun);
-            //    }
+            while (i < runsA.Count && j < runsB.Count)
+            {
+                Run currRun = new Run();
+                if (tryCreateUnion(runsA[i], runsB[j], ref currRun))
+                {
+                    //there is an overlap
+                    //now compare the overlapping run you created to the previous run you added to see if they should be merged
+                    addRunToRLE(ref rtnVal, currRun);
 
-            //}
+                    //now move the counters.
+                    if (runsA[i].EndIndex < runsB[j].EndIndex)
+                    {
+                        i++;
+                    }
+                    else if (runsA[i].EndIndex > runsB[j].EndIndex)
+                    {
+                        j++;
+                    }
+                    else
+                    {
+                        i++;
+                        j++;
+                    }
+                    
+                }
+                else
+                {
+                    //no overlap, so let's just add lower run and step that counter.
+                    if (runsA[i].StartIndex < runsB[j].StartIndex)
+                    {
+                        addRunToRLE(ref rtnVal, runsA[i]);
+                        i++;
+                    }
+                    else
+                    {
+                        addRunToRLE(ref rtnVal, runsB[j]);
+                        j++;
+                    }
+                }
 
-            //return rtnVal;
+            }
 
-            throw new NotImplementedException();
+            //account for remaining runs in one of our sets.
+            int remCounter = 0;
+            List<Run> remRuns = new List<Run>();
+
+            if (i < runsA.Count)
+            {
+                remCounter = i;
+                remRuns = runsA;
+            }
+            else if (j < runsB.Count)
+            {
+                remCounter = j;
+                remRuns = runsB;
+            }
+
+            while (remCounter < remRuns.Count)
+            {
+                addRunToRLE(ref rtnVal, remRuns[remCounter]);
+                remCounter++;
+            }
+
+            return rtnVal;
+
+        }
+
+        /// <summary>
+        /// Helper function for Or operations. 
+        /// Adds the given run to the run-array by. Either:
+        ///  a) merges it with the previous run if overlap with previous in array 
+        ///  b) adds it as next run if no overlap with previous in array
+        /// </summary>
+        /// <param name="currRLE">the RLE to be modified</param>
+        /// <param name="runToAdd">the Run to add</param>
+        private void addRunToRLE(ref RLEBitset currRLE, Run runToAdd)
+        {
+            Run currRun = new Run();
+            if (tryCreateUnion(currRLE._RunArray.LastOrDefault(), runToAdd, ref currRun) && currRLE._RunArray.Count > 0)
+            {
+                //there is overlap with the previous run in run-array so we merge this run with the previous in the array.
+                int tmpIndx = currRLE._RunArray.Count - 1;
+                currRLE._RunArray[tmpIndx] = currRun;
+            }
+            else
+            {
+                //no overlap with previous run in run-array, so we add the overlapping run as is.
+                currRLE._RunArray.Add(runToAdd);
+            }
         }
 
         public void OrWith(IBitset otherSet)

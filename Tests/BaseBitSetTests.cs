@@ -70,7 +70,7 @@ namespace BitsetsNET.Tests
             IBitset expected = CreateSetFromIndices(result, TEST_SET_LENGTH);
             IBitset actual = CreateSetFromIndices(first, TEST_SET_LENGTH).Or(CreateSetFromIndices(second, TEST_SET_LENGTH));
 
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected, actual, generateMessage("OrWith", first, second, result));
 
         }
 
