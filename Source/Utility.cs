@@ -8,20 +8,84 @@ namespace BitsetsNET
 {
     class Utility
     {
+        /// <summary>
+        /// Gets the 16 highest-order bits from an integer.
+        /// </summary>
+        /// <param name="x">The integer to shift</param>
+        /// <returns>The highest-order bits</returns>
         public static ushort GetHighBits(int x)
         {
             uint u = (uint)(x);
             return (ushort) (u >> 16);
         }
 
+        /// <summary>
+        /// Gets the 16 lowest-order bits from an integer.
+        /// </summary>
+        /// <param name="x">The integer to shift</param>
+        /// <returns>The lowest-order bits</returns>
         public static ushort GetLowBits(int x)
         {
             return (ushort)(x & 0xFFFF);
         }
 
-        public static uint toIntUnsigned(ushort x)
+        public static int GetMaxLowBitAsInteger()
         {
-            return (uint) x;
+            return (int) 0xFFFF;
+        }
+
+        public static int toIntUnsigned(ushort x)
+        {
+            return (int) x;
+        }
+
+        public static void flipBitsetRange(long[] bitset, int start, int end)
+        {
+            if (start == end)
+            {
+                return;
+            }
+            uint firstword = (uint) (start / 64);
+            uint endword = (uint) (end - 1) / 64;
+            bitset[firstword] ^= ~(long)(ulong.MaxValue << start);
+            for (uint i = firstword; i < endword; i++)
+            {
+                bitset[i] = ~bitset[i];
+            }
+
+            bitset[endword] ^= (long)(ulong.MaxValue >> -end);
+        }
+
+        public static int flipBitsetRangeAndCardinalityChange(long[] bitmap, int start, int end)
+        {
+            int cardbefore = cardinalityInBitmapWordRange(bitmap, start, end);
+            flipBitsetRange(bitmap, start, end);
+            int cardafter = cardinalityInBitmapWordRange(bitmap, start, end);
+            return cardafter - cardbefore;
+        }
+
+        /**
+   * Hamming weight of the 64-bit words involved in the range
+   *  start, start+1,..., end-1
+   * 
+   * @param bitmap array of words to be modified
+   * @param start first index to be modified (inclusive)
+   * @param end last index to be modified (exclusive)
+   */
+        public static int cardinalityInBitmapWordRange(long[] bitmap, int start, int end)
+        {
+            if (start == end)
+            {
+                return 0;
+            }
+            int firstword = start / 64;
+            int endword = (end - 1) / 64;
+            int answer = 0;
+            for (int i = firstword; i <= endword; i++)
+            {
+                answer += longBitCount(bitmap[i]);
+            }
+            return answer;
         }
 
         public static int unsignedBinarySearch(ushort[] array, int begin, int end, ushort key) {
@@ -339,7 +403,7 @@ namespace BitsetsNET
         /// greater than b, or zero if they are equal</returns>
         public static uint compareUnsigned(ushort a, ushort b)
         {
-            return toIntUnsigned(a) - toIntUnsigned(b);
+            return (uint) (toIntUnsigned(a) - toIntUnsigned(b));
         }
 
         /// <summary>

@@ -64,6 +64,83 @@ namespace BitsetsNET
             return this;
         }
 
+        
+        public override Container flip(ushort x)
+        {
+            int loc = Utility.unsignedBinarySearch(content, 0, cardinality, x);
+            if (loc < 0)
+            {
+                // Transform the ArrayContainer to a BitmapContainer
+                // when cardinality = DEFAULT_MAX_SIZE
+                if (cardinality >= DEFAULT_MAX_SIZE)
+                {
+                    BitsetContainer a = this.toBitsetContainer();
+                    a.add(x);
+                    return a;
+                }
+                if (cardinality >= this.content.Length)
+                {
+                    increaseCapacity();
+                }
+                // insertion : shift the elements > x by one position to
+                // the right
+                // and put x in it's appropriate place
+                Array.Copy(content, -loc - 1, content, -loc, cardinality + loc + 1);
+                content[-loc - 1] = x;
+                ++cardinality;
+            }
+            else
+            {
+                Array.Copy(content, loc + 1, content, loc, cardinality - loc - 1);
+                --cardinality;
+            }
+            return this;
+        }
+
+        public override Container iadd(ushort begin, ushort end)
+        {
+            // TODO: may need to convert to a RunContainer
+            if (end == begin)
+            {
+                return this;
+            }
+            if (begin > end)
+            {
+                throw new ArgumentException("Invalid range [" + begin + "," + end + ")");
+            }
+            int indexstart = Utility.unsignedBinarySearch(content, 0, cardinality, begin);
+            if (indexstart < 0)
+            {
+                indexstart = -indexstart - 1;
+            }
+            int indexend = Utility.unsignedBinarySearch(content, 0, cardinality, (ushort)(end - 1));
+            if (indexend < 0)
+            {
+                indexend = -indexend - 1;
+            }
+            else
+            {
+                indexend++;
+            }
+            int rangelength = end - begin;
+            int newcardinality = indexstart + (cardinality - indexend) + rangelength;
+            if (newcardinality > DEFAULT_MAX_SIZE)
+            {
+                BitsetContainer a = this.toBitsetContainer();
+                return a.iadd(begin, end);
+            }
+            if (newcardinality >= this.content.Length)
+            {
+                increaseCapacity(newcardinality);
+            }
+            Array.Copy(content, indexend, content, indexstart + rangelength, cardinality - indexend);
+            for (int k = 0; k < rangelength; ++k)
+            {
+                content[k + indexstart] = (ushort)(begin + k);
+            }
+            cardinality = newcardinality;
+            return this;
+        }
         /// <summary>
         /// Returns the elements of this ArrayContainer that are not in the
         /// other ArrayContainer.
@@ -136,6 +213,103 @@ namespace BitsetsNET
                 this.getCardinality(), x.content,
                 x.getCardinality(), this.content);
             return this;
+        }
+
+        public override Container inot(int firstOfRange, int lastOfRange)
+        {
+            // TODO: may need to convert to a RunContainer
+            // determine the span of array indices to be affected
+            int startIndex = Utility.unsignedBinarySearch(content, 0, cardinality, (ushort)firstOfRange);
+            if (startIndex < 0)
+            {
+                startIndex = -startIndex - 1;
+            }
+            int lastIndex = Utility.unsignedBinarySearch(content, 0, cardinality, (ushort)(lastOfRange - 1));
+            if (lastIndex < 0)
+            {
+                lastIndex = -lastIndex - 1 - 1;
+            }
+            int currentValuesInRange = lastIndex - startIndex + 1;
+            int spanToBeFlipped = lastOfRange - firstOfRange;
+            int newValuesInRange = spanToBeFlipped - currentValuesInRange;
+            ushort[] buffer = new ushort[newValuesInRange];
+            int cardinalityChange = newValuesInRange - currentValuesInRange;
+            int newCardinality = cardinality + cardinalityChange;
+
+            if (cardinalityChange > 0)
+            { // expansion, right shifting needed
+                if (newCardinality > content.Length)
+                {
+                    // so big we need a bitmap?
+                    if (newCardinality > DEFAULT_MAX_SIZE)
+                    {
+                        return toBitsetContainer().inot(firstOfRange, lastOfRange);
+                    }
+                    // Change the size of the array based on the new cardinality
+                    Array.Resize(ref content, newCardinality);
+                }
+                // slide right the contents after the range
+                Array.Copy(content, lastIndex + 1, content, lastIndex + 1 + cardinalityChange,
+                    cardinality - 1 - lastIndex);
+                negateRange(buffer, startIndex, lastIndex, firstOfRange, lastOfRange);
+            }
+            else
+            { // no expansion needed
+                negateRange(buffer, startIndex, lastIndex, firstOfRange, lastOfRange);
+                if (cardinalityChange < 0)
+                {
+                    // contraction, left sliding.
+                    // Leave array oversize
+                    Array.Copy(content, startIndex + newValuesInRange - cardinalityChange, content,
+                        startIndex + newValuesInRange, newCardinality - (startIndex + newValuesInRange));
+                }
+            }
+            cardinality = newCardinality;
+            return this;
+        }
+
+        // for use in inot range known to be nonempty
+        private void negateRange(ushort[] buffer, int startIndex, int lastIndex,
+            int startRange, int lastRange)
+        {
+            // compute the negation into buffer
+
+            int outPos = 0;
+            int inPos = startIndex; // value here always >= valInRange,
+                                    // until it is exhausted
+                                    // n.b., we can start initially exhausted.
+
+            int valInRange = startRange;
+            for (; valInRange < lastRange && inPos <= lastIndex; ++valInRange)
+            {
+                if ((short)valInRange != content[inPos])
+                {
+                    buffer[outPos++] = (ushort)valInRange;
+                }
+                else
+                {
+                    ++inPos;
+                }
+            }
+
+            // if there are extra items (greater than the biggest
+            // pre-existing one in range), buffer them
+            for (; valInRange < lastRange; ++valInRange)
+            {
+                buffer[outPos++] = (ushort)valInRange;
+            }
+
+            if (outPos != buffer.Length)
+            {
+                throw new SystemException(
+                    "negateRange: outPos " + outPos + " whereas buffer.length=" + buffer.Length);
+            }
+            // copy back from buffer...caller must ensure there is room
+            int i = startIndex;
+            foreach (ushort item in buffer)
+            {
+                content[i++] = item;
+            }
         }
 
         public override Container add(ushort begin, ushort end)
