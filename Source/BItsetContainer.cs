@@ -535,16 +535,23 @@ namespace BitsetsNET
             ushort index = 0;
             foreach(long value in bitmap)
             {
-                //copy value so that we can modify it
-                long val = value;
-                for(int i = 0; i < 64; i++)
+                if (value != 0)
                 {
-                    if((val & 1) == 1)
+                    //copy value so that we can modify it
+                    ulong val = (ulong)value;
+                    for (int i = 0; i < 64; i++)
                     {
-                        yield return index;
+                        if ((val & 1) == 1)
+                        {
+                            yield return index;
+                        }
+                        val >>= 1;
+                        index++;
                     }
-                    val >>= 1;
-                    index++;
+                }
+                else
+                {
+                    index += 64;
                 }
             }
         }
