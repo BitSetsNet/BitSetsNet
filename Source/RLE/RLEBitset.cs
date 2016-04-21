@@ -624,6 +624,70 @@ namespace BitsetsNET
         }
 
         /// <summary>
+        /// Flips the bit at the specified index.
+        /// </summary>
+        /// <param name="index">Index to be flipped</param>
+        public void Flip(int index)
+        {
+            if (_RunArray.Count == 0)
+            {
+                _RunArray.Add(new Run(index, index));
+            }
+            else
+            {
+                if (this.Get(index) == true)
+                {
+                    this.Set(index, false);
+                }
+                else
+                {
+                    this.Set(index, true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Flips each bit in the specified range
+        /// </summary>
+        /// <param name="start">Start of range</param>
+        /// <param name="end">End of range</param>
+        public void Flip(int start, int end)
+        {
+            if (end < start)
+            {
+                throw new ArgumentException("parameter 'end' must be greater than or equal to 'start'");
+            }
+
+            if (_RunArray.Count == 0)
+            {
+                _RunArray.Add(new Run(start, end));
+            }
+            else
+            {
+                List<Run> rangeToFlip = this.getRange(start, end);
+
+                this.Set(rangeToFlip[0].StartIndex, rangeToFlip[0].EndIndex, false);
+
+                int rangeCount = rangeToFlip.Count;
+                for (int i = 1; i < rangeCount; i++)
+                {
+                    this.Set(rangeToFlip[i].StartIndex, rangeToFlip[i].EndIndex, false);
+                    this.Set(rangeToFlip[i - 1].EndIndex + 1, rangeToFlip[i].StartIndex - 1, true);
+                }
+
+                if (start < rangeToFlip[0].StartIndex)
+                {
+                    this.Set(start, rangeToFlip[0].StartIndex - 1, true);
+                }
+
+                if (end > rangeToFlip[rangeCount - 1].EndIndex)
+                {
+                    this.Set(rangeToFlip[rangeCount - 1].EndIndex + 1, end, true);
+                }
+            }
+        }
+
+        /// <summary>
         /// Inverts all the values in the current IBitset, 
         /// so that elements set to true are changed to false, and elements set to false are changed to true.
         /// </summary>
@@ -712,15 +776,6 @@ namespace BitsetsNET
             return rtnVal;
         }
 
-        public void Flip(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Flip(int start, int end)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// Returns the contents of this set as a bit array where the value is
@@ -767,10 +822,52 @@ namespace BitsetsNET
                 }
             }
         }
-
+		
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = _Length;
+                foreach (var run in _RunArray)
+                {
+                    hash = unchecked(17 * hash + run.StartIndex);
+                    hash = unchecked(17 * hash + run.EndIndex);
+                }
+                return hash;
+			}
+		}
         #endregion
 
         #region "Private Methods"
+
+        private List<Run> getRange(int start, int end)
+        {
+            List<Run> range = new List<Run>();
+            for (int i = 0; i < _RunArray.Count; i++)
+            {
+                if(_RunArray[i].StartIndex >= start && _RunArray[i].EndIndex <= end)
+                {
+                    range.Add(_RunArray[i]);
+                }
+                else if(_RunArray[i].StartIndex < start && _RunArray[i].EndIndex <= end)
+                {
+                    range.Add(new Run(start, _RunArray[i].EndIndex));
+                }
+                else if(_RunArray[i].StartIndex < start && _RunArray[i].EndIndex > end)
+                {
+                    range.Add(new Run(start, end));
+                    break;
+                }
+                else if(_RunArray[i].StartIndex >= start && _RunArray[i].EndIndex > end)
+                {
+                    range.Add(new Run(_RunArray[i].StartIndex, end));
+                    break;
+                }
+            }
+
+            return range;
+        }
+
 
         private bool tryCreateIntersection(Run runA, Run runB, ref Run output)
         {
