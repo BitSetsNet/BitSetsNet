@@ -503,9 +503,9 @@ namespace BitsetsNET
             unchecked
             {
                 int hash = cardinality;
-                for (int i = 0; i < cardinality; i++)
+                for (int i = 0; i < bitmap.Length; i++)
                 {
-                    hash = unchecked(17 * hash + (int) (bitmap[i] << 32 >> 32));
+                    hash = 17 * hash + (int) bitmap[i];
                 }
                 return hash;
             }
