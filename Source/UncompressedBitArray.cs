@@ -127,7 +127,11 @@ namespace BitsetsNET
 
         public IEnumerator GetEnumerator()
         {
-            return _Array.GetEnumerator();
+            for (int i = 0; i < this._Array.Length; i++) {
+                if (this._Array.Get(i) == true) { 
+                    yield return i;
+                }
+            }
         }
 
         public IBitset Not()
