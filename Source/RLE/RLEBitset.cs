@@ -778,11 +778,6 @@ namespace BitsetsNET
             return rtnVal;
         }
 
-        public void Serialize(System.IO.Stream stream)
-        {
-            throw new NotImplementedException();
-        }
-
 
         /// <summary>
         /// Returns the contents of this set as a bit array where the value is
