@@ -595,9 +595,9 @@ namespace BitsetsNET
         public override void Serialize(BinaryWriter writer)
         {
             writer.Write(cardinality);
-            foreach(ushort index in content)
+            for (int i = 0; i < cardinality; i++)
             {
-                writer.Write(index);
+                writer.Write(content[i]);
             }
         }
 

@@ -16,6 +16,25 @@ namespace BitsetsNET.Tests
         }
 
         [TestMethod()]
+        public virtual void SerializationTest()
+        {
+            int TEST_SET_LENGTH = 10;
+            int[] indicies = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
+            
+            RoaringBitset actual = (RoaringBitset)CreateSetFromIndices(indicies, TEST_SET_LENGTH);
+            RoaringBitset expected = null;
+
+            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            {
+                actual.Serialize(ms);
+                ms.Position = 0;
+                expected = RoaringBitset.Deserialize(ms);
+            }
+            
+            Assert.AreEqual(actual, expected);
+        }
+
+        [TestMethod()]
         public virtual void SetTrueLarge()
         {
             int[] set = SetGenerator.GetContiguousArray(9, 5009);

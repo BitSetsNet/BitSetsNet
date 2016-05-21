@@ -22,18 +22,16 @@ namespace BitsetsNET.Tests
             int[] indicies = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
 
             RLEBitset actual = (RLEBitset)CreateSetFromIndices(indicies, TEST_SET_LENGTH);
-            System.IO.FileStream fileWriter = new System.IO.FileStream(@"C:\Development\RLE.bin", System.IO.FileMode.Create);
-            actual.Serialize(fileWriter);
-            fileWriter.Close();
-            fileWriter.Dispose();
+            RLEBitset expected = null;
 
-            System.IO.FileStream fileReader = new System.IO.FileStream(@"C:\Development\RLE.bin", System.IO.FileMode.Open);
-            RLEBitset expected = RLEBitset.Deserialize(fileReader);
-            fileReader.Close();
-            fileReader.Dispose();
+            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            {
+                actual.Serialize(ms);
+                ms.Position = 0;
+                expected = RLEBitset.Deserialize(ms);
+            }
 
             Assert.AreEqual(actual, expected);
-
         }
 
     }

@@ -317,12 +317,14 @@ namespace BitsetsNET
         /// <returns></returns>
         public static RoaringArray Deserialize(BinaryReader reader)
         {
-            RoaringArray array = new RoaringArray(reader.ReadInt32());
-            
-            for(int i = 0; i < array.size; i++)
+            int size = reader.ReadInt32();
+            RoaringArray array = new RoaringArray(size);
+            array.size = size;
+
+            for(int i = 0; i < size; i++)
             {
                 array.keys[i] = (ushort) reader.ReadInt16();
-                array.values[i] = Container.Deserialize(reader);
+                array.values[i] = Container.Deserialize(reader); 
             }
 
             return array;

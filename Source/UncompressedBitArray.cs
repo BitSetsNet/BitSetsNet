@@ -196,5 +196,12 @@ namespace BitsetsNET
         {
             return new BitArray(this._Array);
         }
+
+
+        public void Serialize(System.IO.Stream stream)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
