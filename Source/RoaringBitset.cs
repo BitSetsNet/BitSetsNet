@@ -740,10 +740,5 @@ namespace BitsetsNET
             }
             
         }
-
-        public BitArray ToBitArray()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

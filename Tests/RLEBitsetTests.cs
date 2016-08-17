@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,39 @@ namespace BitsetsNET.Tests
             }
 
             Assert.AreEqual(actual, expected);
+        }
+
+        [TestMethod()]
+        public virtual void ToBitArrayTest()
+        {
+            int TEST_SET_LENGTH = 10;
+            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
+            BitArray setArray = new BitArray(TEST_SET_LENGTH);
+
+            foreach (int index in set)
+            {
+                setArray[index] = true;
+            }
+
+            RLEBitset testSet = (RLEBitset)CreateSetFromIndices(set, TEST_SET_LENGTH);
+            BitArray testArray = testSet.ToBitArray();
+
+            bool expected = true;
+            bool actual = true;
+
+            for (int i = 0; i < setArray.Length; i++)
+            {
+                if (setArray[i])
+                {
+                    actual &= setArray[i] == testArray[i];
+                }
+                else
+                {
+                    //do nothing
+                }
+            }
+
+            Assert.AreEqual(expected, actual);
         }
 
     }
