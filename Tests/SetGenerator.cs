@@ -18,7 +18,10 @@ namespace BitsetsNET.Tests
         public static int[] GetRandomArray(int length, int maxNumberOfOnes = 0)
         {
 
-            if (maxNumberOfOnes == 0) { maxNumberOfOnes = length; }
+            if (maxNumberOfOnes == 0)
+            {
+                maxNumberOfOnes = length;
+            }
 
             var indexSet = new HashSet<int>();
            

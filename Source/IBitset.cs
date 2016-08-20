@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 
 namespace BitsetsNET
 {
@@ -8,21 +7,43 @@ namespace BitsetsNET
     /// </summary>
     public interface IBitset : IEnumerable, System.Runtime.Serialization.ISerializable
     {
+        /// <summary>
+        /// Creates a new bitset that is the bitwise AND of this bitset with another bitset
+        /// </summary>
+        /// <param name="otherSet">Other bitset</param>
+        /// <returns>A new IBitset</returns>
         IBitset And(IBitset otherSet);
 
+        /// <summary>
+        /// Performs an in-place intersection of two Bitsets.
+        /// </summary>
+        /// <param name="otherSet">the second Bitset to intersect</param>
         void AndWith(IBitset otherSet);
 
+        /// <summary>
+        /// Create a new bitset that is a deep copy of this one.
+        /// </summary>
+        /// <returns>The cloned bitset</returns>
         IBitset Clone();
 
-        IBitset Or(IBitset otherSet);      
+        /// <summary>
+        /// Creates a new bitset that is the bitwise OR of this bitset with another bitset.
+        /// </summary>
+        /// <param name="otherSet">Other bitset</param>
+        /// <returns>A new IBitset</returns>
+        IBitset Or(IBitset otherSet);
 
+        /// <summary>
+        /// Computes the in-place bitwise OR of this bitset with another bitset.
+        /// </summary>
+        /// <param name="otherSet">Other bitset</param>
         void OrWith(IBitset otherSet);
 
         /// <summary>
         /// Return whether the given index is a member of this set
         /// </summary>
         /// <param name="index">the index to test</param>
-        /// <returns></returns>
+        /// <returns>True if the index is a member of this set</returns>
         bool Get(int index);
 
         /// <summary>
@@ -59,14 +80,14 @@ namespace BitsetsNET
         /// Creates a new IBitSet that has the members of this BitSet that are 
         /// not members of the otherSet.
         /// </summary>
-        /// <param name="otherSet"></param>
+        /// <param name="otherSet">The other bitset</param>
         /// <returns>a new IBitSet</returns>
         IBitset Difference(IBitset otherSet);
 
         bool Equals(object obj);
 
         /// <summary>
-        /// The number of members of the set
+        /// The number of members in the set
         /// </summary>
         /// <returns>an integer for the number of members in the set</returns>
         int Cardinality();
@@ -74,5 +95,4 @@ namespace BitsetsNET
         void Serialize(System.IO.Stream stream);
 
     }
-       
 }

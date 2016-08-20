@@ -34,12 +34,12 @@ namespace BitsetsNET
             return (int) 0xFFFF;
         }
 
-        public static int toIntUnsigned(ushort x)
+        public static int ToIntUnsigned(ushort x)
         {
             return (int) x;
         }
 
-        public static void flipBitsetRange(long[] bitset, int start, int end)
+        public static void FlipBitsetRange(long[] bitset, int start, int end)
         {
             if (start == end)
             {
@@ -56,23 +56,24 @@ namespace BitsetsNET
             bitset[endword] ^= (long)(ulong.MaxValue >> -end);
         }
 
-        public static int flipBitsetRangeAndCardinalityChange(long[] bitmap, int start, int end)
+
+        public static int FlipBitsetRangeAndCardinalityChange(long[] bitmap, int start, int end)
         {
-            int cardbefore = cardinalityInBitmapWordRange(bitmap, start, end);
-            flipBitsetRange(bitmap, start, end);
-            int cardafter = cardinalityInBitmapWordRange(bitmap, start, end);
+            int cardbefore = CardinalityInBitmapWordRange(bitmap, start, end);
+            FlipBitsetRange(bitmap, start, end);
+            int cardafter = CardinalityInBitmapWordRange(bitmap, start, end);
             return cardafter - cardbefore;
         }
 
-        /**
-   * Hamming weight of the 64-bit words involved in the range
-   *  start, start+1,..., end-1
-   * 
-   * @param bitmap array of words to be modified
-   * @param start first index to be modified (inclusive)
-   * @param end last index to be modified (exclusive)
-   */
-        public static int cardinalityInBitmapWordRange(long[] bitmap, int start, int end)
+        /// <summary>
+        /// Hamming weight of the 64-bit words involved in the range
+        /// start, start+1,..., end-1.
+        /// </summary>
+        /// <param name="bitmap">Bitmap array of words to be modified</param>
+        /// <param name="start">First index to be modified (inclusive)</param>
+        /// <param name="end">Last index to be modified (exclusive)</param>
+        /// <returns>Cardinality in specified range</returns>
+        public static int CardinalityInBitmapWordRange(long[] bitmap, int start, int end)
         {
             if (start == end)
             {
@@ -83,13 +84,13 @@ namespace BitsetsNET
             int answer = 0;
             for (int i = firstword; i <= endword; i++)
             {
-                answer += longBitCount(bitmap[i]);
+                answer += LongBitCount(bitmap[i]);
             }
             return answer;
         }
 
-        public static int unsignedBinarySearch(ushort[] array, int begin, int end, ushort key) {
-
+        public static int UnsignedBinarySearch(ushort[] array, int begin, int end, ushort key)
+        {
             //optimizes for the case where the value is inserted at the end
             if ((end > 0) && (array[end - 1] < key))
             {
@@ -98,17 +99,22 @@ namespace BitsetsNET
 
             int low = begin;
             int high = end - 1;
-            while (low <= high) {
-
+            while (low <= high)
+            {
                 // divide by 2 to find the middle index
                 int middleIndex = (low + high) >> 1;
                 ushort middleValue = array[middleIndex];
 
-                if (middleValue < key) {
+                if (middleValue < key)
+                {
                     low = middleIndex + 1;
-                } else if (middleValue > key) {
+                }
+                else if (middleValue > key)
+                {
                     high = middleIndex - 1;
-                } else {
+                }
+                else
+                {
                     return middleIndex;
                 }
             }
@@ -118,13 +124,9 @@ namespace BitsetsNET
         /// <summary>
         /// Naive implementation to count the number of true bits in a word.
         /// </summary>
-        /// <param name="w">
-        /// word
-        /// </param>
-        /// <returns>
-        /// The number of true bits in the word
-        /// </returns>
-        public static int longBitCount(long w)
+        /// <param name="w">word</param>
+        /// <returns>The number of true bits in the word</returns>
+        public static int LongBitCount(long w)
         {
             int rtnVal = 0;
             ulong word = (ulong)w;
@@ -138,28 +140,28 @@ namespace BitsetsNET
         }
 
         /// <summary>
-        /// compute the bitwise AND between two long arrays and write the set
-        /// bits in the container
+        /// Compute the bitwise AND between two long arrays and write the set
+        /// bits in the container.
         /// </summary>
-        /// <param name="container">where we write</param>
-        /// <param name="bitmap1">first bitmap</param>
-        /// <param name="bitmap2">second bitmap</param>
-        public static void fillArrayAND(
-            ref ushort[] container, 
-            long[] bitmap1,
-            long[] bitmap2
-        ) {
+        /// <param name="container">Container to write to</param>
+        /// <param name="bitmap1">First bitmap</param>
+        /// <param name="bitmap2">Second bitmap</param>
+        public static void FillArrayAND(ref ushort[] container, long[] bitmap1, long[] bitmap2)
+        {
             int pos = 0;
 
             if (bitmap1.Length != bitmap2.Length)
+            {
                 throw new ArgumentOutOfRangeException("not supported");
+            }
 
-            for (int k = 0; k < bitmap1.Length; ++k) {
+            for (int k = 0; k < bitmap1.Length; ++k)
+            {
                 long bitset = bitmap1[k] & bitmap2[k];
 
                 while (bitset != 0) {
                     long t = bitset & -bitset;
-                    container[pos++] = (ushort) (k * 64 + longBitCount(t - 1));
+                    container[pos++] = (ushort) (k * 64 + LongBitCount(t - 1));
                     bitset ^= t;
                 }
             }
@@ -170,42 +172,39 @@ namespace BitsetsNET
         /// the set bits in the container.
         /// </summary>
         /// <param name="container"> Writing here</param>
-        /// <param name="bitmap1"></param>
-        /// <param name="bitmap2"></param>
-        public static void fillArrayANDNOT(ushort[] container,
-                                           long[] bitmap1,
-                                           long[] bitmap2)
+        /// <param name="bitmap1">First bitmap</param>
+        /// <param name="bitmap2">Second bitmap</param>
+        public static void FillArrayANDNOT(ushort[] container, long[] bitmap1, long[] bitmap2)
         {
             int pos = 0;
             if (bitmap1.Length != bitmap2.Length)
+            {
                 throw new ArgumentOutOfRangeException("Bitmaps need to be the same length");
+            }
             for (int k = 0; k < bitmap1.Length; ++k)
             {
                 long bitset = bitmap1[k] & (~bitmap2[k]);
                 while (bitset != 0)
                 {
                     long t = bitset & -bitset;
-                    container[pos++] = (ushort)(k * 64 + Utility.longBitCount(t - 1));
+                    container[pos++] = (ushort)(k * 64 + Utility.LongBitCount(t - 1));
                     bitset ^= t;
                 }
             }
         }
-        
-        /**
- * Unite two sorted lists and write the result to the provided
- * output array
- *
- * @param set1    first array
- * @param length1 length of first array
- * @param set2    second array
- * @param length2 length of second array
- * @param buffer  output array
- * @return cardinality of the union
- */
-        public static int unsignedUnion2by2(ushort[] set1,
-                                            int length1, 
-                                            ushort[] set2,
-                                            int length2,
+
+        /// <summary>
+        /// Unite two sorted lists and write the result to the provided
+        /// output array
+        /// </summary>
+        /// <param name="set1">first array</param>
+        /// <param name="length1">length of first array</param>
+        /// <param name="set2">second array</param>
+        /// <param name="length2">length of second array</param>
+        /// <param name="buffer">output array</param>
+        /// <returns>cardinality of the union</returns>
+        public static int UnsignedUnion2by2(ushort[] set1, int length1, 
+                                            ushort[] set2, int length2,
                                             ushort[] buffer)
         {
             int pos = 0;
@@ -271,30 +270,35 @@ namespace BitsetsNET
         }
 
 
-        /**
-         * Intersect two sorted lists and write the result to the provided
-         * output array
-         *
-         * @param set1    first array
-         * @param length1 length of first array
-         * @param set2    second array
-         * @param length2 length of second array
-         * @param buffer  output array
-         * @return cardinality of the intersection
-         */
-        public static int unsignedIntersect2by2(ushort[] set1,
-                                                int length1, ushort[] set2, int length2,
-                                                ushort[] buffer) {
-            if (set1.Length * 64 < set2.Length) {
-                return unsignedOneSidedGallopingIntersect2by2(set1, length1, set2, length2, buffer);
-            } else if (set2.Length * 64 < set1.Length) {
-                return unsignedOneSidedGallopingIntersect2by2(set2, length2, set1, length1, buffer);
-            } else {
-                return unsignedLocalIntersect2by2(set1, length1, set2, length2, buffer);
+        /// <summary>
+        /// Intersect two sorted lists and write the result to the provided
+        /// output array
+        /// </summary>
+        /// <param name="set1">first array</param>
+        /// <param name="length1">length of first array</param>
+        /// <param name="set2">second array</param>
+        /// <param name="length2">length of second array</param>
+        /// <param name="buffer">output array</param>
+        /// <returns>cardinality of the intersection</returns>
+        public static int UnsignedIntersect2by2(ushort[] set1, int length1, 
+                                                ushort[] set2, int length2,
+                                                ushort[] buffer)
+        {
+            if (set1.Length * 64 < set2.Length)
+            {
+                return UnsignedOneSidedGallopingIntersect2by2(set1, length1, set2, length2, buffer);
+            }
+            else if (set2.Length * 64 < set1.Length)
+            {
+                return UnsignedOneSidedGallopingIntersect2by2(set2, length2, set1, length1, buffer);
+            }
+            else
+            {
+                return UnsignedLocalIntersect2by2(set1, length1, set2, length2, buffer);
             }
         }
 
-        protected static int unsignedLocalIntersect2by2(ushort[] set1,
+        protected static int UnsignedLocalIntersect2by2(ushort[] set1,
                                                         int length1, ushort[] set2, int length2,
                                                         ushort[] buffer) {
             if ((0 == length1) || (0 == length2))
@@ -310,8 +314,10 @@ namespace BitsetsNET
             {
                 int v1 = s1;
                 int v2 = s2;
-                if (v2 < v1) {
-                    do {
+                if (v2 < v1)
+                {
+                    do
+                    {
                         ++k2;
                         if (k2 == length2)
                         {
@@ -322,8 +328,11 @@ namespace BitsetsNET
                         s2 = set2[k2];
                         v2 = s2;
                     } while (v2 < v1);
-                } else if (v1 < v2) {
-                    do {
+                }
+                else if (v1 < v2)
+                {
+                    do
+                    {
                         ++k1;
                         if (k1 == length1)
                         {
@@ -334,15 +343,21 @@ namespace BitsetsNET
                         s1 = set1[k1];
                         v1 = s1;
                     } while (v1 < v2);
-                } else {
+                }
+                else
+                {
                     // (set2[k2] == set1[k1])
                     buffer[pos++] = s1;
                     ++k1;
                     if (k1 == length1)
+                    {
                         break;
+                    }
                     ++k2;
                     if (k2 == length2)
+                    {
                         break;
+                    }
                     s1 = set1[k1];
                     s2 = set2[k2];
                 }
@@ -350,12 +365,14 @@ namespace BitsetsNET
             return pos;
         }
 
-        protected static int unsignedOneSidedGallopingIntersect2by2(
-                ushort[] smallSet, int smallLength,
-                ushort[] largeSet, int largeLength,
-                ushort[] buffer) {
+        protected static int UnsignedOneSidedGallopingIntersect2by2(ushort[] smallSet, int smallLength,
+                                                                    ushort[] largeSet, int largeLength,
+                                                                    ushort[] buffer)
+        {
             if (0 == smallLength)
+            {
                 return 0;
+            }
             
             int k1 = 0;
             int k2 = 0;
@@ -363,28 +380,41 @@ namespace BitsetsNET
             ushort s1 = largeSet[k1];
             ushort s2 = smallSet[k2];
 
-            while (true) {
-                if (s1 < s2) {
-                    k1 = advanceUntil(largeSet, k1, largeLength, s2);
+            while (true)
+            {
+                if (s1 < s2)
+                {
+                    k1 = AdvanceUntil(largeSet, k1, largeLength, s2);
                     if (k1 == largeLength)
+                    {
                         break;
+                    }
                     s1 = largeSet[k1];
                 }
-                if (s2 < s1) {
+                if (s2 < s1)
+                {
                     ++k2;
                     if (k2 == smallLength)
+                    {
                         break;
+                    }
                     s2 = smallSet[k2];
-                } else {
+                }
+                else
+                {
                     // (set2[k2] == set1[k1])
                     buffer[pos++] = s2;
                     ++k2;
                     if (k2 == smallLength)
+                    {
                         break;
+                    }
                     s2 = smallSet[k2];
-                    k1 = advanceUntil(largeSet, k1, largeLength, s2);
+                    k1 = AdvanceUntil(largeSet, k1, largeLength, s2);
                     if (k1 == largeLength)
+                    {
                         break;
+                    }
                     s1 = largeSet[k1];
                 }
 
@@ -401,9 +431,9 @@ namespace BitsetsNET
         /// <param name="b">the second unsigned short to compare</param>
         /// <returns>A negative value if a is less than b, a positive value if a is 
         /// greater than b, or zero if they are equal</returns>
-        public static uint compareUnsigned(ushort a, ushort b)
+        public static uint CompareUnsigned(ushort a, ushort b)
         {
-            return (uint) (toIntUnsigned(a) - toIntUnsigned(b));
+            return (uint) (ToIntUnsigned(a) - ToIntUnsigned(b));
         }
 
         /// <summary>
@@ -411,10 +441,8 @@ namespace BitsetsNET
         /// output array
         /// </summary>
         /// <returns>Cardinality of the difference</returns>
-        public static int unsignedDifference(ushort[] set1, 
-                                             int length1,
-                                             ushort[] set2,
-                                             int length2,
+        public static int UnsignedDifference(ushort[] set1, int length1,
+                                             ushort[] set2, int length2,
                                              ushort[] buffer)
         {
             int pos = 0;
@@ -437,7 +465,7 @@ namespace BitsetsNET
             ushort s2 = set2[k2];
             while (true)
             {
-                if (toIntUnsigned(s1) < toIntUnsigned(s2))
+                if (ToIntUnsigned(s1) < ToIntUnsigned(s2))
                 {
                     buffer[pos++] = s1;
                     ++k1;
@@ -447,7 +475,7 @@ namespace BitsetsNET
                     }
                     s1 = set1[k1];
                 }
-                else if (toIntUnsigned(s1) == toIntUnsigned(s2))
+                else if (ToIntUnsigned(s1) == ToIntUnsigned(s2))
                 {
                     ++k1;
                     ++k2;
@@ -515,7 +543,7 @@ namespace BitsetsNET
         /// <param name="min">minimum value</param>
         /// <returns>x greater than pos such that array[pos] is at least as large
         /// as min, pos is is equal to length if it is not possible.</returns>
-        public static int advanceUntil(ushort[] array, int pos, int length, ushort min)
+        public static int AdvanceUntil(ushort[] array, int pos, int length, ushort min)
         {
             int lower = pos + 1;
 
@@ -528,9 +556,10 @@ namespace BitsetsNET
             int spansize = 1; // could set larger
             // bootstrap an upper limit
 
-            while (lower + spansize < length && toIntUnsigned(array[lower + spansize]) < toIntUnsigned(min))
-                spansize *= 2; // hoping for compiler will reduce to
-            // shift
+            while (lower + spansize < length && ToIntUnsigned(array[lower + spansize]) < ToIntUnsigned(min))
+            {
+                spansize *= 2; // hoping for compiler will reduce to shift
+            }
             int upper = (lower + spansize < length) ? lower + spansize : length - 1;
 
             // maybe we are lucky (could be common case when the seek ahead
@@ -541,7 +570,7 @@ namespace BitsetsNET
                 return upper;
             }
 
-            if (toIntUnsigned(array[upper]) < toIntUnsigned(min))
+            if (ToIntUnsigned(array[upper]) < ToIntUnsigned(min))
             {// means
                 // array
                 // has no
@@ -573,13 +602,15 @@ namespace BitsetsNET
 
         }
 
-        public static int select(long w, int j) {
+        public static int Select(long w, int j)
+        {
             ulong word = (ulong) w;
             int seen = 0;
             // Divide 64bit
             uint part = (uint) word & 0xFFFFFFFF;
-            int n = longBitCount(part);
-            if (n <= j) {
+            int n = LongBitCount(part);
+            if (n <= j)
+            {
                 part = (uint) (word >> 32);
                 seen += 32;
                 j -= n;
@@ -589,8 +620,9 @@ namespace BitsetsNET
             // Divide 32bit
             part = ww & 0xFFFF;
 
-            n = longBitCount(part);
-            if (n <= j) {
+            n = LongBitCount(part);
+            if (n <= j)
+            {
 
                 part = ww >> 16;
                 seen += 16;
@@ -600,8 +632,9 @@ namespace BitsetsNET
 
             // Divide 16bit
             part = ww & 0xFF;
-            n = longBitCount(part);
-            if (n <= j) {
+            n = LongBitCount(part);
+            if (n <= j)
+            {
                 part = ww >> 8;
                 seen += 8;
                 j -= n;
@@ -610,9 +643,11 @@ namespace BitsetsNET
 
             // Lookup in final byte
             int counter;
-            for (counter = 0; counter < 8; counter++) {
+            for (counter = 0; counter < 8; counter++)
+            {
                 j -= (int)(ww >> counter) & 1;
-                if (j < 0) {
+                if (j < 0)
+                {
                     break;
                 }
             }
@@ -625,9 +660,12 @@ namespace BitsetsNET
         /// <param name="bitmap">bitmap array of words to be modified</param>
         /// <param name="start">start first index to be modified (inclusive)</param>
         /// <param name="end">end last index to be modified (exclusive)</param>
-        public static void resetBitmapRange(long[] bitmap, int start, int end)
+        public static void ResetBitmapRange(long[] bitmap, int start, int end)
         {
-            if (start == end) return;
+            if (start == end)
+            {
+                return;
+            }
 
             int firstword = start / 64;
             int endword = (end - 1) / 64;
@@ -641,7 +679,9 @@ namespace BitsetsNET
             bitmap[firstword] &= ~(~0L << start);
 
             for (int i = firstword + 1; i < endword; i++)
+            {
                 bitmap[i] = 0;
+            }
 
             bitmap[endword] &= (long)~(~0UL >> -end);
         }
@@ -652,25 +692,27 @@ namespace BitsetsNET
         /// <param name="bitmap">array of words to be modified</param>
         /// <param name="start">first index to be modified (inclusive)</param>
         /// <param name="end">last index to be modified (exclusive)</param>
-        public static void setBitmapRange(long[] bitmap, ushort start, ushort end)
+        public static void SetBitmapRange(long[] bitmap, ushort start, ushort end)
         {
             if (start == end) return;
 
-            int firstword = start / 64;
-            int endword = (end - 1) / 64;
+            int firstWord = start / 64;
+            int endWord = (end - 1) / 64;
 
-            if (firstword == endword)
+            if (firstWord == endWord)
             {
-                bitmap[firstword] |= (~0L << start) & (long)(~0UL >> -end);
+                bitmap[firstWord] |= (~0L << start) & (long)(~0UL >> -end);
                 return;
             }
 
-            bitmap[firstword] |= ~0L << start;
+            bitmap[firstWord] |= ~0L << start;
 
-            for (int i = firstword + 1; i < endword; i++)
+            for (int i = firstWord + 1; i < endWord; i++)
+            {
                 bitmap[i] = ~0L;
+            }
 
-            bitmap[endword] |= (long)(~0UL >> -end);
+            bitmap[endWord] |= (long)(~0UL >> -end);
         }
     }
 }
