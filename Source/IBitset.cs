@@ -63,13 +63,6 @@ namespace BitsetsNET
         /// <returns>a new IBitSet</returns>
         IBitset Difference(IBitset otherSet);
 
-        /// <summary>
-        /// Returns the contents of this set as a bit array where the value is
-        /// set to true for each index that is a member of this set
-        /// </summary>
-        /// <returns>a new BitArray</returns>
-        BitArray ToBitArray();
-
         bool Equals(object obj);
 
         /// <summary>
