@@ -11,154 +11,194 @@ namespace BitsetsNET
     {
         protected static int MAX_CAPACITY = 1 << 16;
 
-        public int cardinality;
-        public long[] bitmap;
+        public int Cardinality;
+        public long[] Bitmap;
 
         public BitsetContainer()
         {
-            this.cardinality = 0;
-            this.bitmap = new long[MAX_CAPACITY / 64];
+            this.Cardinality = 0;
+            this.Bitmap = new long[MAX_CAPACITY / 64];
         }
 
         public BitsetContainer(int cardinality, long[] bitmap)
         {
-            this.cardinality = cardinality;
-            this.bitmap = bitmap;
+            this.Cardinality = cardinality;
+            this.Bitmap = bitmap;
         }
         
         /// <summary>
         /// Recomputes the cardinality of the bitmap.
         /// </summary>
-        protected void computeCardinality()
+        protected void ComputeCardinality()
         {
-            this.cardinality = 0;
-            for (int k = 0; k < this.bitmap.Length; k++)
+            this.Cardinality = 0;
+            for (int k = 0; k < this.Bitmap.Length; k++)
             {
-                this.cardinality += Utility.longBitCount(this.bitmap[k]);
+                this.Cardinality += Utility.LongBitCount(this.Bitmap[k]);
             }
         }
 
-        public override Container add(ushort x)
+        /// <summary>
+        /// Add a short to the container. May generate a new container.
+        /// </summary>
+        /// <param name="x">short to be added</param>
+        /// <returns>this container, modified</returns>
+        public override Container Add(ushort x)
         {
-            long prevVal = bitmap[x / 64];
+            long prevVal = Bitmap[x / 64];
             long newVal = prevVal | (1L << x);
-            bitmap[x / 64] = newVal;
-            if (prevVal != newVal) ++cardinality;
+            Bitmap[x / 64] = newVal;
+            if (prevVal != newVal)
+            {
+                ++Cardinality;
+            }
             return this;
         }
 
-        public override Container add(ushort rangeStart, ushort rangeEnd)
+        /// <summary>
+        /// Add to the current bitmap all integers in [rangeStart,rangeEnd).
+        /// </summary>
+        /// <param name="rangeStart">inclusive beginning of range</param>
+        /// <param name="rangeEnd">exclusive ending of range</param>
+        /// <returns>this container, modified</returns>
+        public override Container Add(ushort rangeStart, ushort rangeEnd)
         {
             // TODO: may need to convert to a RunContainer
-            Utility.setBitmapRange(bitmap, rangeStart, rangeEnd);
-            computeCardinality();
+            Utility.SetBitmapRange(Bitmap, rangeStart, rangeEnd);
+            ComputeCardinality();
             return this;
         }
 
-
-        public void loadData(ArrayContainer arrayContainer)
+        public void LoadData(ArrayContainer arrayContainer)
         {
-            this.cardinality = arrayContainer.cardinality;
-            for (int k = 0; k < arrayContainer.cardinality; ++k)
+            this.Cardinality = arrayContainer.Cardinality;
+            for (int k = 0; k < arrayContainer.Cardinality; ++k)
             {
-                ushort x = arrayContainer.content[k];
-                bitmap[x / 64] |= (1L << x);
+                ushort x = arrayContainer.Content[k];
+                Bitmap[x / 64] |= (1L << x);
             }
         }
 
-         /**
-         * Copies the data to an array container
-         *
-         * @return the array container
-         */
-        public ArrayContainer toArrayContainer()
+        /// <summary>
+        /// Copies the data to an array container
+        /// </summary>
+        /// <returns>The array container</returns>
+        public ArrayContainer ToArrayContainer()
         {
-            ArrayContainer ac = new ArrayContainer(cardinality);
-            ac.loadData(this);
+            ArrayContainer ac = new ArrayContainer(Cardinality);
+            ac.LoadData(this);
             return ac;
         }
 
-        /**
-         * Fill the array with set bits
-         *
-         * @param array container (should be sufficiently large)
-         */
-        public void fillArray(ushort[] array)
+
+        /// <summary>
+        /// Fill the array with set bits.
+        /// </summary>
+        /// <param name="array">Container (should be sufficiently large)</param>
+        public void FillArray(ushort[] array)
         {
             int pos = 0;
-            for (int k = 0; k < bitmap.Length; ++k)
+            for (int k = 0; k < Bitmap.Length; ++k)
             {
-                long bitset = bitmap[k];
+                long bitset = Bitmap[k];
                 while (bitset != 0)
                 {
                     long t = bitset & -bitset;
-                    array[pos++] = (ushort)(k * 64 + Utility.longBitCount(t - 1));
+                    array[pos++] = (ushort)(k * 64 + Utility.LongBitCount(t - 1));
                     bitset ^= t;
                 }
             }
         }
 
-        public override Container and(BitsetContainer value2)
+        /// <summary>
+        /// Computes the bitwise AND of this container with another
+        /// (intersection). This container as well as the provided container are
+        /// left unaffected.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        /// <returns>Aggregated container</returns>
+        public override Container And(BitsetContainer x)
         {
             int newCardinality = 0;
-            for (int k = 0; k < this.bitmap.Length; ++k) {
-                newCardinality += Utility.longBitCount(
-                    this.bitmap[k] & value2.bitmap[k]
-                );
+            for (int k = 0; k < this.Bitmap.Length; ++k)
+            {
+                newCardinality += Utility.LongBitCount(this.Bitmap[k] & x.Bitmap[k]);
             }
-            if (newCardinality > ArrayContainer.DEFAULT_MAX_SIZE) {
+            if (newCardinality > ArrayContainer.DEFAULT_MAX_SIZE)
+            {
                 BitsetContainer answer = new BitsetContainer();
-                for (int k = 0; k < answer.bitmap.Length; ++k) {
-                    answer.bitmap[k] = this.bitmap[k]
-                            & value2.bitmap[k];
+                for (int k = 0; k < answer.Bitmap.Length; ++k)
+                {
+                    answer.Bitmap[k] = this.Bitmap[k] & x.Bitmap[k];
                 }
-                answer.cardinality = newCardinality;
+                answer.Cardinality = newCardinality;
                 return answer;
             }
             ArrayContainer ac = new ArrayContainer(newCardinality);
-            Utility.fillArrayAND(ref ac.content, this.bitmap, value2.bitmap);
-            ac.cardinality = newCardinality;
+            Utility.FillArrayAND(ref ac.Content, this.Bitmap, x.Bitmap);
+            ac.Cardinality = newCardinality;
             return ac;
         }
 
-        public override Container and(ArrayContainer x)
+        /// <summary>
+        /// Computes the bitwise AND of this container with another
+        /// (intersection). This container as well as the provided container are
+        /// left unaffected.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        /// <returns>Aggregated container</returns>
+        public override Container And(ArrayContainer x)
         {
-            ArrayContainer answer = new ArrayContainer(x.content.Length);
-            int c = x.cardinality;
+            ArrayContainer answer = new ArrayContainer(x.Content.Length);
+            int c = x.Cardinality;
             for (int i=0; i<c; i++)
             {
-                ushort v = x.content[i];
-                if (this.contains(v))
-                    answer.content[answer.cardinality++] = v;
+                ushort v = x.Content[i];
+                if (this.Contains(v))
+                {
+                    answer.Content[answer.Cardinality++] = v;
+                }
             }
             return answer;
         }
 
-        public override Container flip(ushort i)
+        /// <summary>
+        /// Add a short to the container if it is not present, otherwise remove it. May generate a new
+        /// container.
+        /// </summary>
+        /// <param name="i">short to be added</param>
+        /// <returns>the new container</returns>
+        public override Container Flip(ushort i)
         {
-            int x = Utility.toIntUnsigned(i);
+            int x = Utility.ToIntUnsigned(i);
             int index = x / 64;
-            long bef = bitmap[index];
+            long bef = Bitmap[index];
             long mask = 1L << x;
-            if (cardinality == ArrayContainer.DEFAULT_MAX_SIZE + 1)
+            if (Cardinality == ArrayContainer.DEFAULT_MAX_SIZE + 1)
             {// this is
              // the
              // uncommon
              // path
                 if ((bef & mask) != 0)
                 {
-                    --cardinality;
-                    bitmap[index] &= ~mask;
-                    return this.toArrayContainer();
+                    --Cardinality;
+                    Bitmap[index] &= ~mask;
+                    return this.ToArrayContainer();
                 }
             }
             // TODO: check whether a branchy version could be faster
-            cardinality += 1 - 2 * (int)((bef & mask) >> x);
-            bitmap[index] ^= mask;
+            Cardinality += 1 - 2 * (int)((bef & mask) >> x);
+            Bitmap[index] ^= mask;
             return this;
         }
 
-        public override Container iadd(ushort begin, ushort end)
+        /// <summary>
+        /// Add all shorts in [begin,end) using an unsigned interpretation. May generate a new container.
+        /// </summary>
+        /// <param name="begin">Start of range</param>
+        /// <param name="end">End of range</param>
+        /// <returns>The new container</returns>
+        public override Container IAdd(ushort begin, ushort end)
         {
             // TODO: may need to convert to a RunContainer
             if (end == begin)
@@ -169,55 +209,85 @@ namespace BitsetsNET
             {
                 throw new ArgumentException("Invalid range [" + begin + "," + end + ")");
             }
-            Utility.setBitmapRange(bitmap, begin, end);
-            computeCardinality();
+            Utility.SetBitmapRange(Bitmap, begin, end);
+            ComputeCardinality();
             return this;
         }
 
-        public override Container inot(int firstOfRange, int lastOfRange)
+        /// <summary>
+        /// Computes the in-place bitwise NOT of this container (complement). Only those bits within the
+        /// range are affected.The current container is generally modified.May generate a new container.
+        /// </summary>
+        /// <param name="rangeStart">beginning of range (inclusive); 0 is beginning of this container.</param>
+        /// <param name="rangeEnd">ending of range (exclusive)</param>
+        /// <returns>(Partially) complemented container</returns>
+        public override Container INot(int rangeStart, int rangeEnd)
         {
-            if (lastOfRange - firstOfRange == MAX_CAPACITY)
+            if (rangeEnd - rangeStart == MAX_CAPACITY)
             {
-                Utility.flipBitsetRange(bitmap, firstOfRange, lastOfRange);
-                cardinality = MAX_CAPACITY - cardinality;
+                Utility.FlipBitsetRange(Bitmap, rangeStart, rangeEnd);
+                Cardinality = MAX_CAPACITY - Cardinality;
             }
-            else if (lastOfRange - firstOfRange > MAX_CAPACITY / 2)
+            else if (rangeEnd - rangeStart > MAX_CAPACITY / 2)
             {
-                Utility.flipBitsetRange(bitmap, firstOfRange, lastOfRange);
-                computeCardinality();
+                Utility.FlipBitsetRange(Bitmap, rangeStart, rangeEnd);
+                ComputeCardinality();
             }
             else
             {
-                cardinality += Utility.flipBitsetRangeAndCardinalityChange(bitmap, firstOfRange, lastOfRange);
+                Cardinality += Utility.FlipBitsetRangeAndCardinalityChange(Bitmap, rangeStart, rangeEnd);
             }
-            if (cardinality <= ArrayContainer.DEFAULT_MAX_SIZE)
+
+            if (Cardinality <= ArrayContainer.DEFAULT_MAX_SIZE)
             {
-                return toArrayContainer();
+                return ToArrayContainer();
             }
             return this;
         }
 
-        public override Container clone()
+        /// <summary>
+        /// Creates a deep copy of this bitset container.
+        /// </summary>
+        /// <returns>The cloned bitset container</returns>
+        public override Container Clone()
         {
-            long[] newBitmap = new long[this.bitmap.Length];
-            this.bitmap.CopyTo(newBitmap, 0);
+            long[] newBitmap = new long[this.Bitmap.Length];
+            this.Bitmap.CopyTo(newBitmap, 0);
 
-            return new BitsetContainer(this.cardinality, newBitmap);
+            return new BitsetContainer(this.Cardinality, newBitmap);
         }
 
-        public override bool contains(ushort x)
+        /// <summary>
+        /// Checks whether the container contains the provided value.
+        /// </summary>
+        /// <param name="x">Value to check</param>
+        public override bool Contains(ushort x)
         {
-            return (bitmap[x / 64] & (1L << x)) != 0;
+            return (Bitmap[x / 64] & (1L << x)) != 0;
         }
 
-        public override void fillLeastSignificant16bits(int[] x, int i, int mask)
+        /// <summary>
+        /// Fill the least significant 16 bits of the integer array, starting at
+        /// index i, with the short values from this container. The caller is
+        /// responsible to allocate enough room. The most significant 16 bits of
+        /// each integer are given by the most significant bits of the provided mask.
+        /// </summary>
+        /// <param name="x">Provided array</param>
+        /// <param name="i">Starting index</param>
+        /// <param name="mask">Indicates most significant bits</param>
+        public override void FillLeastSignificant16bits(int[] x, int i, int mask)
         {
             throw new NotImplementedException();
         }
 
-        public override int getCardinality()
+        /// <summary>
+        /// Computes the distinct number of short values in the container. Can be
+        /// expected to run in constant time.
+        /// </summary>
+        /// <returns>The cardinality</returns>
+        public override int GetCardinality()
         {
-            return cardinality;
+            return Cardinality;
         }
 
         /// <summary>
@@ -226,21 +296,24 @@ namespace BitsetsNET
         /// </summary>
         /// <param name="x">the ArrayContainer to compare against</param>
         /// <returns>A new container with the differences</returns>
-        public override Container andNot(ArrayContainer x)
+        public override Container AndNot(ArrayContainer x)
         {
-            BitsetContainer answer = (BitsetContainer) clone();
-            int c = x.cardinality;
+            BitsetContainer answer = (BitsetContainer) Clone();
+            int c = x.Cardinality;
             for (int k = 0; k < c; ++k)
             {
-                ushort v = x.content[k];
-                uint i = (uint) (Utility.toIntUnsigned(v) >> 6);
-                long w = answer.bitmap[i];
+                ushort v = x.Content[k];
+                uint i = (uint) (Utility.ToIntUnsigned(v) >> 6);
+                long w = answer.Bitmap[i];
                 long aft = w & (~(1L << v));
-                answer.bitmap[i] = aft;
-                answer.cardinality -= (int) ((w ^ aft) >> v);
+                answer.Bitmap[i] = aft;
+                answer.Cardinality -= (int) ((w ^ aft) >> v);
             }
-            if (answer.cardinality <= ArrayContainer.DEFAULT_MAX_SIZE)
-                return answer.toArrayContainer();
+
+            if (answer.Cardinality <= ArrayContainer.DEFAULT_MAX_SIZE)
+            {
+                return answer.ToArrayContainer();
+            }
             return answer;
         }
 
@@ -250,28 +323,27 @@ namespace BitsetsNET
         /// </summary>
         /// <param name="x">the other BitsetContainer</param>
         /// <returns>A new container with the differences</returns>
-        public override Container andNot(BitsetContainer x)
+        public override Container AndNot(BitsetContainer x)
         {
             int newCardinality = 0;
-            for (int k = 0; k < this.bitmap.Length; ++k)
+            for (int k = 0; k < this.Bitmap.Length; ++k)
             {
-                newCardinality += Utility.longBitCount(this.bitmap[k]
-                        & (~x.bitmap[k]));
+                newCardinality += Utility.LongBitCount(this.Bitmap[k] & (~x.Bitmap[k]));
             }
+
             if (newCardinality > ArrayContainer.DEFAULT_MAX_SIZE)
             {
                 BitsetContainer answer = new BitsetContainer();
-                for (int k = 0; k < answer.bitmap.Length; ++k)
+                for (int k = 0; k < answer.Bitmap.Length; ++k)
                 {
-                    answer.bitmap[k] = this.bitmap[k]
-                            & (~x.bitmap[k]);
+                    answer.Bitmap[k] = this.Bitmap[k] & (~x.Bitmap[k]);
                 }
-                answer.cardinality = newCardinality;
+                answer.Cardinality = newCardinality;
                 return answer;
             }
             ArrayContainer ac = new ArrayContainer(newCardinality);
-            Utility.fillArrayANDNOT(ac.content, this.bitmap, x.bitmap);
-            ac.cardinality = newCardinality;
+            Utility.FillArrayANDNOT(ac.Content, this.Bitmap, x.Bitmap);
+            ac.Cardinality = newCardinality;
             return ac;
         }
 
@@ -281,14 +353,16 @@ namespace BitsetsNET
         /// </summary>
         /// <param name="x">the ArrayContainer to compare against</param>
         /// <returns>A new container with the differences</returns>
-        public override Container iandNot(ArrayContainer x)
+        public override Container IAndNot(ArrayContainer x)
         {
-            for (int k = 0; k < x.cardinality; ++k)
+            for (int k = 0; k < x.Cardinality; ++k)
             {
-                this.remove(x.content[k]);
+                this.Remove(x.Content[k]);
             }
-            if (cardinality <= ArrayContainer.DEFAULT_MAX_SIZE)
-                return this.toArrayContainer();
+            if (Cardinality <= ArrayContainer.DEFAULT_MAX_SIZE)
+            {
+                return this.ToArrayContainer();
+            }
             return this;
         }
 
@@ -299,25 +373,25 @@ namespace BitsetsNET
         /// </summary>
         /// <param name="x">the other BitsetContainer</param>
         /// <returns>The current container, modified the differences</returns>
-        public override Container iandNot(BitsetContainer x)
+        public override Container IAndNot(BitsetContainer x)
         {
             int newCardinality = 0;
-            for (int k = 0; k < this.bitmap.Length; ++k)
+            for (int k = 0; k < this.Bitmap.Length; ++k)
             {
-                newCardinality += Utility.longBitCount(this.bitmap[k] & (~x.bitmap[k]));
+                newCardinality += Utility.LongBitCount(this.Bitmap[k] & (~x.Bitmap[k]));
             }
             if (newCardinality > ArrayContainer.DEFAULT_MAX_SIZE)
             {
-                for (int k = 0; k < this.bitmap.Length; ++k)
+                for (int k = 0; k < this.Bitmap.Length; ++k)
                 {
-                    this.bitmap[k] = this.bitmap[k] & (~x.bitmap[k]);
+                    this.Bitmap[k] = this.Bitmap[k] & (~x.Bitmap[k]);
                 }
-                this.cardinality = newCardinality;
+                this.Cardinality = newCardinality;
                 return this;
             }
             ArrayContainer ac = new ArrayContainer(newCardinality);
-            Utility.fillArrayANDNOT(ac.content, this.bitmap, x.bitmap);
-            ac.cardinality = newCardinality;
+            Utility.FillArrayANDNOT(ac.Content, this.Bitmap, x.Bitmap);
+            ac.Cardinality = newCardinality;
             return ac;
         }
 
@@ -327,28 +401,25 @@ namespace BitsetsNET
         /// in place or return a new ArrayContainer.
         /// </summary>
         /// <param name="other">the other BitsetContainer to intersect</param>
-        public override Container iand(BitsetContainer other)
+        public override Container IAnd(BitsetContainer other)
         {
             int newCardinality = 0;
-            for (int k = 0; k < bitmap.Length; ++k)
+            for (int k = 0; k < Bitmap.Length; ++k)
             {
-                newCardinality += Utility.longBitCount(
-                    bitmap[k] & other.bitmap[k]
-                );
+                newCardinality += Utility.LongBitCount(Bitmap[k] & other.Bitmap[k]);
             }
             if (newCardinality > ArrayContainer.DEFAULT_MAX_SIZE)
             {
-                for (int k = 0; k < bitmap.Length; ++k)
+                for (int k = 0; k < Bitmap.Length; ++k)
                 {
-                    bitmap[k] = bitmap[k]
-                            & other.bitmap[k];
+                    Bitmap[k] = Bitmap[k] & other.Bitmap[k];
                 }
-                cardinality = newCardinality;
+                Cardinality = newCardinality;
                 return this;
             }
             ArrayContainer ac = new ArrayContainer(newCardinality);
-            Utility.fillArrayAND(ref ac.content, bitmap, other.bitmap);
-            ac.cardinality = newCardinality;
+            Utility.FillArrayAND(ref ac.Content, Bitmap, other.Bitmap);
+            ac.Cardinality = newCardinality;
             return ac;
         }
 
@@ -358,142 +429,195 @@ namespace BitsetsNET
         /// calling ArrayContainer's and() method with this as input.
         /// </summary>
         /// <param name="other">the ArrayContainer to intersect</param>
-        public override Container iand(ArrayContainer other)
+        public override Container IAnd(ArrayContainer other)
         {
-            return other.and(this); // No in-place possible
+            return other.And(this); // No in-place possible
         }
 
-        public override bool intersects(BitsetContainer x)
+        /// <summary>
+        /// Returns true if the current container intersects the other container.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        /// <returns>Whether they intersect</returns>
+        public override bool Intersects(BitsetContainer x)
         {
             throw new NotImplementedException();
         }
 
-        public override bool intersects(ArrayContainer x)
+        /// <summary>
+        /// Returns true if the current container intersects the other container.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        /// <returns>Whether they intersect</returns>
+        public override bool Intersects(ArrayContainer x)
         {
             throw new NotImplementedException();
         }
 
-        public override Container ior(BitsetContainer x)
+        /// <summary>
+        /// Computes the in-place bitwise OR of this container with another
+        /// (union). The current container is generally modified, whereas the
+        /// provided container(x) is unaffected.May generate a new container.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        /// <returns>Aggregated container</returns>
+        public override Container IOr(BitsetContainer x)
         {
-            this.cardinality = 0;
-            for (int k = 0; k < this.bitmap.Length; ++k)
+            this.Cardinality = 0;
+            for (int k = 0; k < this.Bitmap.Length; ++k)
             {
-                long w = this.bitmap[k] | x.bitmap[k];
-                this.bitmap[k] = w;
-                this.cardinality += Utility.longBitCount(w);
+                long w = this.Bitmap[k] | x.Bitmap[k];
+                this.Bitmap[k] = w;
+                this.Cardinality += Utility.LongBitCount(w);
             }
             return this;
         }
 
-        public override Container ior(ArrayContainer x)
+        /// <summary>
+        /// Computes the in-place bitwise OR of this container with another
+        /// (union). The current container is generally modified, whereas the
+        /// provided container(x) is unaffected.May generate a new container.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        /// <returns>Aggregated container</returns>
+        public override Container IOr(ArrayContainer x)
         {
-            int c = x.cardinality;
+            int c = x.Cardinality;
             for (int k = 0; k < c; ++k)
             {
-                ushort v = x.content[k];
+                ushort v = x.Content[k];
                 int i = v >> 6;
 
-                long w = this.bitmap[i];
+                long w = this.Bitmap[i];
                 long aft = w | (1L << v);
-                this.bitmap[i] = aft;
+                this.Bitmap[i] = aft;
 
-                this.cardinality += (int)((w - aft) >> 63);
-
+                this.Cardinality += (int)((w - aft) >> 63);
             }
             return this;
         }
 
-        public override Container or(BitsetContainer value2)
+        /// <summary>
+        /// Computes the bitwise OR of this container with another (union). This
+        /// container as well as the provided container are left unaffected.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        /// <returns>Aggregated container</returns>
+        public override Container Or(BitsetContainer x)
         {
             BitsetContainer answer = new BitsetContainer();
-            answer.cardinality = 0;
-            for (int k = 0; k < answer.bitmap.Length; ++k) {
-                long w = this.bitmap[k] | value2.bitmap[k];
-                answer.bitmap[k] = w;
-                answer.cardinality += Utility.longBitCount(w);
+            answer.Cardinality = 0;
+            for (int k = 0; k < answer.Bitmap.Length; ++k) {
+                long w = this.Bitmap[k] | x.Bitmap[k];
+                answer.Bitmap[k] = w;
+                answer.Cardinality += Utility.LongBitCount(w);
             }
             return answer;
         }
 
-        public override Container or(ArrayContainer value2)
+        /// <summary>
+        /// Computes the bitwise OR of this container with another (union). This
+        /// container as well as the provided container are left unaffected.
+        /// </summary>
+        /// <param name="x">Other container</param>
+        /// <returns>Aggregated container</returns>
+        public override Container Or(ArrayContainer x)
         {
-            BitsetContainer answer = (BitsetContainer) clone();
+            BitsetContainer answer = (BitsetContainer) Clone();
 
-            int c = value2.cardinality;
-            for (int k = 0; k < c ; ++k) {
-                ushort v = value2.content[k];
+            int c = x.Cardinality;
+            for (int k = 0; k < c ; ++k)
+            {
+                ushort v = x.Content[k];
                 int i = v >> 6;
-                long w = answer.bitmap[i];
+                long w = answer.Bitmap[i];
                 long aft = w | (1L << v);
 
-                answer.bitmap[i] = aft;
-                //if (USE_BRANCHLESS) {
-                answer.cardinality += (int)((w - aft) >> 63);
-                //} else {
-                //    if (w != aft)
-                //        answer.cardinality++;
-                //}
+                answer.Bitmap[i] = aft;
+                answer.Cardinality += (int)((w - aft) >> 63);
             }
             return answer;
         }
 
-        public override Container remove(ushort x)
+        /// <summary>
+        /// Remove specified short from this container. May create a new container.
+        /// </summary>
+        /// <param name="x">Short to be removed</param>
+        /// <returns>The new container</returns>
+        public override Container Remove(ushort x)
         {
             int index = x / 64;
-            long bef = bitmap[index];
+            long bef = Bitmap[index];
             long mask = (1L << x);
 
-            if (cardinality == ArrayContainer.DEFAULT_MAX_SIZE + 1)
+            if (Cardinality == ArrayContainer.DEFAULT_MAX_SIZE + 1)
             {// this is
              // the
              // uncommon
              // path
                 if ((bef & mask) != 0)
                 {
-                    --cardinality;
-                    bitmap[x / 64] = bef & (~mask);
-                    return this.toArrayContainer();
+                    --Cardinality;
+                    Bitmap[x / 64] = bef & (~mask);
+                    return this.ToArrayContainer();
                 }
             }
 
             long aft = bef & (~mask);
-            cardinality -= (aft - bef) != 0 ? 1 : 0;
-            bitmap[index] = aft;
+            Cardinality -= (aft - bef) != 0 ? 1 : 0;
+            Bitmap[index] = aft;
             return this;
         }
-        
-        public override Container remove(ushort begin, ushort end)
+
+        /// <summary>
+        /// Remove shorts in [begin,end) using an unsigned interpretation. May generate a new container.
+        /// </summary>
+        /// <param name="begin">Start of range (inclusive)</param>
+        /// <param name="end">End of range (exclusive)</param>
+        /// <returns>The new container</returns>
+        public override Container Remove(ushort begin, ushort end)
         {
-            Utility.resetBitmapRange(bitmap, begin, end);
-            computeCardinality();
+            Utility.ResetBitmapRange(Bitmap, begin, end);
+            ComputeCardinality();
 
-            if (getCardinality() <= ArrayContainer.DEFAULT_MAX_SIZE)
-                return toArrayContainer();
+            if (GetCardinality() <= ArrayContainer.DEFAULT_MAX_SIZE)
+            {
+                return ToArrayContainer();
+            }
 
             return this;
         }
 
-        public override ushort select(int j)
+        /// <summary>
+        /// Return the jth value of the container.
+        /// </summary>
+        /// <param name="j">Index of the value </param>
+        /// <returns>The jth value of the container</returns>
+        public override ushort Select(int j)
         {
             int leftover = j;
-            for (int k = 0; k < bitmap.Length; ++k)
+            for (int k = 0; k < Bitmap.Length; ++k)
             {
-                int w = Utility.longBitCount(bitmap[k]);
+                int w = Utility.LongBitCount(Bitmap[k]);
                 if (w > leftover)
                 {
-                    return (ushort)(k * 64 + Utility.select(bitmap[k], leftover));
+                    return (ushort)(k * 64 + Utility.Select(Bitmap[k], leftover));
                 }
                 leftover -= w;
             }
             throw new ArgumentOutOfRangeException("Insufficient cardinality.");
         }
 
-        public override bool Equals(Object o) {
-            if (o is BitsetContainer) {
+        public override bool Equals(Object o)
+        {
+            if (o is BitsetContainer)
+            {
                 BitsetContainer srb = (BitsetContainer)o;
-                if (srb.cardinality != this.cardinality)
+                if (srb.Cardinality != this.Cardinality)
+                {
                     return false;
-                return Array.Equals(this.bitmap, srb.bitmap);
+                }
+                return Array.Equals(this.Bitmap, srb.Bitmap);
             } 
             return false;
         }
@@ -502,10 +626,10 @@ namespace BitsetsNET
         {
             unchecked
             {
-                int hash = cardinality;
-                for (int i = 0; i < bitmap.Length; i++)
+                int hash = Cardinality;
+                for (int i = 0; i < Bitmap.Length; i++)
                 {
-                    hash = 17 * hash + (int) bitmap[i];
+                    hash = 17 * hash + (int) Bitmap[i];
                 }
                 return hash;
             }
@@ -515,18 +639,21 @@ namespace BitsetsNET
         /// Serialize this container in a binary format.
         /// </summary>
         /// <param name="writer">The writer to which to serialize this container.</param>
-        /// <remarks>The format of the serialization is the cardinality of this container as a 32-bit integer, followed by the bit array. The cardinality is used in deserialization to distinguish BitsetContainers from ArrayContainers.</remarks>
+        /// <remarks>The format of the serialization is the cardinality of this container as 
+        /// a 32-bit integer, followed by the bit array. The cardinality is used in 
+        /// deserialization to distinguish BitsetContainers from ArrayContainers.</remarks>
         public override void Serialize(BinaryWriter writer)
         {
-            writer.Write(cardinality);
-            foreach(long value in bitmap)
+            writer.Write(Cardinality);
+            foreach(long value in Bitmap)
             {
                 writer.Write(value);
             }
         }
 
         /// <summary>
-        /// Deserialize a container from binary format, as written by the Serialize method minus the first 32 bits giving the cardinality.
+        /// Deserialize a container from binary format, as written by the Serialize method minus 
+        /// the first 32 bits giving the cardinality.
         /// </summary>
         /// <param name="reader">The reader to deserialize from.</param>
         /// <returns>The first container represented by reader.</returns>
@@ -534,10 +661,10 @@ namespace BitsetsNET
         {
             BitsetContainer container = new BitsetContainer();
 
-            container.cardinality = cardinality;
-            for(int i = 0; i < container.bitmap.Length; i++)
+            container.Cardinality = cardinality;
+            for(int i = 0; i < container.Bitmap.Length; i++)
             {
-                container.bitmap[i] = reader.ReadInt64();
+                container.Bitmap[i] = reader.ReadInt64();
             }
 
             return container;
@@ -546,7 +673,7 @@ namespace BitsetsNET
         public override IEnumerator<ushort> GetEnumerator()
         {
             ushort index = 0;
-            foreach(long value in bitmap)
+            foreach(long value in Bitmap)
             {
                 if (value != 0)
                 {

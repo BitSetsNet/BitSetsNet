@@ -240,6 +240,38 @@ namespace BitsetsNET.Tests
             CollectionAssert.AreEquivalent(enumeratedList.ToArray(), set);
         }
 
+        [TestMethod]
+        public virtual void EqualsTest()
+        {
+            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
+            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
+            IBitset otherSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
+            Assert.AreEqual<IBitset>(testSet, otherSet);
+        }
+
+        [TestMethod]
+        public virtual void GetHashCodeEqualityTest()
+        {
+            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
+            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
+            IBitset otherTestSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
+            int hash = testSet.GetHashCode();
+            int otherHash = otherTestSet.GetHashCode();
+            Assert.AreEqual(hash, otherHash);
+        }
+
+        [TestMethod]
+        public virtual void GetHashCodeNotEqualTest()
+        {
+            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
+            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
+            IBitset otherTestSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
+            otherTestSet.Flip(SetGenerator.GetRandomArray(1)[0]);
+            int hash = testSet.GetHashCode();
+            int otherHash = otherTestSet.GetHashCode();
+            Assert.AreNotEqual(hash, otherHash);
+        }
+
         private string generateMessage(string functionName, int[] setA, int[] setB, int[] expected)
         {
             var builder = new System.Text.StringBuilder();
