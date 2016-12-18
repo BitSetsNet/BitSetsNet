@@ -14,7 +14,7 @@ namespace BitsetsNET.Tests
     public abstract class BaseBitSetTests
     {
 
-        const int TEST_SET_LENGTH = 10;
+        protected const int TEST_SET_LENGTH = 10;
         const int TEST_ITERATIONS = 10;
         protected abstract IBitset CreateSetFromIndices(int[] indices, int length);
 

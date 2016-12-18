@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BitsetsNET
 {
@@ -120,7 +116,7 @@ namespace BitsetsNET
             }
             return -(low + 1);
         }
-		
+        
         /// <summary>
         /// Naive implementation to count the number of true bits in a word.
         /// </summary>
