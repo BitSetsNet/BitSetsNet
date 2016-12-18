@@ -19,7 +19,6 @@ namespace BitsetsNET.Tests
         [TestMethod()]
         public virtual void SerializationTest()
         {
-            int TEST_SET_LENGTH = 10;
             int[] indicies = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
 
             RLEBitset actual = (RLEBitset)CreateSetFromIndices(indicies, TEST_SET_LENGTH);
@@ -33,6 +32,15 @@ namespace BitsetsNET.Tests
             }
 
             Assert.AreEqual(actual, expected);
+        }
+
+        [TestMethod]
+        public virtual void SetMethodDoesntMutateLength()
+        {
+            RLEBitset testSet = (RLEBitset)RLEBitset.CreateFrom(new int[] { }, TEST_SET_LENGTH);
+            testSet.Set(0, true);
+            testSet.Set(1, false);
+            Assert.AreEqual<int>(TEST_SET_LENGTH, testSet.Length());
         }
 
         [TestMethod()]

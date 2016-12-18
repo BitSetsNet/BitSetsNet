@@ -193,7 +193,7 @@ namespace BitsetsNET
 
             List<Run> runsA = this.runArray;
             List<Run> runsB = otherRLESet.runArray;
-             
+            
             int i = 0;
             int j = 0;
 
@@ -427,12 +427,16 @@ namespace BitsetsNET
             RLEBitset otherRLESet = (RLEBitset)otherSet; // cast to an RLEBitset - errors if cannot cast
 
             Run current = new Run();
-            int nextThisIndex, nextOtherIndex; 
- 
+            int nextThisIndex, nextOtherIndex;
+
+            if(this.length < otherRLESet.length)
+            {
+                this.length = otherRLESet.length;
+            }
+
             if (this.runArray.Count == 0)
             {
                 this.runArray = new List<Run>(otherRLESet.runArray);
-                this.length = otherRLESet.length;
                 nextThisIndex = this.runArray.Count; //this stops the loops 
                 nextOtherIndex = this.runArray.Count; 
                 
@@ -573,7 +577,7 @@ namespace BitsetsNET
         public void Set(int index, bool value)
         {
             int[] tmpIndices = { index };
-            IBitset other = RLEBitset.CreateFrom(tmpIndices);
+            IBitset other = RLEBitset.CreateFrom(tmpIndices, this.length);
             if (value)
             {
                 OrWith(other);
@@ -851,8 +855,8 @@ namespace BitsetsNET
             }
             return bitset;
         }
-		
-		/// <summary>
+        
+        /// <summary>
         /// Get an enumerator of the set indices of this bitset. 
         /// Meaning, it returns the indicies where the value is set to "true" or "1".
         /// </summary>
@@ -867,7 +871,7 @@ namespace BitsetsNET
                 }
             }
         }
-		
+        
         public override int GetHashCode()
         {
             unchecked
@@ -879,8 +883,8 @@ namespace BitsetsNET
                     hash = unchecked(17 * hash + run.EndIndex);
                 }
                 return hash;
-			}
-		}
+            }
+        }
         #endregion
 
         #region "Private Methods"
