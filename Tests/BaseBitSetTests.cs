@@ -272,6 +272,14 @@ namespace BitsetsNET.Tests
             Assert.AreNotEqual(hash, otherHash);
         }
 
+        [TestMethod]
+        public virtual void SetEdgeCaseTest()
+        {
+            var testSet = CreateSetFromIndices(new int[] { }, TEST_SET_LENGTH);
+            testSet.Set(0, 1, true);
+            Assert.IsTrue(testSet.Get(0));
+        }
+
         private string generateMessage(string functionName, int[] setA, int[] setB, int[] expected)
         {
             var builder = new System.Text.StringBuilder();

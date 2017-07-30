@@ -30,15 +30,15 @@ namespace BitsetsNET
         public void Add(int x)
         {
             ushort highBits = Utility.GetHighBits(x);
-            int containerIndex = containers.GetIndex(highBits);
+            int containerIndex = this.containers.GetIndex(highBits);
 
             if (containerIndex >= 0)
+            {
                 // a container exists at this index already.
                 // find the right container, get the low order bits to add to the container and add them
-            {
-                containers.SetContainerAtIndex(containerIndex, 
-                                               containers.GetContainerAtIndex(containerIndex)
-                                                         .Add(Utility.GetLowBits(x)));
+                this.containers.SetContainerAtIndex(containerIndex, 
+                                                    this.containers.GetContainerAtIndex(containerIndex)
+                                                        .Add(Utility.GetLowBits(x)));
             }
             else
             {
@@ -46,8 +46,8 @@ namespace BitsetsNET
                 // create a new ArrayContainer, since it will only hold one integer to start
                 // get the low order bits and att to the newly created container
                 // add the newly created container to the array of containers
-                ArrayContainer newac = new ArrayContainer();
-                containers.InsertNewKeyValueAt(-containerIndex - 1, highBits, newac.Add(Utility.GetLowBits(x)));
+                ArrayContainer ac = new ArrayContainer();
+                this.containers.InsertNewKeyValueAt(-containerIndex - 1, highBits, ac.Add(Utility.GetLowBits(x)));
             }
         }
 
@@ -80,19 +80,19 @@ namespace BitsetsNET
 
                 // last container may contain partial range
                 ushort containerLast = (hb == hbLast) ? lbLast : ushort.MaxValue;
-                int containerIndex = containers.GetIndex(hb);
+                int containerIndex = this.containers.GetIndex(hb);
 
                 if (containerIndex >= 0)
                 {
-                    Container c = containers.GetContainerAtIndex(containerIndex)
-                                            .Add(containerStart, (ushort)(containerLast + 1));
-                    containers.SetContainerAtIndex(containerIndex, c);
+                    Container c = this.containers.GetContainerAtIndex(containerIndex)
+                                                 .Add(containerStart, (ushort)(containerLast + 1));
+                    this.containers.SetContainerAtIndex(containerIndex, c);
                 }
                 else
                 {
-                    Container newContainer = new ArrayContainer(100);
-                    newContainer = newContainer.Add(lbStart, lbLast);
-                    containers.InsertNewKeyValueAt(-containerIndex - 1, hb, newContainer);
+                    Container ac = new ArrayContainer(100);
+                    ac = ac.Add(lbStart, (ushort)(lbLast + 1));
+                    this.containers.InsertNewKeyValueAt(-containerIndex - 1, hb, ac);
                 }
             }
         }
