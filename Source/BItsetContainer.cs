@@ -492,7 +492,7 @@ namespace BitsetsNET
                 long aft = w | (1L << v);
                 this.Bitmap[i] = aft;
 
-                this.Cardinality += (int)((w - aft) >> 63);
+                this.Cardinality += (int)(((w - aft) >> 63) & 1);
             }
             return this;
         }
@@ -534,7 +534,7 @@ namespace BitsetsNET
                 long aft = w | (1L << v);
 
                 answer.Bitmap[i] = aft;
-                answer.Cardinality += (int)((w - aft) >> 63);
+                answer.Cardinality += (int)(((w - aft) >> 63) & 1);
             }
             return answer;
         }
