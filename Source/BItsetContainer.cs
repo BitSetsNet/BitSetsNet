@@ -617,7 +617,7 @@ namespace BitsetsNET
                 {
                     return false;
                 }
-                return Array.Equals(this.Bitmap, srb.Bitmap);
+                return this.Bitmap.SequenceEqual(srb.Bitmap);
             } 
             return false;
         }
