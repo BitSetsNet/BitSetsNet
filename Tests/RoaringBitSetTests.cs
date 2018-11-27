@@ -119,5 +119,67 @@ namespace BitsetsNET.Tests
             Assert.AreEqual(true, testSet4.Get(6));
 
         }
+
+        /*
+         The roaring bit set stores 2 different types of containers. 
+         The switch is based primarily on size, Array (small) and Bitset (large).
+         We want to ensure logic works between large and small containers.
+        */
+
+        [TestMethod()]
+        public virtual void VariedSizeOrTest()
+        {
+            int largeSize = 100000;
+            int smallSize = 100;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(smallSize);
+            int[] result = first.Union(second).ToArray();
+            IBitset expected = CreateSetFromIndices(result, largeSize);
+            IBitset actual = CreateSetFromIndices(first, largeSize).Or(CreateSetFromIndices(second, smallSize));
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public virtual void VariedSizeOrWithTest()
+        {
+            int largeSize = 100000;
+            int smallSize = 100;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(smallSize);
+            int[] result = first.Union(second).ToArray();
+            IBitset testSet = CreateSetFromIndices(first, largeSize);
+            testSet.OrWith(CreateSetFromIndices(second, smallSize));
+
+            Assert.AreEqual(CreateSetFromIndices(result, largeSize), testSet);
+        }
+
+        [TestMethod()]
+        public virtual void VariedSizeAndTest()
+        {
+            int largeSize = 100000;
+            int smallSize = 100;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(smallSize);
+            int[] result = first.Intersect(second).ToArray();
+            IBitset expected = CreateSetFromIndices(result, largeSize);
+            IBitset actual = CreateSetFromIndices(first, largeSize).And(CreateSetFromIndices(second, smallSize));
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public virtual void VariedSizeAndWithTest()
+        {
+            int largeSize = 100000;
+            int smallSize = 100;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(smallSize);
+            int[] result = first.Intersect(second).ToArray();
+            IBitset testSet = CreateSetFromIndices(first, largeSize);
+            testSet.AndWith(CreateSetFromIndices(second, smallSize));
+
+            Assert.AreEqual(CreateSetFromIndices(result, largeSize), testSet);
+        }
     }
 }
