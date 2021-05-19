@@ -1,12 +1,35 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project>
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>BitsetsNET.Test</PackageId>
+        <Version>0.6.0</Version>
+        <PackageVersion>0.6.0</PackageVersion>
+    </PropertyGroup>
+    <PropertyGroup>
+        <BaseIntermediateOutputPath>obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
-
-        <IsPackable>false</IsPackable>
-
         <RootNamespace>BitsetsNET.Test</RootNamespace>
+        <AssemblyName>BitsetsNET.Test</AssemblyName>
+        <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+        <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+        <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+        <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+        <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+        <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+        <OutputPath>obj\$(Configuration)\$(MSBuildProjectName)</OutputPath>
+        <TargetFrameworks>net45;net5.0</TargetFrameworks>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+    </PropertyGroup>
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
@@ -20,12 +43,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="UncompressedBitArrayTests.cs">
-        <SubType>Code</SubType>
-      </Compile>
     </ItemGroup>
 
     <ItemGroup>
