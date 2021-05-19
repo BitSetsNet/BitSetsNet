@@ -2,7 +2,6 @@
 using System.Text;
 using System.Linq;
 using System.Collections;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BitsetsNET.Tests
@@ -14,9 +13,9 @@ namespace BitsetsNET.Tests
     public abstract class BaseBitSetTests
     {
 
-        protected const int TEST_SET_LENGTH = 10;
+        const int TEST_SET_LENGTH = 10;
         const int TEST_ITERATIONS = 10;
-        protected abstract IBitset CreateSetFromIndices(int[] indices, int length);
+        protected abstract IBitset CreateSetFromIndicies(int[] indices, int length);
 
         [TestMethod()]
         public virtual void AndTest()
@@ -24,8 +23,8 @@ namespace BitsetsNET.Tests
             int[] first = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
             int[] second = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
             int[] result = first.Intersect(second).ToArray();
-            IBitset expected = CreateSetFromIndices(result, TEST_SET_LENGTH);
-            IBitset actual = CreateSetFromIndices(first, TEST_SET_LENGTH).And(CreateSetFromIndices(second, TEST_SET_LENGTH));
+            IBitset expected = CreateSetFromIndicies(result, TEST_SET_LENGTH);
+            IBitset actual = CreateSetFromIndicies(first, TEST_SET_LENGTH).And(CreateSetFromIndicies(second, TEST_SET_LENGTH));
             Assert.AreEqual(expected, actual);
         }
 
@@ -35,10 +34,10 @@ namespace BitsetsNET.Tests
             int[] first = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
             int[] second = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
             int[] result = first.Intersect(second).ToArray();
-            IBitset testSet = CreateSetFromIndices(first, TEST_SET_LENGTH);
-            testSet.AndWith(CreateSetFromIndices(second, TEST_SET_LENGTH));
+            IBitset testSet = CreateSetFromIndicies(first, TEST_SET_LENGTH);
+            testSet.AndWith(CreateSetFromIndicies(second, TEST_SET_LENGTH));
 
-            Assert.AreEqual(CreateSetFromIndices(result, TEST_SET_LENGTH), testSet);
+            Assert.AreEqual(CreateSetFromIndicies(result, TEST_SET_LENGTH), testSet);
   
         }
 
@@ -46,7 +45,7 @@ namespace BitsetsNET.Tests
         public virtual void CloneTest()
         {
             int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
+            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
             var clone = testSet.Clone();
             Assert.AreEqual(clone, testSet);
         }
@@ -55,7 +54,7 @@ namespace BitsetsNET.Tests
         public virtual void GetTest()
         {
             int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
+            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
             bool expected = set.Contains(2);
             bool result = testSet.Get(2);
             Assert.AreEqual(expected, result);
@@ -67,10 +66,10 @@ namespace BitsetsNET.Tests
             int[] first = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
             int[] second = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
             int[] result = first.Union(second).ToArray();
-            IBitset expected = CreateSetFromIndices(result, TEST_SET_LENGTH);
-            IBitset actual = CreateSetFromIndices(first, TEST_SET_LENGTH).Or(CreateSetFromIndices(second, TEST_SET_LENGTH));
+            IBitset expected = CreateSetFromIndicies(result, TEST_SET_LENGTH);
+            IBitset actual = CreateSetFromIndicies(first, TEST_SET_LENGTH).Or(CreateSetFromIndicies(second, TEST_SET_LENGTH));
 
-            Assert.AreEqual(expected, actual, generateMessage("OrWith", first, second, result));
+            Assert.AreEqual(expected, actual);
 
         }
 
@@ -81,10 +80,10 @@ namespace BitsetsNET.Tests
             int[] second = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
             int[] result = first.Union(second).ToArray();
 
-            IBitset testSet = CreateSetFromIndices(first, TEST_SET_LENGTH);
-            testSet.OrWith(CreateSetFromIndices(second, TEST_SET_LENGTH));
+            IBitset testSet = CreateSetFromIndicies(first, TEST_SET_LENGTH);
+            testSet.OrWith(CreateSetFromIndicies(second, TEST_SET_LENGTH));
 
-            Assert.AreEqual(CreateSetFromIndices(result, TEST_SET_LENGTH), testSet, generateMessage("OrWith", first, second, result));
+            Assert.AreEqual(CreateSetFromIndicies(result, TEST_SET_LENGTH), testSet, generateMessage("OrWith", first, second, result));
 
         }
 
@@ -92,7 +91,7 @@ namespace BitsetsNET.Tests
         public virtual void SetTrueTest()
         {
             int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
+            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
             testSet.Set(8, true);
             bool expected = true;
             bool result = testSet.Get(8);
@@ -103,7 +102,7 @@ namespace BitsetsNET.Tests
         public virtual void SetFalseTest()
         {
             int[] set = { 1, 2, 3 };
-            IBitset testSet = CreateSetFromIndices(set, 4);
+            IBitset testSet = CreateSetFromIndicies(set, 4);
             testSet.Set(2, false);
             bool expected = false;
             bool result = testSet.Get(2);
@@ -114,7 +113,7 @@ namespace BitsetsNET.Tests
         public virtual void SetRangeTrueTest()
         {
             int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
+            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
             testSet.Set(7,9, true);
             bool expected = true;
             bool result = testSet.Get(8);
@@ -125,7 +124,7 @@ namespace BitsetsNET.Tests
         public virtual void SetRangeFalseTest()
         {
             int[] set = { 1, 2, 3 };
-            IBitset testSet = CreateSetFromIndices(set, 4);
+            IBitset testSet = CreateSetFromIndicies(set, 4);
             testSet.Set(1, 3, false);
             bool expected = false;
             bool result = testSet.Get(2);
@@ -133,10 +132,16 @@ namespace BitsetsNET.Tests
         }
 
         [TestMethod()]
+        public virtual void SetAllTest()
+        {
+
+        }
+
+        [TestMethod()]
         public virtual void FlipTrueTest()
         {
             int[] set = { 1, 2, 3, 5 };
-            IBitset testSet = CreateSetFromIndices(set, 6);
+            IBitset testSet = CreateSetFromIndicies(set, 6);
             testSet.Flip(4);
             bool expected = true;
             bool result = testSet.Get(4);
@@ -147,7 +152,7 @@ namespace BitsetsNET.Tests
         public virtual void FlipFalseTest()
         {
             int[] set = { 1, 2, 3, 5 };
-            IBitset testSet = CreateSetFromIndices(set, 6);
+            IBitset testSet = CreateSetFromIndicies(set, 6);
             testSet.Flip(2);
             bool expected = false;
             bool result = testSet.Get(2);
@@ -158,7 +163,7 @@ namespace BitsetsNET.Tests
         public virtual void FlipRangeTrueTest()
         {
             int[] set = { 1, 2, 3, 7 };
-            IBitset testSet = CreateSetFromIndices(set, 8);
+            IBitset testSet = CreateSetFromIndicies(set, 8);
             testSet.Flip(4,6);
             bool expected = true;
             bool result = testSet.Get(5);
@@ -169,7 +174,7 @@ namespace BitsetsNET.Tests
         public virtual void FlipRangeFalseTest()
         {
             int[] set = { 1, 2, 3, 7 };
-            IBitset testSet = CreateSetFromIndices(set, 8);
+            IBitset testSet = CreateSetFromIndicies(set, 8);
             testSet.Flip(2,4);
             bool expected = false;
             bool result = testSet.Get(3);
@@ -180,47 +185,52 @@ namespace BitsetsNET.Tests
         public virtual void DifferenceTest()
         {
             int[] set1 = { 1, 2, 3, 7 };
-            IBitset testSet1 = CreateSetFromIndices(set1, 8);
+            IBitset testSet1 = CreateSetFromIndicies(set1, 8);
 
-            int[] set2 = { 1, 4, 7 };
-            IBitset testSet2 = CreateSetFromIndices(set2, 8);
+            int[] set2 = { 1, 7 };
+            IBitset testSet2 = CreateSetFromIndicies(set2, 8);
 
-            // These sparse sets will all use array containers.
-            IBitset arrayContainerDiffSet = testSet1.Difference(testSet2);
+            IBitset diffSet = testSet1.Difference(testSet2);
 
-            Assert.AreEqual(false, arrayContainerDiffSet.Get(1));
-            Assert.AreEqual(true, arrayContainerDiffSet.Get(3));
+            bool expected1 = false;
+            bool result1 = diffSet.Get(1);
+            Assert.AreEqual(expected1, result1);
 
-            // Test difference from large contiguous bitset to exercise bitsetcontainers.
-            int[] set3 = SetGenerator.GetContiguousArray(0, 5000);
-            IBitset testSet3 = CreateSetFromIndices(set3, 5000);
+            bool expected2 = true;
+            bool result2 = diffSet.Get(3);
+            Assert.AreEqual(expected2, result2);
+        }
 
-            int[] setExceptions = { 4 };
-            int[] set4 = SetGenerator.GetContiguousArrayWithExceptions(0, 5000, setExceptions);
-            IBitset testSet4 = CreateSetFromIndices(set4, 5000);
+        [TestMethod]
+        public virtual void ToBitArrayTest()
+        {
+            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
+            BitArray setArray = new BitArray(TEST_SET_LENGTH);
 
-            // Both sets are using bitset containers
-            IBitset bitsetContainerDiffSet = testSet3.Difference(testSet4);
+            foreach (int index in set)
+            {
+                setArray[index] = true;
+            }
 
-            Assert.AreEqual(false, bitsetContainerDiffSet.Get(1));
-            Assert.AreEqual(true, bitsetContainerDiffSet.Get(4));
+            IBitset testSet = CreateSetFromIndicies(set, TEST_SET_LENGTH);
+            BitArray testArray = testSet.ToBitArray();
 
-            // Diff sets using bitset containers with array containers and vice versa
-            IBitset mixedDiffSet1 = testSet4.Difference(testSet2);
-            IBitset mixedDiffSet2 = testSet2.Difference(testSet4);
+            bool expected = true;
+            bool actual = setArray.Length == testArray.Length;
 
-            Assert.AreEqual(false, mixedDiffSet1.Get(1));
-            Assert.AreEqual(true, mixedDiffSet1.Get(3));
+            for (int i = 0; i < setArray.Length; i++)
+            {
+                actual &= setArray[i] == testArray[i];
+            }
 
-            Assert.AreEqual(false, mixedDiffSet2.Get(1));
-            Assert.AreEqual(true, mixedDiffSet2.Get(4));
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
         public virtual void CardinalityTest()
         {
             int[] set = SetGenerator.GetContiguousArray(1, 5000);
-            IBitset testSet = CreateSetFromIndices(set, set.Max() + 1);
+            IBitset testSet = CreateSetFromIndicies(set, set.Max() + 1);
 
             int expected = set.Length;
             int actual = testSet.Cardinality();
@@ -228,56 +238,31 @@ namespace BitsetsNET.Tests
         }
 
         [TestMethod]
-        public virtual void EnumerationTest()
+        public virtual void OverlapsIsTrueWhenSetContainsElementsOfOtherSetTest()
         {
-            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
-            List<int> enumeratedList = new List<int>();
-            foreach (int i in testSet)
-            {
-                enumeratedList.Add(i);
-            }
-            CollectionAssert.AreEquivalent(enumeratedList.ToArray(), set);
+            int[] set1 = { 1, 2, 3, 7 };
+            IBitset testSet1 = CreateSetFromIndicies(set1, 8);
+
+            int[] set2 = { 1, 7 };
+            IBitset testSet2 = CreateSetFromIndicies(set2, 8);
+
+            bool actual = testSet1.Overlaps(testSet2);
+
+            Assert.IsTrue(actual);
         }
 
         [TestMethod]
-        public virtual void EqualsTest()
+        public virtual void OverlapsIsFalseWhenSetContainsNoElementsOfOtherSetTest()
         {
-            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
-            IBitset otherSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
-            Assert.AreEqual<IBitset>(testSet, otherSet);
-        }
+            int[] set1 = { 1, 2, 3, 7 };
+            IBitset testSet1 = CreateSetFromIndicies(set1, 12);
 
-        [TestMethod]
-        public virtual void GetHashCodeEqualityTest()
-        {
-            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
-            IBitset otherTestSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
-            int hash = testSet.GetHashCode();
-            int otherHash = otherTestSet.GetHashCode();
-            Assert.AreEqual(hash, otherHash);
-        }
+            int[] set2 = { 8, 9, 10, 11};
+            IBitset testSet2 = CreateSetFromIndicies(set2, 12);
 
-        [TestMethod]
-        public virtual void GetHashCodeNotEqualTest()
-        {
-            int[] set = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            IBitset testSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
-            IBitset otherTestSet = CreateSetFromIndices(set, TEST_SET_LENGTH);
-            otherTestSet.Flip(SetGenerator.GetRandomArray(1)[0]);
-            int hash = testSet.GetHashCode();
-            int otherHash = otherTestSet.GetHashCode();
-            Assert.AreNotEqual(hash, otherHash);
-        }
+            bool actual = testSet1.Overlaps(testSet2);
 
-        [TestMethod]
-        public virtual void SetEdgeCaseTest()
-        {
-            var testSet = CreateSetFromIndices(new int[] { }, TEST_SET_LENGTH);
-            testSet.Set(0, 1, true);
-            Assert.IsTrue(testSet.Get(0));
+            Assert.IsFalse(actual);
         }
 
         private string generateMessage(string functionName, int[] setA, int[] setB, int[] expected)

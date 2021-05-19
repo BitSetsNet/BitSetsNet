@@ -14,330 +14,311 @@ namespace BitsetsNET
         /// Add a short to the container. May generate a new container.
         /// </summary>
         /// <param name="x">short to be added</param>
-        /// <returns>this container, modified</returns>
-        public abstract Container Add(ushort x);
+        /// <returns>this container modified</returns>
+        public abstract Container add(ushort x);
+
+        /**
+        * Add to the current bitmap all integers in [rangeStart,rangeEnd).
+        *
+        * @param rangeStart inclusive beginning of range
+        * @param rangeEnd   exclusive ending of range
+        */
 
         /// <summary>
         /// Add to the current bitmap all integers in [rangeStart,rangeEnd).
         /// </summary>
         /// <param name="rangeStart">inclusive beginning of range</param>
         /// <param name="rangeEnd">exclusive ending of range</param>
-        /// <returns>this container, modified</returns>
-        public abstract Container Add(ushort rangeStart, ushort rangeEnd);
+        public abstract Container add(ushort rangeStart, ushort rangeEnd);
 
-        /// <summary>
-        /// Computes the bitwise AND of this container with another
-        /// (intersection). This container as well as the provided container are
-        /// left unaffected.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public abstract Container And(ArrayContainer x);
+        /**
+         * Computes the bitwise AND of this container with another
+         * (intersection). This container as well as the provided container are
+         * left unaffected.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public abstract Container and(ArrayContainer x);
 
-        /// <summary>
-        /// Computes the bitwise AND of this container with another
-        /// (intersection). This container as well as the provided container are
-        /// left unaffected.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public abstract Container And(BitsetContainer x);
+        /**
+         * Computes the bitwise AND of this container with another
+         * (intersection). This container as well as the provided container are
+         * left unaffected.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public abstract Container and(BitsetContainer x);
 
-        /// <summary>
-        /// Computes the bitwise AND of this container with another
-        /// (intersection). This container as well as the provided container are
-        /// left unaffected.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public Container And(Container x)
+        /**
+         * Computes the bitwise AND of this container with another
+         * (intersection). This container as well as the provided container are
+         * left unaffected.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public Container and(Container x)
         {
             if (x is ArrayContainer)
-            {
-                return And((ArrayContainer)x);
-            }
-            return And((BitsetContainer) x);
+                return and((ArrayContainer) x);
+            return and((BitsetContainer) x);
         }
 
-        /// <summary>
-        /// Computes the bitwise ANDNOT of this container with another
-        /// (difference). This container as well as the provided container are
-        /// left unaffected. 
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>A new container with the result</returns>
-        public abstract Container AndNot(ArrayContainer x);
+        /**
+         * Computes the bitwise Difference of this container with another.
+         * This container as well as the provided container are left unaffected.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public abstract Container difference(ArrayContainer x);
 
-        /// <summary>
-        /// Computes the bitwise ANDNOT of this container with another
-        /// (difference). This container as well as the provided container are
-        /// left unaffected. 
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>A new container with the result</returns>
-        public abstract Container AndNot(BitsetContainer x);
+        /**
+         * Computes the bitwise Difference of this container with another.
+         * This container as well as the provided container are left unaffected.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public abstract Container difference(BitsetContainer x);
 
-        /// <summary>
-        /// Computes the bitwise ANDNOT of this container with another
-        /// (difference). This container as well as the provided container are
-        /// left unaffected. 
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>A new container with the result</returns>
-        public Container AndNot(Container x)
+        /**
+         * Computes the bitwise Difference of this container with another.
+         * This container as well as the provided container are left unaffected.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public Container difference(Container x)
         {
             if (x is ArrayContainer)
-            {
-                return AndNot((ArrayContainer)x);
-            }
-            return AndNot((BitsetContainer) x);
+                return difference((ArrayContainer) x);
+            return difference((BitsetContainer) x);
         }
 
-        /// <summary>
-        /// Computes the bitwise ANDNOT of this container with another
-        /// (difference). Modifies the current container in place.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        public abstract Container IAndNot(ArrayContainer x);
+        /**
+        * Computes whether any elements are shared between the two containers.
+        *
+        * @param x other container
+        * @return true if elements are shared
+        */
+        public abstract bool overlaps(ArrayContainer x);
 
-        /// <summary>
-        /// Computes the bitwise ANDNOT of this container with another
-        /// (difference). Modifies the current container in place.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        public abstract Container IAndNot(BitsetContainer x);
+        /**
+        * Computes whether any elements are shared between the two containers.
+        *
+        * @param x other container
+        * @return true if elements are shared
+        */
+        public abstract bool overlaps(BitsetContainer x);
 
-        /// <summary>
-        /// Computes the bitwise ANDNOT of this container with another
-        /// (difference). Modifies the current container in place.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>A new container with the result</returns>
-        public Container IAndNot(Container x)
+        /**
+         * Computes whether any elements are shared between the two containers.
+         *
+         * @param x other container
+         * @return true if elements are shared
+         */
+        public bool overlaps(Container x)
         {
             if (x is ArrayContainer)
-            {
-                return IAndNot((ArrayContainer)x);
-            }
-            return IAndNot((BitsetContainer)x);
+                return overlaps((ArrayContainer) x);
+            return overlaps((BitsetContainer) x);
         }
 
-        public abstract Container Clone();
+        
+        public abstract Container clone();
 
-        /// <summary>
-        /// Checks whether the container contains the provided value.
-        /// </summary>
-        /// <param name="x">Value to check</param>
-        public abstract bool Contains(ushort x);
+        /**
+         * Checks whether the contain contains the provided value
+         *
+         * @param x value to check
+         * @return whether the value is in the container
+         */
+        public abstract bool contains(ushort x);
 
-        /// <summary>
-        /// Fill the least significant 16 bits of the integer array, starting at
-        /// index i, with the short values from this container. The caller is
-        /// responsible to allocate enough room. The most significant 16 bits of
-        /// each integer are given by the most significant bits of the provided mask.
-        /// </summary>
-        /// <param name="x">Provided array</param>
-        /// <param name="i">Starting index</param>
-        /// <param name="mask">Indicates most significant bits</param>
-        public abstract void FillLeastSignificant16bits(int[] x, int i, int mask);
+        /**
+         * Fill the least significant 16 bits of the integer array, starting at
+         * index i, with the short values from this container. The caller is
+         * responsible to allocate enough room. The most significant 16 bits of
+         * each integer are given by the most significant bits of the provided
+         * mask.
+         *
+         * @param x    provided array
+         * @param i    starting index
+         * @param mask indicates most significant bits
+         */
+        public abstract void fillLeastSignificant16bits(int[] x, int i, int mask);
 
-        /// <summary>
-        /// Computes the distinct number of short values in the container. Can be
-        /// expected to run in constant time.
-        /// </summary>
-        /// <returns>The cardinality</returns>
-        public abstract int GetCardinality();
+        /**
+         * Computes the distinct number of short values in the container. Can be
+         * expected to run in constant time.
+         *
+         * @return the cardinality
+         */
+        public abstract int getCardinality();
 
-        /// <summary>
-        /// Computes the in-place bitwise AND of this container with another
-        /// (intersection). The current container is generally modified, whereas
-        /// the provided container (x) is unaffected. May generate a new container.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public abstract Container IAnd(ArrayContainer x);
+        /**
+         * Computes the in-place bitwise AND of this container with another
+         * (intersection). The current container is generally modified, whereas
+         * the provided container (x) is unaffected. May generate a new
+         * container.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public abstract Container iand(ArrayContainer x);
 
-        /// <summary>
-        /// Computes the in-place bitwise AND of this container with another
-        /// (intersection). The current container is generally modified, whereas
-        /// the provided container (x) is unaffected. May generate a new container.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public abstract Container IAnd(BitsetContainer x);
+        /**
+         * Computes the in-place bitwise AND of this container with another
+         * (intersection). The current container is generally modified, whereas
+         * the provided container (x) is unaffected. May generate a new
+         * container.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public abstract Container iand(BitsetContainer x);
 
-        /// <summary>
-        /// Computes the in-place bitwise AND of this container with another
-        /// (intersection). The current container is generally modified, whereas
-        /// the provided container (x) is unaffected. May generate a new container.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public Container IAnd(Container x)
+        /**
+         * Computes the in-place bitwise AND of this container with another
+         * (intersection). The current container is generally modified, whereas
+         * the provided container (x) is unaffected. May generate a new
+         * container.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public Container iand(Container x)
         {
             if (x is ArrayContainer)
-            {
-                return IAnd((ArrayContainer)x);
-            }
-            return IAnd((BitsetContainer)x);
+                return iand((ArrayContainer)x);
+            return iand((BitsetContainer)x);
         }
 
-        /// <summary>
-        /// Computes the in-place bitwise NOT of this container (complement). Only those bits within the
-        /// range are affected.The current container is generally modified.May generate a new container.
-        /// </summary>
-        /// <param name="start">beginning of range (inclusive); 0 is beginning of this container.</param>
-        /// <param name="end">ending of range (exclusive)</param>
-        /// <returns>(Partially) complemented container</returns>
-        public abstract Container INot(int start, int end);
-
-        /// <summary>
-        /// Returns true if the current container intersects the other container.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Whether they intersect</returns>
-        public bool Intersects(Container x)
+        /**
+         * Returns true if the current container intersects the other container.
+         *
+         * @param x other container
+         * @return whether they intersect
+         */
+        public bool intersects(Container x)
         {
             if (x is ArrayContainer)
-            {
-                return Intersects((ArrayContainer)x);
-            }
-            return Intersects((BitsetContainer)x);
+                return intersects((ArrayContainer)x);
+            return intersects((BitsetContainer)x);
         }
 
-        /// <summary>
-        /// Returns true if the current container intersects the other container.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Whether they intersect</returns>
-        public abstract bool Intersects(ArrayContainer x);
+        /**
+         * Returns true if the current container intersects the other container.
+         *
+         * @param x other container
+         * @return whether they intersect
+         */
+        public abstract bool intersects(ArrayContainer x);
 
-        /// <summary>
-        /// Returns true if the current container intersects the other container.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Whether they intersect</returns>
-        public abstract bool Intersects(BitsetContainer x);
+        /**
+         * Returns true if the current container intersects the other container.
+         *
+         * @param x other container
+         * @return whether they intersect
+          */
+        public abstract bool intersects(BitsetContainer x);
 
-        /// <summary>
-        /// Create a container initialized with a range of consecutive values.
-        /// </summary>
-        /// <param name="start">First index</param>
-        /// <param name="last">Last index</param>
-        /// <returns>A new container initialized with the specified values</returns>
-        /// <remarks>In the original lemire version, there is some optimization here
-        /// to choose between an ArrayContainer and a RunContainer based on serialized size.
-        /// For now, this has been stripped out and always uses an ArrayContainer.</remarks>
-        public static Container RangeOfOnes(ushort start, ushort last)
-        {
-            //TODO: Add in logic for RunContainers
-            Container answer = new ArrayContainer();
-            answer = answer.IAdd(start, last);
-            return answer;
-        }
 
-        /// <summary>
-        /// Add a short to the container if it is not present, otherwise remove it. May generate a new
-        /// container.
-        /// </summary>
-        /// <param name="x">short to be added</param>
-        /// <returns>the new container</returns>
-        public abstract Container Flip(ushort x);
+        /**
+ * Computes the in-place bitwise OR of this container with another
+ * (union). The current container is generally modified, whereas the
+ * provided container (x) is unaffected. May generate a new container.
+ *
+ * @param x other container
+ * @return aggregated container
+ */
+        public abstract Container ior(ArrayContainer x);
 
-        /// <summary>
-        /// Add all shorts in [begin,end) using an unsigned interpretation. May generate a new container.
-        /// </summary>
-        /// <param name="begin">Start of range</param>
-        /// <param name="end">End of range</param>
-        /// <returns>The new container</returns>
-        public abstract Container IAdd(ushort begin, ushort end);
+        /**
+         * Computes the in-place bitwise OR of this container with another
+         * (union). The current container is generally modified, whereas the
+         * provided container (x) is unaffected. May generate a new container.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public abstract Container ior(BitsetContainer x);
 
-        /// <summary>
-        /// Computes the in-place bitwise OR of this container with another
-        /// (union). The current container is generally modified, whereas the
-        /// provided container(x) is unaffected.May generate a new container.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public abstract Container IOr(ArrayContainer x);
-
-        /// <summary>
-        /// Computes the in-place bitwise OR of this container with another
-        /// (union). The current container is generally modified, whereas the
-        /// provided container(x) is unaffected.May generate a new container.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public abstract Container IOr(BitsetContainer x);
-
-        /// <summary>
-        /// Computes the in-place bitwise OR of this container with another
-        /// (union). The current container is generally modified, whereas the
-        /// provided container(x) is unaffected.May generate a new container.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public Container IOr(Container x)
+        /**
+ * Computes the in-place bitwise OR of this container with another
+ * (union). The current container is generally modified, whereas the
+ * provided container (x) is unaffected. May generate a new container.
+ *
+ * @param x other container
+ * @return aggregated container
+ */
+        public Container ior(Container x)
         {
             if (x is ArrayContainer)
-            {
-                return IOr((ArrayContainer)x);
-            }
-            return IOr((BitsetContainer)x);
+                return ior((ArrayContainer)x);
+            return ior((BitsetContainer)x);
         }
 
-        /// <summary>
-        /// Computes the bitwise OR of this container with another (union). This
-        /// container as well as the provided container are left unaffected.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public abstract Container Or(ArrayContainer x);
 
-        /// <summary>
-        /// Computes the bitwise OR of this container with another (union). This
-        /// container as well as the provided container are left unaffected.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public abstract Container Or(BitsetContainer x);
+        /**
+         * Computes the bitwise OR of this container with another (union). This
+         * container as well as the provided container are left unaffected.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public abstract Container or(ArrayContainer x);
 
-        /// <summary>
-        /// Computes the bitwise OR of this container with another (union). This
-        /// container as well as the provided container are left unaffected.
-        /// </summary>
-        /// <param name="x">Other container</param>
-        /// <returns>Aggregated container</returns>
-        public Container Or(Container x)
+        /**
+         * Computes the bitwise OR of this container with another (union). This
+         * container as well as the provided container are left unaffected.
+         *
+         * @param x other container
+         * @return aggregated container
+         */
+        public abstract Container or(BitsetContainer x);
+
+        /**
+ * Computes the bitwise OR of this container with another (union). This
+ * container as well as the provided container are left unaffected.
+ *
+ * @param x other container
+ * @return aggregated container
+ */
+        public Container or(Container x)
         {
             if (x is ArrayContainer)
-            {
-                return Or((ArrayContainer)x);
-            }
-            return Or((BitsetContainer)x);
+                return or((ArrayContainer)x);
+            return or((BitsetContainer)x);
         }
         
         /// <summary>
-        /// Remove specified short from this container. May create a new container.
+        /// Remove the short from this container. May create a new container.
         /// </summary>
-        /// <param name="x">Short to be removed</param>
-        /// <returns>The new container</returns>
-        public abstract Container Remove(ushort x);
+        /// <param name="x">to be removed</param>
+        /// <returns>the new container</returns>
+        public abstract Container remove(ushort x);
 
         /// <summary>
         /// Remove shorts in [begin,end) using an unsigned interpretation. May generate a new container.
         /// </summary>
-        /// <param name="begin">Start of range (inclusive)</param>
-        /// <param name="end">End of range (exclusive)</param>
-        /// <returns>The new container</returns>
-        public abstract Container Remove(ushort begin, ushort end);
+        /// <param name="begin">start of range (inclusive)</param>
+        /// <param name="end">end of range (exclusive)</param>
+        /// <returns>the new container</returns>
+        public abstract Container remove(ushort begin, ushort end);
 
-        /// <summary>
-        /// Return the jth value of the container.
-        /// </summary>
-        /// <param name="j">Index of the value </param>
-        /// <returns>The jth value of the container</returns>
-        public abstract ushort Select(int j);
+        /**
+         * Return the jth value 
+         * 
+         * @param j index of the value 
+         *
+         * @return the value
+         */
+        public abstract ushort select(int j);
+
 
         /// <summary>
         /// Serialize this container in a binary format.
@@ -354,7 +335,8 @@ namespace BitsetsNET
         public static Container Deserialize(System.IO.BinaryReader reader)
         {
             int cardinality = reader.ReadInt32();
-            if(cardinality < ArrayContainer.DEFAULT_MAX_SIZE)
+
+            if(cardinality <= ArrayContainer.DEFAULT_MAX_SIZE)
             {
                 return ArrayContainer.Deserialize(reader, cardinality);
             }

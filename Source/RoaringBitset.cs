@@ -16,29 +16,23 @@ namespace BitsetsNET
         public static RoaringBitset Create(int[] input)
         {
             RoaringBitset rb = new RoaringBitset();
-            foreach (int i in input)
-            {
-                rb.Add(i);
+            foreach (int i in input) {
+                rb.add(i);
             }
             return rb;
         }
 
-        /// <summary>
-        /// Adds the specified value to the current bitmap
-        /// </summary>
-        /// <param name="x">Value to be added</param>
-        public void Add(int x)
+        public void add(int x)
         {
             ushort highBits = Utility.GetHighBits(x);
-            int containerIndex = this.containers.GetIndex(highBits);
+            int containerIndex = containers.getIndex(highBits);
 
             if (containerIndex >= 0)
-            {
                 // a container exists at this index already.
                 // find the right container, get the low order bits to add to the container and add them
-                this.containers.SetContainerAtIndex(containerIndex, 
-                                                    this.containers.GetContainerAtIndex(containerIndex)
-                                                        .Add(Utility.GetLowBits(x)));
+            {
+                containers.setContainerAtIndex(containerIndex, containers.getContainerAtIndex(containerIndex).add(Utility.GetLowBits(x))
+                );
             }
             else
             {
@@ -46,22 +40,21 @@ namespace BitsetsNET
                 // create a new ArrayContainer, since it will only hold one integer to start
                 // get the low order bits and att to the newly created container
                 // add the newly created container to the array of containers
-                ArrayContainer ac = new ArrayContainer();
-                this.containers.InsertNewKeyValueAt(-containerIndex - 1, highBits, ac.Add(Utility.GetLowBits(x)));
+                ArrayContainer newac = new ArrayContainer();
+                containers.insertNewKeyValueAt(-containerIndex - 1, highBits, newac.add(Utility.GetLowBits(x)));
             }
+
         }
 
         /// <summary>
         /// Add to the current bitmap all integers in [rangeStart,rangeEnd).
         /// </summary>
-        /// <param name="rangeStart">Inclusive beginning of range</param>
-        /// <param name="rangeEnd">Exclusive ending of range</param>
-        public void Add(int rangeStart, int rangeEnd)
+        /// <param name="rangeStart">inclusive beginning of range</param>
+        /// <param name="rangeEnd">exclusive ending of range</param>
+        public void add(int rangeStart, int rangeEnd)
         {
             if (rangeStart >= rangeEnd)
-            {
                 return; // empty range
-            }
 
             ushort hbStart = Utility.GetHighBits(rangeStart);
             ushort lbStart = Utility.GetLowBits(rangeStart);
@@ -73,26 +66,22 @@ namespace BitsetsNET
 
                 // first container may contain partial range
                 ushort containerStart = 0;
-                if (hb == hbStart)
-                {
-                    containerStart = lbStart;
-                }
+                if (hb == hbStart) { containerStart = lbStart; }
 
                 // last container may contain partial range
                 ushort containerLast = (hb == hbLast) ? lbLast : ushort.MaxValue;
-                int containerIndex = this.containers.GetIndex(hb);
+                int containerIndex = containers.getIndex(hb);
 
                 if (containerIndex >= 0)
                 {
-                    Container c = this.containers.GetContainerAtIndex(containerIndex)
-                                                 .Add(containerStart, (ushort)(containerLast + 1));
-                    this.containers.SetContainerAtIndex(containerIndex, c);
+                    Container c = containers.getContainerAtIndex(containerIndex).add(
+                                   containerStart, (ushort)(containerLast + 1));
+                    containers.setContainerAtIndex(containerIndex, c);
                 }
-                else
-                {
-                    Container ac = new ArrayContainer(100);
-                    ac = ac.Add(lbStart, (ushort)(lbLast + 1));
-                    this.containers.InsertNewKeyValueAt(-containerIndex - 1, hb, ac);
+                else {
+                    Container newContainer = new ArrayContainer(100);
+                    newContainer = newContainer.add(lbStart, lbLast);
+                    containers.insertNewKeyValueAt(-containerIndex - 1, hb, newContainer);
                 }
             }
         }
@@ -102,12 +91,10 @@ namespace BitsetsNET
         /// </summary>
         /// <param name="rangeStart">inclusive beginning of range</param>
         /// <param name="rangeEnd">exclusive ending of range</param>
-        public void Remove(int rangeStart, int rangeEnd)
+        public void remove(int rangeStart, int rangeEnd)
         {
             if (rangeStart >= rangeEnd)
-            {
                 return; // empty range
-            }
 
             ushort hbStart = Utility.GetHighBits(rangeStart);
             ushort lbStart = Utility.GetLowBits(rangeStart);
@@ -116,46 +103,38 @@ namespace BitsetsNET
 
             if (hbStart == hbLast)
             {
-                int containerIndex = containers.GetIndex(hbStart);
+                int containerIndex = containers.getIndex(hbStart);
 
-                if (containerIndex < 0)
-                {
-                    return;
-                }
+                if (containerIndex < 0) return;
 
-                Container c = containers.GetContainerAtIndex(containerIndex)
-                                        .Remove(lbStart, (ushort)(lbLast + 1));
+                Container c = containers.getContainerAtIndex(containerIndex).remove(
+                        lbStart, (ushort)(lbLast + 1));
 
-                if (c.GetCardinality() > 0)
-                {
-                    containers.SetContainerAtIndex(containerIndex, c);
-                }
+                if (c.getCardinality() > 0)
+                    containers.setContainerAtIndex(containerIndex, c);
                 else
-                {
-                    containers.RemoveAtIndex(containerIndex);
-                }
+                    containers.removeAtIndex(containerIndex);
                 return;
             }
 
-            int ifirst = containers.GetIndex(hbStart);
-            int ilast = containers.GetIndex(hbLast);
+            int ifirst = containers.getIndex(hbStart);
+            int ilast = containers.getIndex(hbLast);
 
             if (ifirst >= 0)
             {
                 if (lbStart != 0)
                 {
-                    Container c = containers.GetContainerAtIndex(ifirst)
-                                            .Remove(lbStart, ushort.MaxValue);
+                    Container c = containers.getContainerAtIndex(ifirst).remove(
+                             lbStart, ushort.MaxValue);
 
-                    if (c.GetCardinality() > 0)
+                    if (c.getCardinality() > 0)
                     {
-                        containers.SetContainerAtIndex(ifirst, c);
+                        containers.setContainerAtIndex(ifirst, c);
                         ifirst++;
                     }
                 }
             }
-            else
-            {
+            else {
                 ifirst = -ifirst - 1;
             }
 
@@ -163,63 +142,50 @@ namespace BitsetsNET
             {
                 if (lbLast != ushort.MaxValue)
                 {
-                    Container c = containers.GetContainerAtIndex(ilast)
-                                            .Remove(0, (ushort)(lbLast + 1));
+                    Container c = containers.getContainerAtIndex(ilast).remove(
+                            0, (ushort)(lbLast + 1));
 
-                    if (c.GetCardinality() > 0)
+                    if (c.getCardinality() > 0)
                     {
-                        containers.SetContainerAtIndex(ilast, c);
+                        containers.setContainerAtIndex(ilast, c);
                     }
-                    else
-                    {
-                        ilast++;
-                    }
+                    else ilast++;
                 }
-                else
-                {
-                    ilast++;
-                }
+                else ilast++;
             }
-            else
-            {
+            else {
                 ilast = -ilast - 1;
             }
 
-            containers.RemoveIndexRange(ifirst, ilast);
+            containers.removeIndexRange(ifirst, ilast);
         }
 
-        public static RoaringBitset And(RoaringBitset x1, RoaringBitset x2)
+        public static RoaringBitset and(RoaringBitset x1,
+                                        RoaringBitset x2)
         {
             RoaringBitset answer = new RoaringBitset();
-            int length1 = x1.containers.Size, length2 = x2.containers.Size;
+            int length1 = x1.containers.size, length2 = x2.containers.size;
             int pos1 = 0, pos2 = 0;
 
-            while (pos1 < length1 && pos2 < length2)
-            {
-                ushort s1 = x1.containers.GetKeyAtIndex(pos1);
-                ushort s2 = x2.containers.GetKeyAtIndex(pos2);
+            while (pos1 < length1 && pos2 < length2) {
+                ushort s1 = x1.containers.getKeyAtIndex(pos1);
+                ushort s2 = x2.containers.getKeyAtIndex(pos2);
 
-                if (s1 == s2)
-                {
-                    Container c1 = x1.containers.GetContainerAtIndex(pos1);
-                    Container c2 = x2.containers.GetContainerAtIndex(pos2);
-                    Container c = c1.And(c2);
+                if (s1 == s2) {
+                    Container c1 = x1.containers.getContainerAtIndex(pos1);
+                    Container c2 = x2.containers.getContainerAtIndex(pos2);
+                    Container c = c1.and(c2);
 
-                    if (c.GetCardinality() > 0)
-                    {
-                        answer.containers.Append(s1, c);
+                    if (c.getCardinality() > 0) {
+                        answer.containers.append(s1, c);
                     }
 
                     ++pos1;
                     ++pos2;
-                }
-                else if (s1 < s2) // s1 < s2
-                { 
-                    pos1 = x1.containers.AdvanceUntil(s2, pos1);
-                }
-                else // s1 > s2
-                { 
-                    pos2 = x2.containers.AdvanceUntil(s1, pos2);
+                } else if (s1 < s2 ) { // s1 < s2
+                    pos1 = x1.containers.advanceUntil(s2, pos1);
+                } else { // s1 > s2
+                    pos2 = x2.containers.advanceUntil(s1, pos2);
                 }
             }
             return answer;
@@ -229,26 +195,25 @@ namespace BitsetsNET
         /// Performs an in-place intersection of two Roaring Bitsets.
         /// </summary>
         /// <param name="other">the second Roaring Bitset to intersect</param>
-        private void AndWith(RoaringBitset other)
+        private void andWith(RoaringBitset other)
         {
-            int thisLength = this.containers.Size;
-            int otherLength = other.containers.Size;
+            int length1 = this.containers.size, length2 = other.containers.size;
             int pos1 = 0, pos2 = 0, intersectionSize = 0;
 
-            while (pos1 < thisLength && pos2 < otherLength)
+            while (pos1 < length1 && pos2 < length2)
             {
-                ushort s1 = this.containers.GetKeyAtIndex(pos1);
-                ushort s2 = other.containers.GetKeyAtIndex(pos2);
+                ushort s1 = this.containers.getKeyAtIndex(pos1);
+                ushort s2 = other.containers.getKeyAtIndex(pos2);
 
                 if (s1 == s2)
                 {
-                    Container c1 = this.containers.GetContainerAtIndex(pos1);
-                    Container c2 = other.containers.GetContainerAtIndex(pos2);
-                    Container c = c1.IAnd(c2);
+                    Container c1 = this.containers.getContainerAtIndex(pos1);
+                    Container c2 = other.containers.getContainerAtIndex(pos2);
+                    Container c = c1.iand(c2);
 
-                    if (c.GetCardinality() > 0)
+                    if (c.getCardinality() > 0)
                     {
-                        this.containers.ReplaceKeyAndContainerAtIndex(intersectionSize++, s1, c);
+                        this.containers.replaceKeyAndContainerAtIndex(intersectionSize++, s1, c);
                     }
                         
                     ++pos1;
@@ -256,44 +221,127 @@ namespace BitsetsNET
                 }
                 else if (s1 < s2)
                 { // s1 < s2
-                    pos1 = this.containers.AdvanceUntil(s2, pos1);
+                    pos1 = this.containers.advanceUntil(s2, pos1);
                 }
                 else
                 { // s1 > s2
-                    pos2 = other.containers.AdvanceUntil(s1, pos2);
+                    pos2 = other.containers.advanceUntil(s1, pos2);
                 }
             }
-            this.containers.Resize(intersectionSize);
+            this.containers.resize(intersectionSize);
         }
 
-        public int Select(int j)
+        public static RoaringBitset difference(RoaringBitset x1,
+                                                RoaringBitset x2)
+        {
+            RoaringBitset answer = new RoaringBitset();
+            int length1 = x1.containers.size, length2 = x2.containers.size;
+            int pos1 = 0, pos2 = 0;
+
+            while (pos1 < length1 && pos2 < length2) {
+                ushort s1 = x1.containers.getKeyAtIndex(pos1);
+                ushort s2 = x2.containers.getKeyAtIndex(pos2);
+
+                if (s1 == s2) {
+                    Container c1 = x1.containers.getContainerAtIndex(pos1);
+                    Container c2 = x2.containers.getContainerAtIndex(pos2);
+                    Container c = c1.difference(c2);
+
+                    if (c.getCardinality() > 0) {
+                        answer.containers.append(s1, c);
+                    }
+
+                    ++pos1;
+                    ++pos2;
+                } else if (s1 < s2 ) { // s1 < s2
+                    Container c1 = x1.containers.getContainerAtIndex(pos1);
+                    if (c1.getCardinality() > 0) {
+                        Container c = c1.clone();
+                        answer.containers.append(s1, c);
+                    }
+                    ++pos1;
+                } else { // s1 > s2
+                    pos2 = x2.containers.advanceUntil(s1, pos2);
+                }
+            }
+
+            // Handle the case where we finish searching set2 before set1 or set2 is empty
+            while(pos1 < length1)
+            {
+                // All remaining elements in set1 are not in set2 so we copy them to the result
+                // in the case where set 2 was empty, this means copy everything to the result.
+                ushort s1 = x1.containers.getKeyAtIndex(pos1);
+                Container c = x1.containers.getContainerAtIndex(pos1);
+                if (c.getCardinality() > 0)
+                {
+                    answer.containers.append(s1, c);
+                }
+
+                ++pos1;
+            }
+
+            return answer;
+        }
+
+        public static bool overlaps(RoaringBitset x1,
+                                    RoaringBitset x2)
+        {
+            int length1 = x1.containers.size, length2 = x2.containers.size;
+            int pos1 = 0, pos2 = 0;
+
+            while (pos1 < length1 && pos2 < length2) {
+                ushort s1 = x1.containers.getKeyAtIndex(pos1);
+                ushort s2 = x2.containers.getKeyAtIndex(pos2);
+
+                if (s1 == s2) {
+                    Container c1 = x1.containers.getContainerAtIndex(pos1);
+                    Container c2 = x2.containers.getContainerAtIndex(pos2);
+
+                    if (c1.overlaps(c2))
+                        return true;
+
+                    ++pos1;
+                    ++pos2;
+                } else if (s1 < s2 ) { // s1 < s2
+                    pos1 = x1.containers.advanceUntil(s2, pos1);
+                } else { // s1 > s2
+                    pos2 = x2.containers.advanceUntil(s1, pos2);
+                }
+            }
+            return false;
+        }
+
+        public override bool Equals(Object o)
+        {
+            if (o is RoaringBitset) {
+                RoaringBitset srb = (RoaringBitset) o;
+                return srb.containers.Equals(this.containers);
+            }
+            return false;
+        }
+
+        public int select(int j)
         {
             int leftover = j;
-            for (int i = 0; i < this.containers.Size; i++)
+            for (int i = 0; i < this.containers.size; i++)
             {
-                Container c = this.containers.GetContainerAtIndex(i);
-                int thisCardinality = c.GetCardinality();
-                if (thisCardinality > leftover)
+                Container c = this.containers.getContainerAtIndex(i);
+                int thiscard = c.getCardinality();
+                if (thiscard > leftover)
                 {
-                    uint keycontrib = (uint) this.containers.GetKeyAtIndex(i) << 16;
-                    uint lowcontrib = (uint) c.Select(leftover);
+                    uint keycontrib = (uint) this.containers.getKeyAtIndex(i) << 16;
+                    uint lowcontrib = (uint) c.select(leftover);
                     return (int) (lowcontrib + keycontrib);
                 }
-                leftover -= thisCardinality;
+                leftover -= thiscard;
             }
             throw new ArgumentOutOfRangeException("select " + j + " when the cardinality is " + this.Cardinality());
         }
-
-        /// <summary>
-        /// Creates a new bitset that is the bitwise AND of this bitset with another
-        /// </summary>
-        /// <param name="otherSet">Other bitset</param>
-        /// <returns>A new roaring bitset</returns>
+        
         public IBitset And(IBitset otherSet)
         {
-            if (otherSet is RoaringBitset)
-            {
-                return And(this, (RoaringBitset)otherSet);
+            if (otherSet is RoaringBitset) {
+                return and(this, (RoaringBitset)otherSet);
             }
             throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitset");
         }
@@ -306,7 +354,7 @@ namespace BitsetsNET
         {
             if (otherSet is RoaringBitset)
             {
-                AndWith((RoaringBitset)otherSet);
+                andWith((RoaringBitset)otherSet);
             }
             else
             {
@@ -314,128 +362,104 @@ namespace BitsetsNET
             }
         }
 
-        /// <summary>
-        /// Create a new bitset that is a deep copy of this one.
-        /// </summary>
-        /// <returns>The cloned bitset</returns>
         public IBitset Clone()
         {
             RoaringBitset x = new RoaringBitset();
-            x.containers = containers.Clone();
+            x.containers = containers.clone();
             return x;
         }
 
-        /// <summary>
-        /// Creates a new bitset that is the bitwise OR of this bitset with another
-        /// </summary>
-        /// <param name="otherSet">Other bitset</param>
-        /// <returns>A new IBitset</returns>
         public IBitset Or(IBitset otherSet)
         {
             if (!(otherSet is RoaringBitset))
-            {
                 throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitSet");
-            }
             
             RoaringBitset answer = new RoaringBitset();
             RoaringBitset x2 = (RoaringBitset) otherSet;
 
             int pos1 = 0, pos2 = 0;
-            int thisSize = this.containers.Size;
-            int otherSetSize = x2.containers.Size;
+            int length1 = this.containers.size, length2 = x2.containers.size;
 
-            if (pos1 < thisSize && pos2 < otherSetSize)
-            {
-                ushort s1 = this.containers.GetKeyAtIndex(pos1);
-                ushort s2 = x2.containers.GetKeyAtIndex(pos2);
+            if (pos1 < length1 && pos2 < length2) {
+                ushort s1 = this.containers.getKeyAtIndex(pos1);
+                ushort s2 = x2.containers.getKeyAtIndex(pos2);
 
-                while (true)
-                {
-                    if (s1 == s2)
-                    {
-                        Container newContainer = this.containers.GetContainerAtIndex(pos1)
-                                                     .Or(x2.containers.GetContainerAtIndex(pos2));
-                        answer.containers.Append(s1, newContainer);
+                while (true) {
+                    if (s1 == s2) {
+                        answer.containers.append(
+                            s1, 
+                            this.containers.getContainerAtIndex(pos1).or(
+                                x2.containers.getContainerAtIndex(pos2)
+                            )
+                        );
                         pos1++;
                         pos2++;
-                        if ((pos1 == thisSize) || (pos2 == otherSetSize))
-                        {
+                        if ((pos1 == length1) || (pos2 == length2)) {
                             break;
                         }
-                        s1 = this.containers.GetKeyAtIndex(pos1);
-                        s2 = x2.containers.GetKeyAtIndex(pos2);
-                    }
-                    else if (s1 < s2)
-                    {
-                        answer.containers.AppendCopy(this.containers, pos1);
+                        s1 = this.containers.getKeyAtIndex(pos1);
+                        s2 = x2.containers.getKeyAtIndex(pos2);
+                    } else if (s1 < s2) {
+                        answer.containers.appendCopy(this.containers, pos1);
                         pos1++;
-                        if (pos1 == thisSize)
-                        {
+                        if (pos1 == length1) {
                             break;
                         }
-                        s1 = this.containers.GetKeyAtIndex(pos1);
-                    }
-                    else // s1 > s2
-                    { 
-                        answer.containers.AppendCopy(x2.containers, pos2);
+                        s1 = this.containers.getKeyAtIndex(pos1);
+                    } else { // s1 > s2
+                        answer.containers.appendCopy(x2.containers, pos2);
                         pos2++;
-                        if (pos2 == otherSetSize)
-                        {
+                        if (pos2 == length2) {
                             break;
                         }
-                        s2 = x2.containers.GetKeyAtIndex(pos2);
+                        s2 = x2.containers.getKeyAtIndex(pos2);
                     }
                 }
             }
 
-            if (pos1 == thisSize)
-            {
-                answer.containers.AppendCopy(x2.containers, pos2, otherSetSize);
-            }
-            else if (pos2 == otherSetSize)
-            {
-                answer.containers.AppendCopy(this.containers, pos1, thisSize);
+            if (pos1 == length1) {
+                answer.containers.appendCopy(x2.containers, pos2, length2);
+            } else if (pos2 == length2) {
+                answer.containers.appendCopy(this.containers, pos1, length1);
             }
 
             return answer;
         }
 
-        /// <summary>
-        /// Computes the in-place bitwise OR of this bitset with another
-        /// </summary>
-        /// <param name="otherSet">Other bitset</param>
         public void OrWith(IBitset otherSet)
         {
             if (!(otherSet is RoaringBitset))
-            {
                 throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitSet");
-            }
+
 
             RoaringBitset x2 = (RoaringBitset)otherSet;
 
             int pos1 = 0, pos2 = 0;
-            int length1 = this.containers.Size, length2 = x2.containers.Size;
+            int length1 = this.containers.size, length2 = x2.containers.size;
 
             if (pos1 < length1 && pos2 < length2)
             {
-                ushort s1 = this.containers.GetKeyAtIndex(pos1);
-                ushort s2 = x2.containers.GetKeyAtIndex(pos2);
+                ushort s1 = this.containers.getKeyAtIndex(pos1);
+                ushort s2 = x2.containers.getKeyAtIndex(pos2);
 
                 while (true)
                 {
                     if (s1 == s2)
                     {
-                        Container newContainer = this.containers.GetContainerAtIndex(pos1)
-                                                     .IOr(x2.containers.GetContainerAtIndex(pos2));
-                        this.containers.SetContainerAtIndex(pos1,newContainer);
+                        this.containers.setContainerAtIndex(
+                            pos1,
+                            this.containers.getContainerAtIndex(pos1).ior(
+                                x2.containers.getContainerAtIndex(pos2)
+                            )
+                        );
                         pos1++;
                         pos2++;
                         if ((pos1 == length1) || (pos2 == length2))
                         {
                             break;
                         }
-                        s1 = this.containers.GetKeyAtIndex(pos1);
-                        s2 = x2.containers.GetKeyAtIndex(pos2);
+                        s1 = this.containers.getKeyAtIndex(pos1);
+                        s2 = x2.containers.getKeyAtIndex(pos2);
                     }
                     else if (s1 < s2)
                     {
@@ -444,11 +468,11 @@ namespace BitsetsNET
                         {
                             break;
                         }
-                        s1 = this.containers.GetKeyAtIndex(pos1);
+                        s1 = this.containers.getKeyAtIndex(pos1);
                     }
                     else
                     { // s1 > s2
-                        this.containers.InsertNewKeyValueAt(pos1, s2, x2.containers.GetContainerAtIndex(pos2));
+                        this.containers.insertNewKeyValueAt(pos1, s2, x2.containers.getContainerAtIndex(pos2));
                         pos1++;
                         length1++;
                         pos2++;
@@ -456,34 +480,29 @@ namespace BitsetsNET
                         {
                             break;
                         }
-                        s2 = x2.containers.GetKeyAtIndex(pos2);
+                        s2 = x2.containers.getKeyAtIndex(pos2);
                     }
                 }
             }
 
             if (pos1 == length1)
             {
-                this.containers.AppendCopy(x2.containers, pos2, length2);
+                this.containers.appendCopy(x2.containers, pos2, length2);
             } 
         }
 
-        /// <summary>
-        /// Return whether the given index is a member of this set
-        /// </summary>
-        /// <param name="index">the index to test</param>
-        /// <returns>True if the index is a member of this set</returns>
         public bool Get(int index)
         {
             ushort highBits = Utility.GetHighBits(index);
-            int containerIndex = containers.GetIndex(highBits);
+            int containerIndex = containers.getIndex(highBits);
 
             // a container exists at this index already.
             // find the right container, get the low order bits to add to the 
             // container and add them
             if (containerIndex >= 0)
             {
-                return containers.GetContainerAtIndex(containerIndex)
-                                 .Contains(Utility.GetLowBits(index));
+                return containers.getContainerAtIndex(containerIndex).contains(
+                    Utility.GetLowBits(index));
             }
             else
             {
@@ -496,294 +515,70 @@ namespace BitsetsNET
         /// Adds the current index to the set if value is true, otherwise 
         /// removes it if the set contains it.
         /// </summary>
-        /// <param name="index">The index to set</param>
-        /// <param name="value">Boolean of whether to add or remove the index</param>
+        /// <param name="index">
+        /// the index to set
+        /// </param>
+        /// <param name="value">
+        /// boolean of whether to add or remove the index
+        /// </param>
         public void Set(int index, bool value)
         {
             if (value)
             {
-                Add(index);
-            }
-            else
-            { 
+                add(index);
+            } else { 
                 ushort hb = Utility.GetHighBits(index);
-                int containerIndex = containers.GetIndex(hb);
+                int containerIndex = containers.getIndex(hb);
 
                 if (containerIndex > -1)
                 {
-                    Container updatedContainer = containers.GetContainerAtIndex(containerIndex)
-                                                           .Remove(Utility.GetLowBits(index));
-                    containers.SetContainerAtIndex(containerIndex, updatedContainer);
+                    Container updatedContainer = 
+                        containers.getContainerAtIndex(containerIndex).remove(
+                            Utility.GetLowBits(index)
+                        );
+                    containers.setContainerAtIndex(containerIndex, updatedContainer);
                 }
             }
         }
 
-        /// <summary>
-        /// For indices in the range [start, end) add the index to the set if
-        /// the value is true, otherwise remove it.
-        /// </summary>
-        /// <param name="start">the index to start from (inclusive)</param>
-        /// <param name="end">the index to stop at (exclusive)</param>
         public void Set(int start, int end, bool value)
         {
             if (value)
             {
-                Add(start, end);
-            }
-            else
+                add(start, end);
+            } else
             {
-                Remove(start, end);
+                remove(start, end);
             }
         }
-
-        /// <summary>
-        /// The number of members of the set
-        /// </summary>
-        /// <returns>an integer for the number of members in the set</returns>
-        public int Cardinality()
+        
+        public void Flip(int index)
         {
-            int size = 0;
-            for (int i = 0; i < this.containers.Size; i++)
-            {
-                size += this.containers.GetContainerAtIndex(i).GetCardinality();
-            }
-            return size;
+            throw new NotImplementedException();
         }
-
-        /// <summary>
-        /// If the given index is not in the set add it, otherwise remove it.
-        /// </summary>
-        /// <param name="index">The index to flip</param>
-        public void Flip(int x)
-        {
-            ushort hb = Utility.GetHighBits(x);
-            int i = containers.GetIndex(hb);
-
-            if (i >= 0)
-            {
-                Container c = containers.GetContainerAtIndex(i).Flip(Utility.GetLowBits(x));
-                if (c.GetCardinality() > 0)
-                {
-                    containers.SetContainerAtIndex(i, c);
-                }
-                else
-                {
-                    containers.RemoveAtIndex(i);
-                }
-            }
-            else
-            {
-                ArrayContainer newac = new ArrayContainer();
-                containers.InsertNewKeyValueAt(-i - 1, hb, newac.Add(Utility.GetLowBits(x)));
-            }
-        }
-
-        /// <summary>
-        /// For indices in the range [start, end) add the index to the set if
-        /// it does not exists, otherwise remove it.
-        /// </summary>
-        /// <param name="start">the index to start from (inclusive)</param>
-        /// <param name="end">the index to stop at (exclusive)</param>
-        public void Flip(int start, int end)
-        {
-            if (start >= end)
-            {
-                return; // empty range
-            }
-
-            // Separate out the ranges of higher and lower-order bits
-            int hbStart = Utility.ToIntUnsigned(Utility.GetHighBits(start));
-            int lbStart = Utility.ToIntUnsigned(Utility.GetLowBits(start));
-            int hbLast = Utility.ToIntUnsigned(Utility.GetHighBits(end - 1));
-            int lbLast = Utility.ToIntUnsigned(Utility.GetLowBits(end - 1));
-
-            for (int hb = hbStart; hb <= hbLast; hb++)
-            {
-                // first container may contain partial range
-                int containerStart = (hb == hbStart) ? lbStart : 0;
-                // last container may contain partial range
-                int containerLast = (hb == hbLast) ? lbLast : Utility.GetMaxLowBitAsInteger();
-                int i = containers.GetIndex((ushort)hb);
-
-                if (i >= 0)
-                {
-                    Container c = containers.GetContainerAtIndex(i)
-                                            .INot(containerStart, containerLast + 1);
-                    if (c.GetCardinality() > 0)
-                    {
-                        containers.SetContainerAtIndex(i, c);
-                    }
-                    else
-                    {
-                        containers.RemoveAtIndex(i);
-                    }
-                }
-                else
-                {
-                    containers.InsertNewKeyValueAt(-i - 1, (ushort)hb,
-                        Container.RangeOfOnes((ushort) containerStart, (ushort) (containerLast + 1)));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Finds members of a bitset that are not in the other set (ANDNOT).
-        /// This does not modify either bitset.
-        /// </summary>
-        /// <param name="otherSet">The set to compare against</param>
-        /// <returns>A new IBitset containing the members that are in
-        /// the first bitset but not in the second.</returns>
-        public IBitset AndNot(RoaringBitset otherSet)
-        {
-
-            RoaringBitset answer = new RoaringBitset();
-            int pos1 = 0, pos2 = 0;
-            int length1 = containers.Size, length2 = otherSet.containers.Size;
-
-            while (pos1 < length1 && pos2 < length2)
-            {
-                ushort s1 = containers.GetKeyAtIndex(pos1);
-                ushort s2 = otherSet.containers.GetKeyAtIndex(pos2);
-                if (s1 == s2)
-                {
-                    Container c1 = containers.GetContainerAtIndex(pos1);
-                    Container c2 = otherSet.containers.GetContainerAtIndex(pos2);
-                    Container c = c1.AndNot(c2);
-                    if (c.GetCardinality() > 0)
-                    {
-                        answer.containers.Append(s1, c);
-                    }
-                    ++pos1;
-                    ++pos2;
-                }
-                else if (Utility.CompareUnsigned(s1, s2) < 0)
-                { // s1 < s2
-                    int nextPos1 = containers.AdvanceUntil(s2, pos1);
-                    answer.containers.AppendCopy(containers, pos1, nextPos1);
-                    pos1 = nextPos1;
-                }
-                else
-                { // s1 > s2
-                    pos2 = otherSet.containers.AdvanceUntil(s1, pos2);
-                }
-            }
-            if (pos2 == length2)
-            {
-                answer.containers.AppendCopy(containers, pos1, length1);
-            }
-            return answer;
-        }
-
-        /// <summary>
-        /// Finds members of this bitset that are not in the other set (ANDNOT).
-        /// Modifies current bitset in place.
-        /// </summary>
-        /// <param name="otherSet">The set to compare against</param>
-        public void IAndNot(RoaringBitset otherSet)
-        {
-            int pos1 = 0, pos2 = 0, intersectionSize = 0;
-            int thisSize = containers.Size;
-            int otherSetSize = otherSet.containers.Size;
-
-            while (pos1 < thisSize && pos2 < otherSetSize)
-            {
-                ushort s1 = containers.GetKeyAtIndex(pos1);
-                ushort s2 = otherSet.containers.GetKeyAtIndex(pos2);
-                if (s1 == s2)
-                {
-                    Container c1 = containers.GetContainerAtIndex(pos1);
-                    Container c2 = otherSet.containers.GetContainerAtIndex(pos2);
-                    Container c = c1.IAndNot(c2);
-                    if (c.GetCardinality() > 0)
-                    {
-                        containers.ReplaceKeyAndContainerAtIndex(intersectionSize++, s1, c);
-                    }
-                    ++pos1;
-                    ++pos2;
-                }
-                else if (Utility.CompareUnsigned(s1, s2) < 0)
-                { // s1 < s2
-                    if (pos1 != intersectionSize)
-                    {
-                        Container c1 = containers.GetContainerAtIndex(pos1);
-                        containers.ReplaceKeyAndContainerAtIndex(intersectionSize, s1, c1);
-                    }
-                    ++intersectionSize;
-                    ++pos1;
-                }
-                else
-                { // s1 > s2
-                    pos2 = otherSet.containers.AdvanceUntil(s1, pos2);
-                }
-            }
-            if (pos1 < thisSize)
-            {
-                containers.CopyRange(pos1, thisSize, intersectionSize);
-                intersectionSize += thisSize - pos1;
-            }
-            containers.Resize(intersectionSize);
-        }
-
-        /// <summary>
-        /// Finds members of this bitset that are not in the other set (ANDNOT).
-        /// This does not modify either bitset.
-        /// </summary>
-        /// <param name="otherSet">The set to compare against</param>
-        /// <returns>A new IBitset containing the members that are in
-        /// this bitset but not in the other.</returns>
-        public IBitset Difference(IBitset otherSet)
-        {
-            if (otherSet is RoaringBitset)
-            {
-                return this.AndNot((RoaringBitset) otherSet);
-            }
-            throw new ArgumentOutOfRangeException("Other set must be a roaring bitset");      
-        }
-
-        /// <summary>
-        /// Finds members of this bitset that are not in the other set (ANDNOT).
-        /// Places the results in the current bitset (modifies in place).
-        /// </summary>
-        /// <param name="otherSet">The set to compare against</param>
-        /// <returns>A new IBitset containing the members that are in
-        /// this bitset but not in the other.</returns>
-        public void DifferenceWith(IBitset otherSet)
-        {
-            if (otherSet is RoaringBitset)
-            {
-                this.IAndNot((RoaringBitset)otherSet);
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException("Other set must be a roaring bitset");
-            }
-            
-        }
-
-        public override bool Equals(Object o)
-        {
-            if (o is RoaringBitset)
-            {
-                RoaringBitset srb = (RoaringBitset)o;
-                return srb.containers.Equals(this.containers);
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return containers.GetHashCode();
-        }
-
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
 
         }
 
-        public BitArray ToBitArray()
+        public int Cardinality()
         {
-            throw new NotImplementedException();
+            int size = 0;
+            for (int i = 0; i < this.containers.size; i++)
+            {
+                size += this.containers.getContainerAtIndex(i).getCardinality();
+            }
+            return size;
+        }
+
+        /// <inheritdoc />
+        public bool Overlaps(IBitset otherSet)
+        {
+            if (otherSet is RoaringBitset) {
+                return overlaps(this, (RoaringBitset)otherSet);
+            }
+            throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitset");
         }
 
         /// <summary>
@@ -829,6 +624,24 @@ namespace BitsetsNET
         public IEnumerator<int> GetEnumerator()
         {
             return containers.GetEnumerator();
+        }
+
+        public void Flip(int start, int end)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBitset Difference(IBitset otherSet)
+        {
+            if (otherSet is RoaringBitset) {
+                return difference(this, (RoaringBitset)otherSet);
+            }
+            throw new ArgumentOutOfRangeException("otherSet must be a RoaringBitset");
+        }
+
+        public BitArray ToBitArray()
+        {
+            throw new NotImplementedException();
         }
     }
 }

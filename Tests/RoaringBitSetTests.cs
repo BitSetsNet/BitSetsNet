@@ -10,35 +10,16 @@ namespace BitsetsNET.Tests
     [TestClass()]
     public class RoaringBitSetTests : BaseBitSetTests 
     {
-        protected override IBitset CreateSetFromIndices(int[] indices, int length)
+        protected override IBitset CreateSetFromIndicies(int[] indices, int length)
         {
             return RoaringBitset.Create(indices);
-        }
-
-        [TestMethod()]
-        public virtual void SerializationTest()
-        {
-            int TEST_SET_LENGTH = 10;
-            int[] indicies = SetGenerator.GetRandomArray(TEST_SET_LENGTH);
-            
-            RoaringBitset actual = (RoaringBitset)CreateSetFromIndices(indicies, TEST_SET_LENGTH);
-            RoaringBitset expected = null;
-
-            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
-            {
-                actual.Serialize(ms);
-                ms.Position = 0;
-                expected = RoaringBitset.Deserialize(ms);
-            }
-            
-            Assert.AreEqual(actual, expected);
         }
 
         [TestMethod()]
         public virtual void SetTrueLarge()
         {
             int[] set = SetGenerator.GetContiguousArray(9, 5009);
-            IBitset testSet = CreateSetFromIndices(set, 5000);
+            IBitset testSet = CreateSetFromIndicies(set, 5000);
             testSet.Set(8, true);
             bool expected = true;
             bool result = testSet.Get(8);
@@ -49,7 +30,7 @@ namespace BitsetsNET.Tests
         public virtual void SetFalseLarge()
         {
             int[] set = SetGenerator.GetContiguousArray(0, 5000);
-            IBitset testSet = CreateSetFromIndices(set, 5000);
+            IBitset testSet = CreateSetFromIndicies(set, 5000);
             testSet.Set(2, false);
             bool expected = false;
             bool result = testSet.Get(2);
@@ -60,7 +41,7 @@ namespace BitsetsNET.Tests
         public virtual void SetRangeTrueLargeTest()
         {
             int[] set = SetGenerator.GetContiguousArray(0, 5000);
-            IBitset testSet = CreateSetFromIndices(set, 5000);
+            IBitset testSet = CreateSetFromIndicies(set, 5000);
             testSet.Set(5007, 5009, true);
             bool expected = true;
             bool result = testSet.Get(8);
@@ -71,53 +52,198 @@ namespace BitsetsNET.Tests
         public virtual void SetRangeFalseLargeTest()
         {
             int[] set = SetGenerator.GetContiguousArray(0, 5000); ;
-            IBitset testSet = CreateSetFromIndices(set, 5000);
+            IBitset testSet = CreateSetFromIndicies(set, 5000);
             testSet.Set(1, 3, false);
             bool expected = false;
             bool result = testSet.Get(2);
             Assert.AreEqual(expected, result);
         }
 
+        /*
+         The roaring bit set stores 2 different types of containers. 
+         The switch is based primarily on size, Array (small) and Bitset (large).
+         We want to ensure logic works between large and small containers.
+        */
+
         [TestMethod()]
-        public virtual void DifferenceWithTest()
+        public virtual void VariedSizeOrTest()
         {
-            // Test arrayContainer-based sets
-            int[] set1 = { 1, 2, 3, 7 };
-            RoaringBitset testSet1 = RoaringBitset.Create(set1);
+            int largeSize = 100000;
+            int smallSize = 100;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(smallSize);
+            int[] result = first.Union(second).ToArray();
+            IBitset expected = CreateSetFromIndicies(result, largeSize);
+            IBitset actual = CreateSetFromIndicies(first, largeSize).Or(CreateSetFromIndicies(second, smallSize));
 
-            int[] set2 = { 1, 4, 7 };
-            RoaringBitset testSet2 = RoaringBitset.Create(set2);
+            Assert.AreEqual(expected, actual);
+        }
 
-            testSet1.DifferenceWith(testSet2);
+        [TestMethod()]
+        public virtual void LargeSetOrTest()
+        {
+            int largeSize = 100000;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(largeSize);
+            int[] result = first.Union(second).ToArray();
+            IBitset expected = CreateSetFromIndicies(result, largeSize);
+            IBitset actual = CreateSetFromIndicies(first, largeSize).Or(CreateSetFromIndicies(second, largeSize));
 
-            Assert.AreEqual(false, testSet1.Get(1));
-            Assert.AreEqual(true, testSet1.Get(3));
+            Assert.AreEqual(expected, actual);
+        }
 
-            // Test bitsetContainer-based sets
-            int[] set3 = SetGenerator.GetContiguousArray(0, 5000);
-            RoaringBitset testSet3 = RoaringBitset.Create(set3);
+        [TestMethod()]
+        public virtual void VariedSizeOrWithTest()
+        {
+            int largeSize = 100000;
+            int smallSize = 100;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(smallSize);
+            int[] result = first.Union(second).ToArray();
+            IBitset testSet = CreateSetFromIndicies(first, largeSize);
+            testSet.OrWith(CreateSetFromIndicies(second, smallSize));
 
-            int[] setExceptions = { 4 };
-            int[] set4 = SetGenerator.GetContiguousArrayWithExceptions(0, 5000, setExceptions);
-            RoaringBitset testSet4 = RoaringBitset.Create(set4);
+            Assert.AreEqual(CreateSetFromIndicies(result, largeSize), testSet);
+        }
 
-            // Reduce contiguous array to single value (4) via DifferenceWith
-            testSet3.DifferenceWith(testSet4);
+        [TestMethod()]
+        public virtual void LargeSetOrWithTest()
+        {
+            int largeSize = 100000;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(largeSize);
+            int[] result = first.Union(second).ToArray();
+            IBitset testSet = CreateSetFromIndicies(first, largeSize);
+            testSet.OrWith(CreateSetFromIndicies(second, largeSize));
 
-            Assert.AreEqual(false, testSet3.Get(2));
-            Assert.AreEqual(true, testSet3.Get(4));
+            Assert.AreEqual(CreateSetFromIndicies(result, largeSize), testSet);
+        }
 
-            // 
-            // Reduce testSet2 to 4 as well
-            testSet2.DifferenceWith(testSet4);
-            Assert.AreEqual(false, testSet2.Get(1));
-            Assert.AreEqual(true, testSet2.Get(4));
+        [TestMethod()]
+        public virtual void VariedSizeAndTest()
+        {
+            int largeSize = 100000;
+            int smallSize = 100;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(smallSize);
+            int[] result = first.Intersect(second).ToArray();
+            IBitset expected = CreateSetFromIndicies(result, largeSize);
+            IBitset actual = CreateSetFromIndicies(first, largeSize).And(CreateSetFromIndicies(second, smallSize));
 
-            // Remove contents of set1 from set4
-            testSet4.DifferenceWith(testSet1);
-            Assert.AreEqual(false, testSet4.Get(2));
-            Assert.AreEqual(true, testSet4.Get(6));
+            Assert.AreEqual(expected, actual);
+        }
 
+        [TestMethod()]
+        public virtual void LargeSetAndTest()
+        {
+            int largeSize = 100000;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(largeSize);
+            int[] result = first.Intersect(second).ToArray();
+            IBitset expected = CreateSetFromIndicies(result, largeSize);
+            IBitset actual = CreateSetFromIndicies(first, largeSize).And(CreateSetFromIndicies(second, largeSize));
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public virtual void VariedSizeAndWithTest()
+        {
+            int largeSize = 100000;
+            int smallSize = 100;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(smallSize);
+            int[] result = first.Intersect(second).ToArray();
+            IBitset testSet = CreateSetFromIndicies(first, largeSize);
+            testSet.AndWith(CreateSetFromIndicies(second, smallSize));
+
+            Assert.AreEqual(CreateSetFromIndicies(result, largeSize), testSet);
+        }
+
+        [TestMethod()]
+        public virtual void LargeSetAndWithTest()
+        {
+            int largeSize = 100000;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(largeSize);
+            int[] result = first.Intersect(second).ToArray();
+            IBitset testSet = CreateSetFromIndicies(first, largeSize);
+            testSet.AndWith(CreateSetFromIndicies(second, largeSize));
+
+            Assert.AreEqual(CreateSetFromIndicies(result, largeSize), testSet);
+        }
+
+        [TestMethod()]
+        public virtual void VariedSizeDifferenceTest()
+        {
+            int largeSize = 100000;
+            int smallSize = 100;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(smallSize);
+            int[] result = first.Except(second).ToArray();
+            IBitset expected = CreateSetFromIndicies(result, result.Length);
+            IBitset actual = CreateSetFromIndicies(first, largeSize).Difference(CreateSetFromIndicies(second, smallSize));
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public virtual void LargeSetDifferenceTest()
+        {
+            int largeSize = 100000;
+            int[] first = SetGenerator.GetRandomArray(largeSize);
+            int[] second = SetGenerator.GetRandomArray(largeSize);
+            int[] result = first.Except(second).ToArray();
+            IBitset expected = CreateSetFromIndicies(result, result.Length);
+            IBitset actual = CreateSetFromIndicies(first, largeSize).Difference(CreateSetFromIndicies(second, largeSize));
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public virtual void VariedSizeOverlapsWithSharedElementsTest()
+        {
+            int largeSize = 100000;
+            int smallSize = 100;
+            int[] first = SetGenerator.GetContiguousArray(50, largeSize + 50);
+            int[] second = SetGenerator.GetContiguousArray(0, smallSize);
+            bool actual = CreateSetFromIndicies(first, largeSize).Overlaps(CreateSetFromIndicies(second, smallSize));
+
+            Assert.IsTrue(actual);
+        }
+
+        [TestMethod()]
+        public virtual void LargeSetOverlapsWithSharedElementsTest()
+        {
+            int largeSize = 100000;
+            int[] first = SetGenerator.GetContiguousArray(50, largeSize + 50);
+            int[] second = SetGenerator.GetContiguousArray(0, largeSize);
+            bool actual = CreateSetFromIndicies(first, largeSize).Overlaps(CreateSetFromIndicies(second, largeSize));
+
+            Assert.IsTrue(actual);
+        }
+
+        [TestMethod()]
+        public virtual void VariedSizeOverlapsWithNoSharedElementsTest()
+        {
+            int largeSize = 100000;
+            int smallSize = 100;
+            int[] first = SetGenerator.GetContiguousArray(101, largeSize + 101);
+            int[] second = SetGenerator.GetContiguousArray(0, smallSize);
+            bool actual = CreateSetFromIndicies(first, largeSize).Overlaps(CreateSetFromIndicies(second, smallSize));
+
+            Assert.IsFalse(actual);
+        }
+
+        [TestMethod()]
+        public virtual void LargeSetOverlapsWithNoSharedElementsTest()
+        {
+            int largeSize = 100000;
+            int[] first = SetGenerator.GetContiguousArray(0, largeSize);
+            int[] second = SetGenerator.GetContiguousArray(largeSize + 1, largeSize * 2);
+            bool actual = CreateSetFromIndicies(first, largeSize).Overlaps(CreateSetFromIndicies(second, largeSize));
+
+            Assert.IsFalse(actual);
         }
     }
 }
