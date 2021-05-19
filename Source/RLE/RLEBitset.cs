@@ -658,17 +658,23 @@ namespace BitsetsNET
 
         public void Set(int start, int end, bool value)
         {
-            throw new NotImplementedException();
+            for (int i = start; i <= end; i++)
+            {
+                Set(i, value);
+            }
         }
 
         public void Flip(int index)
         {
-            throw new NotImplementedException();
+            Set(index, !Get(index));
         }
 
         public void Flip(int start, int end)
         {
-            throw new NotImplementedException();
+            for (int i = start; i <= end; i++)
+            {
+                Flip(i);
+            }
         }
 
         public BitArray ToBitArray()

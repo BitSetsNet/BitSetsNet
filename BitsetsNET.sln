@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitsetsNET", "Source\BitsetsNET.csproj", "{3EDD9484-BBBE-47E4-A783-0B99B51D253D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitsetsNET.Tests", "Tests\BitsetsNET.Tests.csproj", "{6D4A018C-E525-44FB-BBBB-4CB7FE9D2C49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitsetsNET.Tests", "BitsetsNET.Tests\BitsetsNET.Tests.csproj", "{6E67A14E-5099-4BD9-A32D-E72D514FF866}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{3EDD9484-BBBE-47E4-A783-0B99B51D253D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EDD9484-BBBE-47E4-A783-0B99B51D253D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EDD9484-BBBE-47E4-A783-0B99B51D253D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6D4A018C-E525-44FB-BBBB-4CB7FE9D2C49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6D4A018C-E525-44FB-BBBB-4CB7FE9D2C49}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6D4A018C-E525-44FB-BBBB-4CB7FE9D2C49}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6D4A018C-E525-44FB-BBBB-4CB7FE9D2C49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E67A14E-5099-4BD9-A32D-E72D514FF866}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E67A14E-5099-4BD9-A32D-E72D514FF866}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E67A14E-5099-4BD9-A32D-E72D514FF866}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E67A14E-5099-4BD9-A32D-E72D514FF866}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

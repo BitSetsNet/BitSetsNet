@@ -554,7 +554,7 @@ namespace BitsetsNET
         
         public void Flip(int index)
         {
-            throw new NotImplementedException();
+            Set(index, !Get(index));
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -628,7 +628,10 @@ namespace BitsetsNET
 
         public void Flip(int start, int end)
         {
-            throw new NotImplementedException();
+            for (int i = start; i <= end; i++)
+            {
+                Flip(i);
+            }
         }
 
         public IBitset Difference(IBitset otherSet)
