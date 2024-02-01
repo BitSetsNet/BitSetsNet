@@ -448,7 +448,7 @@ namespace BitsetsNET
                     }
                     else
                     { // s1 > s2
-                        this.containers.InsertNewKeyValueAt(pos1, s2, x2.containers.GetContainerAtIndex(pos2));
+                        this.containers.InsertNewKeyValueAt(pos1, s2, x2.containers.GetContainerAtIndex(pos2).Clone());
                         pos1++;
                         length1++;
                         pos2++;
